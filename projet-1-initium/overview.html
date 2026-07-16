@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport d'Architecture — Projet INITIUM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.625;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 3.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2.5rem;
+        }
+
+        .meta-badge {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            background: var(--accent-light);
+            padding: 0.35rem 0.75rem;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+
+        .lead {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 3.5rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+            border-left: 3px solid var(--accent);
+            padding-left: 0.75rem;
+        }
+
+        p {
+            color: var(--text);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* Grille de synthèse */
+        .executive-summary {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+
+        .executive-summary h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-item {
+            border-top: 2px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .summary-item.active {
+            border-top-color: var(--accent);
+        }
+
+        .summary-item span {
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .summary-item p {
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+            margin-bottom: 0;
+        }
+
+        .ascii-art {
+            background: #1c1c1e;
+            color: #e4e4e7;
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 2rem 0;
+            border: 1px solid #27272a;
+        }
+
+        /* Compétences valorisées */
+        .metric-list {
+            margin: 2rem 0;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border);
+            gap: 1.5rem;
+        }
+
+        .metric-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            min-width: 200px;
+        }
+
+        .metric-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: right;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .metric-row {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .metric-desc {
+                text-align: left;
+            }
+        }
+
+        footer {
+            margin-top: 6rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <nav class="back-nav">
+            <a href="index.html">← ACCUEIL PORTFOLIO</a>
+            <a href="mailto:kossi-christian.agbogan@ism.edu.sn">DEMANDER LE RAPPORT PDF →</a>
+        </nav>
+
+        <header>
+            <div class="meta-badge">RAPPORT TECHNIQUE &amp; ARCHITECTURE</div>
+            <h1>Projet INITIUM : Modélisation et Sécurisation d'une Infrastructure Critique</h1>
+            <p class="lead">
+                Rapport de conception d'une infrastructure d'importance vitale (ESIV) hautement résiliente, modélisée sur hyperviseur pour isoler les flux d'informations médicaux face aux risques d'espionnage et de ransomware.
+            </p>
+        </header>
+
+        <!-- Executive Summary pour les recruteurs pressés -->
+        <div class="executive-summary">
+            <h3>Fiche Synthétique du Projet</h3>
+            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                Ce projet simule le durcissement d'un réseau hospitalier plat hébergeant des données de santé critiques afin de bloquer les vecteurs d'attaque classiques par déplacement latéral.
+            </p>
+            <div class="summary-grid">
+                <div class="summary-item active">
+                    <span>Problématique</span>
+                    <p>Réseau plat, équipements IoT médicaux non chiffrés et Active Directory non sécurisé.</p>
+                </div>
+                <div class="summary-item active">
+                    <span>Solution</span>
+                    <p>Segmentation logique stricte (VLANs), filtrage d'état (pfSense) et durcissement de l'identité (GPO Active Directory).</p>
+                </div>
+                <div class="summary-item active">
+                    <span>Méthodologie</span>
+                    <p>Maquettage de précision (EVE-NG) et validation des politiques d'isolation par tests d'intrusion ciblés.</p>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <h2>Le Contexte : Analyse de la Surface d'Attaque</h2>
+            <p>
+                Dans un établissement de santé, l'infrastructure informatique est directement liée à la continuité des soins. Pourtant, l'audit initial a révélé des vulnérabilités critiques : des protocoles médicaux ouverts (<strong>DICOM</strong>, <strong>HL7</strong>) transitant en clair sur un réseau sans aucun cloisonnement.
+            </p>
+            <p>
+                Une simple compromission par hameçonnage (phishing) sur le poste d'un secrétaire médical offrait à un attaquant un accès direct et immédiat aux serveurs de fichiers d'identité (Active Directory) ou aux consoles de contrôle de dispositifs biomédicaux (scanners, respirateurs).
+            </p>
+        </section>
+
+        <section>
+            <h2>L'Architecture Proposée : Le Cloisonnement Défensif</h2>
+            <p>
+                La philosophie appliquée ici est celle de la <strong>défense en profondeur</strong> et du <strong>Zero-Trust</strong>. Ne pouvant pas totalement garantir l'étanchéité des postes clients face aux erreurs humaines, l'objectif est de limiter drastiquement l'aire de propagation d'un logiciel malveillant (Blast Radius).
+            </p>
+            
+            <div class="ascii-art">
+                  ┌──────────────────────────────────────────────┐
+                  │                 INTERNET (WAN)               │
+                  └───────────────────────┬──────────────────────┘
+                                          │ (Filtrage Périmétrique)
+                                          ▼
+                                   [ pfSense-FW ] (Pare-feu Centralisé & Routage)
+                                          │ (Trunk 802.1Q - VLANs Taggués)
+                                          ▼
+                                  [ Hosp-SW-01 ] (Commutateur de Distribution)
+                                          │
+       ┌────────────────────┬─────────────┴──────┬────────────────────┐
+       │ (Flux Interdits)   │ (Flux Interdits)   │ (Accès GPO)        │ (Flux Hyper-Restreints)
+       ▼                    ▼                    ▼                    ▼
+   VLAN 30              VLAN 10              VLAN 50              VLAN 60
+ [ Hosp-CL-01 ]       [ MEDIC Void ]       [ Hosp-BIO-01 ]      [ Hosp-AD-01 ]
+ (Postes Admin)       (Zone de Soins)      (IoT / Imagerie)     (Active Directory)</div>
+
+            <p>
+                Grâce à cette conception, toutes les communications inter-VLAN doivent passer par le pare-feu <b>pfSense</b>. Par défaut, <b>tout flux non explicitement autorisé est bloqué</b>. Un ransomware sur le VLAN 30 ne dispose d'aucune route ni d'aucun droit pour scanner ou rebondir vers le VLAN 50 (médical) ou 60 (système).
+            </p>
+        </section>
+
+        <section>
+            <h2>Livrables & Compétences d'Ingénierie Validées</h2>
+            <p>
+                Ce lab n'est pas une simple maquette théorique ; il représente la mise en œuvre de standards industriels d'ingénierie système et réseau :
+            </p>
+
+            <div class="metric-list">
+                <div class="metric-row">
+                    <div class="metric-title">Segmentation Réseau L2/L3</div>
+                    <div class="metric-desc">Configuration de trunks 802.1Q et de sous-interfaces sur pare-feu pfSense. Routage inter-VLAN contrôlé par des règles de filtrage dynamiques (Stateful).</div>
+                </div>
+                
+                <div class="metric-row">
+                    <div class="metric-title">Gestion de l'Identité & IAM</div>
+                    <div class="metric-desc">Déploiement d'un annuaire Windows Server Active Directory avec structuration en Unités d'Organisation (OU) pour cloisonner les droits d'administration.</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-title">Durcissement Système (Hardening)</div>
+                    <div class="metric-desc">Création de stratégies de groupe (GPO) restrictives : restriction des clés USB, exigences strictes de complexité des mots de passe, et limitation des privilèges locaux.</div>
+                </div>
+
+                <div class="metric-row">
+                    <div class="metric-title">Gestion d'Infrastructure (IaC)</div>
+                    <div class="metric-desc">Maquettage et déploiement de l'environnement sous EVE-NG, impliquant la gestion fine des images de virtualisation (QCOW2, permissions KVM, configuration réseau émulée).</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Pourquoi cette approche apporte de la valeur à une équipe</h2>
+            <p>
+                Ce projet démontre ma capacité à <b>analyser un besoin métier critique (la santé), en identifier les risques de sécurité majeurs (ransomwares, vols de données), et y apporter des solutions d'architecture concrètes et adaptées</b>.
+            </p>
+            <p>
+                En tant que futur architecte, j'apporte une méthodologie rigoureuse de déploiement et de documentation, la maîtrise des technologies clés de l'infrastructure d'entreprise (Cisco, pfSense, Active Directory), ainsi qu'une vision globale orientée vers la <b>résilience du système d'information</b>.
+            </p>
+        </section>
+
+        <section>
+            <h2>Évolution Future : Le Jalon SecOps</h2>
+            <p>
+                L'architecture réseau passive étant validée, le jalon suivant consiste à déployer une brique de <b>Détection Active (SOC)</b> :
+            </p>
+            <p>
+                Intégration d'un pare-feu de nouvelle génération (NGFW FortiGate), monitoring continu via le SIEM open source <strong>Wazuh</strong> pour centraliser les journaux de sécurité, et mise en place d'une politique de sauvegarde immuable contre les ransomwares.
+            </p>
+        </section>
+
+        <footer>
+            <p>Rapport d'Architecture — Christian AGBOGAN — Projet INITIUM 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

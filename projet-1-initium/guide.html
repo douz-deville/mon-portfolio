@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INITIUM — Guide Technique Pas-à-Pas Complet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --code-bg: #1c1c1e;
+            --code-text: #f4f4f5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.625;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .document-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            background: #f1f0ec;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .detail-item strong {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: #e5e5ea;
+            color: #1c1c1e;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            margin: 1.25rem 0;
+            border: 1px solid #27272a;
+        }
+
+        .warning-box {
+            background-color: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            background-color: #f1f0ec;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .ascii-art {
+            background: #1c1c1e;
+            color: #a1a1aa;
+            padding: 2rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 2rem 0;
+            border: 1px solid #27272a;
+        }
+
+        footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR À L'ACCUEIL</a>
+        </nav>
+
+        <header>
+            <div class="meta">Rapport d'ingénierie & Guide pas-à-pas complet</div>
+            <h1>INITIUM – Durcissement du Socle Réseau & Identité (Phase 1)</h1>
+            <div class="document-details">
+                <div class="detail-item"><strong>Auteur</strong>AGBOGAN Kossi Christian Daniel Esuté</div>
+                <div class="detail-item"><strong>Organisation</strong>CHR HEALTH-CENTER (ESIV)</div>
+                <div class="detail-item"><strong>Mise à jour</strong>16 Juillet 2026</div>
+                <div class="detail-item"><strong>Version</strong>1.1</div>
+            </div>
+        </header>
+
+        <section>
+            <h2>1. Contexte, Menaces & Objectifs</h2>
+            <p>À la suite d’un audit de sécurité, le Centre Hospitalier Régional HEALTH-CENTER a révélé des vulnérabilités structurelles majeures : absence de segmentation (réseau "plat"), présence de systèmes d'exploitation obsolètes non isolés, défaut de contrôle des accès administratifs et absence de traçabilité.</p>
+            <p>Le projet INITIUM pose les fondations d'un socle réseau et d'identité étanche et résilient. L'objectif est d'appliquer le principe du moindre privilège au niveau des flux et de l'annuaire avant l'intégration ultérieure d'outils de détection avancés.</p>
+
+            <h3>Projet 1 : "INITIUM – Durcissement du Socle Réseau & Identité"</h3>
+            <p>Cette première phase pose les fondations indispensables de la nouvelle infrastructure. Aucun outil de supervision ou de détection avancée n'est déployé à ce stade : on se concentre sur l'étanchéité et le contrôle des accès.</p>
+
+            <h3>Objectifs et Compétences Technique</h3>
+            <ul>
+                <li><strong>Sécurité Périmétrique et Routage Contrôlé :</strong> Segmenter un réseau plat par le déploiement d'un pare-feu open source (pfSense) et la configuration de réseaux virtuels (VLANs) étanches.</li>
+                <li><strong>Application du Principe du Moindre Privilège :</strong> Concevoir, documenter et appliquer une matrice de flux inter-VLAN stricte (blocage par défaut, autorisation exclusive de l'existant légitime).</li>
+                <li><strong>Centralisation et Durcissement de la Gestion des Identités (IAM) :</strong> Déployer un annuaire d'entreprise (Active Directory) sain, structuré par rôles métiers, et y appliquer des stratégies de sécurité restrictives via GPO (Group Policy Objects).</li>
+                <li><strong>Prise en compte des contraintes sectorielles (Santé) :</strong> Isoler concrètement le segment Biomédical sensible contenant des protocoles non chiffrés (DICOM/HL7), une problématique propre aux architectures hospitalières.</li>
+            </ul>
+
+            <div class="ascii-art">
+                  ┌──────────────────────────────────────────────┐
+                  │                 INTERNET (WAN)               │
+                  └───────────────────────┬──────────────────────┘
+                                          │ (vtnet0 - DHCP)
+                                          ▼
+                                   [ pfSense-FW ] (IP Admin: WAN / HTTPS 443)
+                                          │ (vtnet1 - Trunk)
+                                          ▼
+                                  [ Hosp-SW-01 ] (vIOS-L2)
+                                          │
+       ┌────────────────────┬─────────────┴──────┬────────────────────┐
+       │ (Gi0/2 - Access)   │ (Access)           │ (Access)           │ (Gi0/1 - Access)
+       ▼                    ▼                    ▼                    ▼
+   VLAN 30              VLAN 10              VLAN 50              VLAN 60
+ [ Hosp-CL-01 ]       [ MEDIC Void ]       [ Hosp-BIO-01 ]      [ Hosp-AD-01 ]
+ (ADMIN Subnet)       (MEDIC Subnet)       (BIOMED Subnet)      (SERVERS Subnet)</div>
+        </section>
+
+        <section>
+            <h2>2. Conception Logique (Cible Réseau)</h2>
+            <h3>2.1 Ajustement du Plan d'Adressage</h3>
+            <p>Pour la Phase 1, un plan d'adressage uniforme en /24 a été retenu pour l'ensemble des segments afin de valider fonctionnellement le routage et les mécanismes d'annuaire. L'implémentation de sous-réseaux plus restreints (/28, /27, /26) est reportée à la partie 2 du projet (voir Backlog).</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>VLAN</th>
+                        <th>Nom du Segment</th>
+                        <th>Bloc IP (CIDR)</th>
+                        <th>Plage d'Adresses</th>
+                        <th>Passerelle (pfSense)</th>
+                        <th>Usage final cible</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>10</strong></td>
+                        <td>MEDIC</td>
+                        <td>10.0.10.0/24</td>
+                        <td>10.0.10.1 - 10.0.10.253</td>
+                        <td>10.0.10.254</td>
+                        <td>Équipements de soin / Clinique (Vide en Phase 1)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>30</strong></td>
+                        <td>ADMIN</td>
+                        <td>10.0.30.0/24</td>
+                        <td>10.0.30.1 - 10.0.30.253</td>
+                        <td>10.0.30.254</td>
+                        <td>Postes administratifs et d'administration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>50</strong></td>
+                        <td>BIOMED</td>
+                        <td>10.0.50.0/24</td>
+                        <td>10.0.50.1 - 10.0.50.253</td>
+                        <td>10.0.50.254</td>
+                        <td>Dispositifs médicaux critiques (PACS/IRM)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>60</strong></td>
+                        <td>SERVERS</td>
+                        <td>10.0.60.0/24</td>
+                        <td>10.0.60.1 - 10.0.60.253</td>
+                        <td>10.0.60.254</td>
+                        <td>Contrôleurs de domaine, DNS, futurs serveurs SecOps</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>2.2 Périmètre Technique du Projet 1 (Sur EVE-NG)</h3>
+            <p>Pour valider techniquement ce socle sans surcharger les ressources physiques, le laboratoire se limitera aux briques suivantes :</p>
+            
+            <h4>Sécurité Périmétrique :</h4>
+            <ul>
+                <li>1x Instance pfSense unique (la Haute Disponibilité CARP sera traitée au Projet 2).</li>
+                <li>4x VLANs ciblés au lieu du modèle global.</li>
+            </ul>
+
+            <h4>Gestion de l'Identité & Systèmes :</h4>
+            <ul>
+                <li><strong>1x Contrôleur de Domaine (Windows Server 2022) :</strong> Rôle AD DS pour le domaine <code>health-center.com</code>. Création des Unités Organisationnelles (OU) médicales et administratives.</li>
+                <li><strong>GPO de durcissement initial :</strong> Stratégie de mots de passe forte, verrouillage automatique de session, blocage des périphériques de stockage amovibles (USB).</li>
+                <li><strong>1x Poste Client (Windows 10/11) :</strong> Placé dans le VLAN ADMIN, intégré au domaine, servant de témoin pour valider la descente des GPO et le routage.</li>
+                <li><strong>1x Équipement Biomédical Virtuel (Linux léger) :</strong> Placé dans le VLAN 50 pour valider l'étanchéité du réseau biomédical.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Étape 1 : Création du point d'accès externe (Cloud0)</h2>
+            <p>Avant de poser la moindre machine, nous devons créer la porte d'entrée qui relie le laboratoire au monde extérieur. Dans EVE-NG, cela se matérialise par un réseau de type "Nuage".</p>
+
+            <ol>
+                <li>Faisons un clic droit sur le quadrillage blanc d'EVE-NG ➜ Sélectionnons <strong>Network</strong>.</li>
+                <li>Dans la fenêtre de configuration qui s'ouvre :</li>
+                <ul>
+                    <li><strong>Name/Prefix :</strong> Effaçons le texte par défaut et tapons <code>WAN_Internet</code>.</li>
+                    <li><strong>Type :</strong> Choisir impérativement <code>Management(Cloud0)</code> dans le menu déroulant.</li>
+                </ul>
+                <li>Clique sur <strong>Save</strong>.</li>
+            </ol>
+
+            <p><strong>Pourquoi fait-on cela ?</strong><br>
+            Ce nuage <code>Management(Cloud0)</code> est directement relié à la première carte réseau (eth0) de EVE-NG, celle que nous avons configurée en mode NAT dans Virt-Manager. C'est ce nœud qui va accomplir deux rôles critiques : donner un accès Internet au pare-feu pour ses futures mises à jour, et permettre d'ouvrir l'interface graphique du pfSense depuis le navigateur du PC hôte.</p>
+        </section>
+
+        <section>
+            <h2>Étape 2 : Déploiement du nœud pfSense et câblage</h2>
+            <p>Maintenant que la porte de sortie existe, nous installons le pare-feu périmétrique.</p>
+
+            <ol>
+                <li><strong>Ajout du Node :</strong> Faire un clic droit sur le quadrillage ➜ <strong>Node</strong> ➜ Sélectionner <strong>pfSense</strong>. Laisser les paramètres par défaut (2 interfaces, RAM à 1024 ou 2048 MB) mais passer de 'telnet' à 'vnc' et cliquer sur <strong>Save</strong>.</li>
+                <li><strong>Câblage de la patte Internet :</strong> Survoler le pfSense pour attraper l'icône de prise orange, puis glisser le câble vers le nuage <code>WAN_Internet</code>. Dans la fenêtre qui s'ouvre, choisir impérativement l'interface <strong>em0</strong> du côté pfSense, et <strong>Cloud0</strong> du côté du nuage. Valider.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 3 : Initialisation dans la console pfSense</h2>
+            <p>Allumer le pfSense en faisant un double-clic dessus et ouvrir sa console textuelle. Laisser le système charger jusqu'à ce qu'il pose les questions d'attribution des cartes.</p>
+            <p>Voici la configuration exacte à saisir :</p>
+
+            <ul>
+                <li><strong>Should VLANs be set up now [y|n]?</strong> Répondre <strong>n</strong> (Non). Nous allons créer les VLANs proprement depuis l'interface web, ce sera beaucoup plus simple et visuel pour la suite.</li>
+                <li><strong>Enter the WAN interface name :</strong> Taper <strong>vtnet0</strong> et valider. (L'interface em0 devient ainsi officiellement la patte externe connectée à Internet).</li>
+                <li><strong>Enter the LAN interface name :</strong> Appuyer directement sur Entrée sans rien écrire. (C'est normal : nous n'affectons pas de LAN classique puisque nous allons découper l'interface em1 en plusieurs VLANs logiques par la suite).</li>
+                <li><strong>Do you want to proceed [y|n]?</strong> Taper <strong>y</strong> (Oui) et valider.</li>
+                <li><strong>Would you like to remove the LAN IP address and unload the interface now [y|n]?</strong> Taper <strong>y</strong> (Oui) et valider.</li>
+            </ul>
+            <p>Le pfSense va terminer son initialisation et afficher son menu principal. Sur la ligne de l'interface WAN (wan), il va indiquer l'adresse IP qu'il a récupérée (dans notre cas : <code>192.168.122.146/24</code>).</p>
+        </section>
+
+        <section>
+            <h2>Étape 4 : Premier accès à l'interface graphique (WebGUI)</h2>
+            <p>Une fois l'adresse IP WAN attribuée par l'hyperviseur, l'administration du pare-feu s'effectue depuis le navigateur web du poste hôte.</p>
+
+            <ol>
+                <li>Ouvrir un navigateur web sur le PC physique.</li>
+                <li>Saisir l'adresse IP obtenue par le pfSense dans la barre d'adresse (ex: <code>https://192.168.122.146</code>).</li>
+                <li>Ignorer l'avertissement de sécurité lié au certificat SSL auto-signé en cliquant sur Paramètres avancés puis sur Continuer vers le site.</li>
+                <li>Saisir les identifiants de connexion initiaux par défaut :
+                    <ul>
+                        <li>Username : <code>admin</code></li>
+                        <li>Password : <code>pfsense</code></li>
+                    </ul>
+                </li>
+                <li>Cliquer sur <strong>Sign In</strong>.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 5 : Configuration initiale via l'assistant (Wizard)</h2>
+            <p>Au premier accès, un assistant de configuration s'ouvre automatiquement pour structurer les paramètres système fondamentaux de l'infrastructure hospitalière.</p>
+
+            <h3>1. Identification et DNS du Système</h3>
+            <ul>
+                <li><strong>Hostname :</strong> Taper <code>pfsense-fw</code> (Nom réseau du pare-feu).</li>
+                <li><strong>Domain :</strong> Taper <code>health-center.lan</code> (Domaine de l'organisation, en évitant le TLD .local pour prévenir les conflits de protocoles mDNS/Apple).</li>
+                <li><strong>Primary DNS Server :</strong> Saisir <code>10.0.60.10</code> (Adresse IP planifiée pour le futur contrôleur de domaine Active Directory du VLAN 60, indispensable pour la résolution interne).</li>
+                <li><strong>Secondary DNS Server :</strong> Saisir <code>1.1.1.1</code> (Serveur DNS public pour maintenir la résolution externe en cas de maintenance du serveur interne).</li>
+                <li><strong>Override DNS :</strong> Décocher la case pour interdire au DHCP d'EVE-NG d'écraser ces paramètres statiques.</li>
+                <li>Cliquer sur <strong>Next</strong>.</li>
+            </ul>
+
+            <h3>2. Synchronisation Horaire (NTP)</h3>
+            <ul>
+                <li><strong>Time server hostname :</strong> Laisser <code>pool.ntp.org</code> (Garantit une synchronisation parfaite des horloges, condition critique pour la corrélation des logs et les équipements biomédicaux).</li>
+                <li><strong>Timezone :</strong> Sélectionner <code>Europe/Paris</code> (ou le fuseau adapté).</li>
+                <li>Cliquer sur <strong>Next</strong>.</li>
+            </ul>
+
+            <h3>3. Configuration de l'interface WAN</h3>
+            <ul>
+                <li><strong>Configuration Type :</strong> Laisser sur <code>DHCP</code>.</li>
+                <li>Laisser tous les blocs de configurations statiques ou spécifiques (PPPoE, PPTP) vides.</li>
+                <li><strong>RFC1918 & Bogon Networks :</strong> Décocher impérativement les deux cases <em>Block RFC1918 Private Networks</em> et <em>Block bogon networks</em>.</li>
+                <p><strong>Pourquoi fait-on cela ?</strong> Si ces options restent cochées, le pare-feu bloquera tout trafic provenant de plages d'adresses privées. L'adresse du poste physique et le réseau NAT de Virt-Manager étant en zone privée (RFC1918), cocher ces cases couperait immédiatement l'accès à l'interface graphique du lab.</p>
+                <li>Cliquer sur <strong>Next</strong>.</li>
+            </ul>
+
+            <h3>4. Sécurisation du compte d'administration</h3>
+            <ul>
+                <li><strong>New admin Password :</strong> Saisir <code>Hosp-Initium2026!</code>.</li>
+                <li><strong>Confirm admin Password :</strong> Saisir <code>Hosp-Initium2026!</code>.</li>
+                <p><strong>Pourquoi ce choix ?</strong> Ce mot de passe intègre l'identité du projet hospitalier tout en appliquant les bonnes pratiques de complexité (majuscule, minuscules, chiffres, caractère spécial) requises pour un environnement de production.</p>
+                <li>Cliquer sur <strong>Next</strong> puis sur <strong>Reload</strong> pour appliquer la configuration.</li>
+            </ul>
+            <p>Une fois le rechargement terminé, le pfSense affiche son tableau de bord complet (Dashboard).</p>
+        </section>
+
+        <section>
+            <h2>Étape 6 : Raccordement du pfSense au switch virtuel Trunk</h2>
+            <p>Pour que le pare-feu puisse router le trafic des différents services de l'hôpital, sa seconde interface doit être connectée au commutateur virtuel en mode Trunk (agrégation de liens).</p>
+
+            <ol>
+                <li><strong>Arrêt propre de la VM :</strong> Dans la console Termius du pfSense, saisir l'option <strong>0</strong> (Shutdown system) et valider par <strong>y</strong>. Attendre que le nœud devienne gris (éteint) sur le schéma EVE-NG.</li>
+                <li><strong>Ajout du nuage interne :</strong> Faire un clic droit sur le quadrillage d'EVE-NG ➜ <strong>Network</strong> :
+                    <ul>
+                        <li><strong>Name/Prefix :</strong> <code>Trunk_Hosp</code></li>
+                        <li><strong>Type :</strong> Choisir <code>Management(Cloud1)</code> (qui correspond au switch virtuel / pont réseau créé dans Virt-Manager dédié au trafic interne).</li>
+                    </ul>
+                </li>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+                <li><strong>Câblage de l'interconnexion :</strong> Glisser le câble depuis l'icône orange du pfSense vers le nuage <code>Trunk_Hosp</code>. Sélectionner impérativement l'interface <strong>em1</strong> (ou <strong>vtnet1</strong>) du côté pfSense. Valider.</li>
+                <li><strong>Relance du système :</strong> Faire un clic droit sur le pfSense ➜ <strong>Start</strong>.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 7 : Création des interfaces virtuelles (VLANs) dans pfSense</h2>
+            <p>Une fois le pare-feu redémarré, l'accès à l'interface WebGUI (<code>https://192.168.122.146</code>) permet d'injecter la logique de découpage réseau.</p>
+            <p>Pour chaque VLAN, la procédure suivante doit être répétée dans les menus du pfSense :</p>
+
+            <h3>1. Accéder au gestionnaire de VLANs</h3>
+            <p>Naviguer dans le menu supérieur vers <strong>Interfaces > Assignments</strong>, puis cliquer sur l'onglet <strong>VLANs</strong> tout à droite. Cliquer sur le bouton vert <strong>+ Add</strong>.</p>
+
+            <h3>2. Taguer l'interface parente</h3>
+            <ul>
+                <li><strong>Parent Interface :</strong> Sélectionner impérativement <code>em1</code> (ou <code>vtnet1</code>).</li>
+                <li><strong>VLAN Tag :</strong> Saisir le numéro du VLAN (ex: <code>10</code>).</li>
+                <li><strong>Description :</strong> Saisir le nom du service (ex: <code>VLAN10_MEDIC</code>).</li>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+            </ul>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>VLAN Tag</th>
+                        <th>VLAN Priority</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>10</td>
+                        <td>0 (Best Effort)</td>
+                        <td>VLAN10_MEDIC</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>0 (Best Effort)</td>
+                        <td>VLAN30_ADMIN</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>0 (Best Effort)</td>
+                        <td>VLAN50_BIOMED</td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td>0 (Best Effort)</td>
+                        <td>VLAN60_SERVERS</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>Quelques précisions techniques importantes pour tes notes :</strong><br>
+            - <strong>VLAN Tag :</strong> C'est le numéro unique (la norme 802.1Q) qui va être injecté dans l'en-tête de chaque paquet réseau pour que le switch et le pfSense sachent à quel service de l'hôpital appartient la donnée.<br>
+            - <strong>VLAN Priority :</strong> On laisse la valeur par défaut à 0 (qui correspond au trafic standard sans priorité, appelé Best Effort). En production hospitalière, on utiliserait des priorités plus hautes (comme 5 ou 6) pour la voix sur IP (VoIP) ou la télémétrie cardiaque critique, mais pour notre laboratoire, 0 est parfait.<br>
+            - <strong>Description :</strong> On met exactement ces noms en majuscules. Cela permettra de se retrouver instantanément à l'étape suivante lorsque nous assignerons ces tags à des interfaces logiques.</p>
+
+            <h3>3. Assigner le VLAN créé</h3>
+            <p>Revenir sur l'onglet <strong>Interface Assignments</strong>. Dans le menu déroulant <strong>Available network ports</strong>, sélectionner le VLAN fraîchement créé (ex: <code>VLAN 10 on em1...</code>) et cliquer sur <strong>+ Add</strong>.</p>
+
+            <h3>4. Configurer l'adressage IP</h3>
+            <p>Cliquer sur le nom de la nouvelle interface apparue (souvent nommée <code>OPT1</code>).</p>
+            <ul>
+                <li>Cocher <strong>Enable Interface</strong>.</li>
+                <li><strong>Description :</strong> Renommer l'interface de manière explicite (ex: <code>MEDIC</code>).</li>
+                <li><strong>IPv4 Configuration Type :</strong> Sélectionner <code>Static IPv4</code>.</li>
+                <li>En bas dans <strong>Static IPv4 Configuration</strong> : Saisir la passerelle correspondante (ex: <code>10.0.10.254</code>) avec un masque en <strong>/24</strong>.</li>
+                <li>Cliquer sur <strong>Save</strong> puis sur <strong>Apply Changes</strong> en haut.</li>
+            </ul>
+
+            <p>Voici le plan d'adressage strict à appliquer pour les 4 interfaces du laboratoire :</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom de l'interface</th>
+                        <th>Identifiant VLAN</th>
+                        <th>Adresse IP Statique (Passerelle)</th>
+                        <th>Sous-réseau</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>MEDIC</strong></td>
+                        <td>10</td>
+                        <td>10.0.10.254</td>
+                        <td>/24 (255.255.255.0)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ADMIN</strong></td>
+                        <td>30</td>
+                        <td>10.0.30.254</td>
+                        <td>/24 (255.255.255.0)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BIOMED</strong></td>
+                        <td>50</td>
+                        <td>10.0.50.254</td>
+                        <td>/24 (255.255.255.0)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SERVERS</strong></td>
+                        <td>60</td>
+                        <td>10.0.60.254</td>
+                        <td>/24 (255.255.255.0)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>Étape 7.5 : Résolution du blocage de l'accès WebGUI (IP WAN)</h2>
+            <p>Après la validation de l'assistant initial, le pare-feu active par sécurité ses mécanismes de protection restrictifs. Dans un environnement de laboratoire virtuel où l'administration s'effectue par la patte externe (WAN), ces protections provoquent un blocage immédiat de l'interface graphique.</p>
+
+            <h3>1. Déblocage d'urgence via la console Termius</h3>
+            <p>Pour reprendre la main temporairement sans perdre la configuration, il faut désactiver le filtrage actif en ligne de commande :</p>
+            <ol>
+                <li>Ouvrir la session Terminal <strong>Host-Initium-pfSense</strong>.</li>
+                <li>Dans le menu principal textuel, saisir l'option <strong>8</strong> pour ouvrir le Shell.</li>
+                <li>Saisir la commande suivante pour couper temporairement le moteur de filtrage du pare-feu :</li>
+                <pre>pfctl -d</pre>
+                <p><em>(La console affiche la confirmation "pf disabled", l'accès au navigateur est instantanément restauré).</em></p>
+            </ol>
+
+            <h3>2. Pérennisation des accès dans l'interface Web</h3>
+            <p>Pour éviter que le blocage ne se reproduise au prochain redémarrage du système, les vérifications d'accès doivent être désactivées de manière définitive :</p>
+            <ol>
+                <li>Retourner sur le navigateur web et actualiser la page d'administration.</li>
+                <li>Naviguer vers le menu : <strong>System > Advanced</strong>.</li>
+                <li>Dans l'onglet <strong>Admin Access</strong>, faire défiler la page jusqu'à la section <strong>WebGUI Anti-Lockout / DNS Rebind / Browser HTTP_REFERER Enforcement</strong>.</li>
+                <li>Cocher la case : <strong>Disable DNS Rebind Checks</strong>.</li>
+                <li>Cocher la case : <strong>Disable HTTP_REFERER enforcement</strong>.</li>
+                <li>Descendre tout en bas de la page et cliquer sur le bouton bleu <strong>Save</strong>.</li>
+            </ol>
+            <p><strong>Note technique :</strong> Ces manipulations désactivent la vérification de la provenance des requêtes HTTP et la protection contre le rebind DNS, une configuration indispensable pour administrer confortablement un pfSense virtualisé depuis son système hôte.</p>
+        </section>
+
+        <section>
+            <h2>Étape 8 : Configuration des serveurs DHCP par VLAN</h2>
+            <p>Dans pfSense, le service DHCP s'active de manière indépendante pour chaque interface réseau locale. Pour notre laboratoire, nous allons l'activer sur les zones clients (MEDIC, ADMIN, BIOMED).</p>
+
+            <div class="warning-box">
+                <strong>Règle de conception importante :</strong> Nous n'activerons pas le DHCP sur le VLAN 60 (SERVERS). Dans une infrastructure critique, tous les serveurs (Active Directory, serveurs de bases de données, etc.) doivent impérativement posséder une adresse IP statique configurée à la main pour garantir la stabilité des services.
+            </div>
+
+            <p>Pour les VLANs 10, 30 et 50, naviguer dans le menu supérieur vers <strong>Services > DHCP Server</strong> et appliquer la configuration suivante en sélectionnant tour à tour l'onglet de chaque interface :</p>
+
+            <h3>1. Zone Médicale (Interface MEDIC - VLAN 10)</h3>
+            <ul>
+                <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on MEDIC interface</em>.</li>
+                <li><strong>Range (Plage d'adresses) :</strong> From: <code>10.0.10.10</code> | To: <code>10.0.10.100</code></li>
+                <p><em>(Nous laissons les adresses de .101 à .253 libres pour d'éventuels équipements biomédicaux lourds à IP fixes).</em></p>
+                <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code> (L'adresse du futur serveur Active Directory/DNS de l'hôpital).</li>
+                <li>Cliquer sur <strong>Save</strong> en bas de la page.</li>
+            </ul>
+
+            <h3>2. Zone Administrative (Interface ADMIN - VLAN 30)</h3>
+            <ul>
+                <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on ADMIN interface</em>.</li>
+                <li><strong>Range :</strong> From: <code>10.0.30.10</code> | To: <code>10.0.30.100</code></li>
+                <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code>.</li>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+            </ul>
+
+            <h3>3. Zone Biomédicale (Interface BIOMED - VLAN 50)</h3>
+            <ul>
+                <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on BIOMED interface</em>.</li>
+                <li><strong>Range :</strong> From: <code>10.0.50.10</code> | To: <code>10.0.50.100</code></li>
+                <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code>.</li>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Étape 9 : Création de la règle de pare-feu initiale (Règle "Any-Any")</h2>
+            <p>Par défaut, la politique de sécurité d'un pare-feu pfSense est le <em>Deny All</em> (Tout ce qui n'est pas explicitement autorisé est interdit). Pour l'instant, si nous branchions une machine, elle ne pourrait ni communiquer avec les autres VLANs, ni sortir sur Internet, ni même joindre le pfSense.</p>
+            <p>Pour pouvoir monter notre laboratoire sereinement et valider nos liaisons réseaux, nous allons appliquer une règle temporaire d'autorisation totale (appelée règle "Any-Any") sur nos interfaces.</p>
+            
+            <p>Naviguer dans le menu supérieur vers <strong>Firewall > Rules</strong>, puis cliquer sur l'onglet <strong>ADMIN</strong> :</p>
+            <ol>
+                <li>Cliquer sur le bouton vert <strong>Add ↑</strong> (Ajouter une règle en haut de la liste).</li>
+                <li><strong>Action :</strong> Sélectionner <code>Pass</code> (Autoriser).</li>
+                <li><strong>Interface :</strong> Vérifier que <code>ADMIN</code> est bien sélectionné.</li>
+                <li><strong>Address Family :</strong> <code>IPv4</code>.</li>
+                <li><strong>Protocol :</strong> Sélectionner <code>Any</code> (Tous les protocoles : TCP, UDP, ICMP...).</li>
+                <li><strong>Source :</strong> Sélectionner <code>ADMIN net</code> (Tout le sous-réseau de la zone administration).</li>
+                <li><strong>Destination :</strong> Sélectionner <code>Any</code> (N'importe où : Internet et les autres VLANs).</li>
+                <li><strong>Description :</strong> Saisir <em>« Autorisation temporaire totale Lab Admin »</em>.</li>
+                <li>Cliquer sur <strong>Save</strong> puis sur le bouton vert <strong>Apply Changes</strong> en haut de l'écran.</li>
+            </ol>
+            <p>Répéter exactement cette même opération (étapes 1 à 9) dans les onglets <strong>MEDIC</strong>, <strong>BIOMED</strong> et <strong>SERVERS</strong> en adaptant la Source à chaque fois (<em>MEDIC net</em>, <em>BIOMED net</em>, <em>SERVERS net</em>).</p>
+        </section>
+
+        <section>
+            <h2>Étape 10 : Déploiement et câblage du Switch dans EVE-NG</h2>
+            <p>Le cœur de routage (pfSense) est prêt. Il faut maintenant un commutateur (Switch) pour distribuer ces VLANs aux futures machines de l'hôpital. Dans EVE-NG, nous allons utiliser notre switch de niveau 2.</p>
+
+            <ol>
+                <li><strong>Ajout du Switch :</strong> Sur le schéma EVE-NG, faire un clic droit ➜ <strong>Node</strong> ➜ Sélectionner l’image de <strong>Switch</strong>.</li>
+                <ul>
+                    <li><strong>Name/Prefix :</strong> <code>Hosp-SW-01</code></li>
+                    <li><strong>Icon :</strong> <code>Switch.png</code></li>
+                </ul>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+                <li><strong>Câblage du Trunk principal :</strong> Glisser un câble depuis l'icône du nuage <strong>Trunk_Hosp</strong> (que l'on a créé à l'étape 8) vers le Switch <code>Hosp-SW-01</code>. Côté Switch, connecte-le sur le premier port disponible, par exemple <strong>GigabitEthernet0/0</strong>.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 11 : Configuration initiale du Switch (Nom et VLANs)</h2>
+            <p>Nous devons maintenant dire au switch que les 4 VLANs de l'hôpital existent, pour qu'il puisse taguer les ports correctement.</p>
+
+            <ol>
+                <li>Double-cliquer sur le Switch <code>Hosp-SW-01</code> dans EVE-NG pour ouvrir sa console textuelle.</li>
+                <li>Passer en mode de configuration globale en tapant les commandes suivantes :</li>
+                <pre>enable
+configure terminal</pre>
+                <li>Lui donner son nom officiel :</li>
+                <pre>hostname Hosp-SW-01</pre>
+                <li>Déclarer les 4 VLANs dans la base de données du switch :</li>
+                <pre>vlan 10
+name MEDIC
+vlan 30
+name ADMIN
+vlan 50
+name BIOMED
+vlan 60
+name SERVERS
+exit</pre>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 12 : Configuration du port Trunk sur le Switch</h2>
+            <p>Le port Gi0/0 reçoit tous les VLANs en même temps depuis le pfSense. Il faut donc le configurer en mode Trunk (agrégation).</p>
+            <p>Saisir les commandes suivantes dans la console du switch :</p>
+            <pre>interface GigabitEthernet0/0
+description Trunk_vers_pfSense
+switchport trunk encapsulation dot1q
+switchport mode trunk
+no shutdown
+exit</pre>
+            <p><em>(Note : Si le switch te dit que la commande "encapsulation dot1q" n'existe pas, c'est normal sur certaines images récentes, passe directement à "switchport mode trunk").</em></p>
+        </section>
+
+        <section>
+            <h2>Étape 13 : Configuration des ports d'accès (Access Ports) sur le Switch</h2>
+            <p>Pour l'instant, le switch connaît les VLANs et communique avec pfSense, mais tous ses autres ports sont dans le VLAN 1 par défaut. Nous devons attribuer des ports spécifiques à nos futurs équipements (Serveur Active Directory, PC Admin, etc.).</p>
+            <p>Voici la répartition que nous allons appliquer sur Hosp-SW-01 :</p>
+            <ul>
+                <li><strong>GigabitEthernet0/1 :</strong> Dédié au futur Serveur Active Directory / DNS (VLAN 60 - SERVERS)</li>
+                <li><strong>GigabitEthernet0/2 :</strong> Dédié au futur PC de l'administration (VLAN 30 - ADMIN)</li>
+            </ul>
+            <p>Retournons sur la console du switch Hosp-SW-01 et saisissons les commandes suivantes :</p>
+            <pre>configure terminal
+interface GigabitEthernet0/1
+description Connexion_Serveur_AD
+switchport mode access
+switchport access vlan 60
+no shutdown
+exit
+
+interface GigabitEthernet0/2
+description Connexion_PC_Admin
+switchport mode access
+switchport access vlan 30
+no shutdown
+exit
+end
+write</pre>
+        </section>
+
+        <section>
+            <h2>Étape 14 : Déploiement du premier client de test (PC-ADMIN)</h2>
+            <p>Pour valider que tout notre système (Routage pfSense + Trunk + Switch Access + DHCP) fonctionne, nous allons brancher une machine de test dans le réseau Administration.</p>
+
+            <ol>
+                <li><strong>Ajout du nœud :</strong> Dans EVE-NG, faire un clic droit ➜ <strong>Node</strong> ➜ Sélectionner <strong>Virtual PC (VPCS)</strong>. Il s'agit d'un tout petit ordinateur simulé en ligne de commande, parfait pour faire des tests légers.</li>
+                <ul>
+                    <li><strong>Name/Prefix :</strong> <code>PC-ADMIN</code></li>
+                </ul>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+                <li><strong>Câblage :</strong> Éteindre le Switch, Glisser un câble depuis PC-ADMIN (port Ethernet0) vers le Switch Hosp-SW-01.</li>
+                <p><strong>[ATTENTION]</strong> Côté Switch, connecte-le impérativement sur le port <strong>GigabitEthernet0/2</strong> (celui qu'on vient de configurer pour l'administration).</p>
+                <li><strong>Allumage :</strong> Fais un clic droit sur PC-ADMIN et clique sur <strong>Start</strong>.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 15 : Test de récupération IP (Validation DHCP)</h2>
+            <p>Double-cliquer sur PC-ADMIN pour ouvrir sa console.</p>
+            <p>Pour demander une adresse IP au serveur DHCP du pfSense, taper simplement la commande suivante :</p>
+            <pre>ip dhcp</pre>
+            <p>Le VPCS va envoyer une requête. S'il affiche des lignes commençant par <code>DDDDD</code> ou <code>DHCP lease grabbed</code>, c'est gagné ! Il va afficher l'adresse IP obtenue (qui est <code>10.0.30.10</code>).</p>
+        </section>
+
+        <section>
+            <h2>Étape 16 : Déploiement et préparation matérielle de Windows Server (EVE-NG)</h2>
+            <p>Maintenant que la tuyauterie réseau est validée, nous attaquons le cœur applicatif de l'hôpital : le contrôleur de domaine Active Directory (AD). Il centralisera l'annuaire des utilisateurs et gérera le service DNS interne. Ce rôle sera hébergé sur une machine virtuelle Windows Server 2022.</p>
+
+            <h3>1. Création des dossiers et transfert de l'OS (Via Termius)</h3>
+            <p>Avant d'ajouter le nœud dans l'interface web, il faut injecter l'ISO et créer le stockage dans le système de fichiers d'EVE-NG :</p>
+            <pre># Création du répertoire d'accueil de la machine virtuelle
+mkdir -p /opt/unetlab/addons/qemu/winserver-WinServer2022/
+
+# [Depuis votre terminal local] Transfert de l'ISO d'installation (renommé en cdrom.iso)
+scp -r SERVER_EVAL_x64FRE_fr-fr.iso root@192.168.122.134:/opt/unetlab/addons/qemu/winserver-WinServer2022/cdrom.iso
+
+# Retour sur le terminal EVE-NG : Création du disque dur virtuel de 60 Go (format VirtIO)
+cd /opt/unetlab/addons/qemu/winserver-WinServer2022/
+/opt/qemu/bin/qemu-img create -f qcow2 virtioa.qcow2 60G</pre>
+
+            <h3>2. Injection des pilotes VirtIO (Contournement du bug "Aucun lecteur trouvé")</h3>
+            <p>Par défaut, l'installateur Windows ne détecte pas le disque dur <code>virtioa.qcow2</code>. Il faut lui injecter les pilotes de virtualisation indispensables :</p>
+            <pre># Téléchargement de l'image contenant les pilotes officiels KVM/Fedora
+wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
+
+# Renommer le fichier pour qu'EVE-NG l'insère comme un second lecteur amovible
+mv virtio-win-0.1.240.iso floppy.iso
+
+# Réparation globale des permissions système d'EVE-NG
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions</pre>
+
+            <h3>3. Ajout et câblage du serveur dans la topologie web</h3>
+            <ol>
+                <li><strong>Éteindre</strong> le Switch Hosp-SW-01 (clic droit -> Stop) pour pouvoir effectuer le raccordement.</li>
+                <li>Faire un clic droit sur le quadrillage EVE-NG -> <strong>Node</strong> -> Sélectionner <strong>Windows Server</strong>.</li>
+                <ul>
+                    <li><strong>Name/Prefix :</strong> <code>Hosp-AD-01</code></li>
+                    <li><strong>RAM :</strong> <code>4096 MB</code> (Minimum requis pour la fluidité)</li>
+                </ul>
+                <li>Cliquer sur <strong>Save</strong>.</li>
+                <li><strong>Câblage :</strong> Relier l'interface réseau de Hosp-AD-01 au commutateur Hosp-SW-01.</li>
+                <p><strong>[ATTENTION STRICTE]</strong> Côté Switch, le connecter impérativement sur le port <strong>GigabitEthernet0/1</strong> (le port d'accès configuré pour le VLAN 60 - SERVERS).</p>
+                <li><strong>Allumage :</strong> Démarrer le Switch et le serveur Hosp-AD-01.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 17 : Installation de l'OS et configuration de l'IP Statique</h2>
+            
+            <h3>1. Lancement de l'installation et chargement du pilote</h3>
+            <ol>
+                <li>Double-cliquer sur le nœud Hosp-AD-01 pour ouvrir sa session graphique (VNC/HTML5).</li>
+                <li>Choisir la version <strong>Windows Server 2022 Standard (Avec Expérience de bureau)</strong>.</li>
+                <li>À l'écran de sélection des disques (qui apparaît vide), cliquer sur <strong>Charger un pilote</strong> ➜ <strong>Parcourir</strong>.</li>
+                <li>Dérouler le lecteur CD nommé <strong>Virtio-win</strong> et suivre ce chemin exact :</li>
+                <pre>viostor ➜ 2k22 ➜ amd64</pre>
+                <li>Valider par OK puis Suivant. Le disque de 60 Go apparaît. Le sélectionner et lancer l'installation.</li>
+                <li>Au premier démarrage, définir le mot de passe Administrateur personnalisé : <code>AdminHosp2026</code>.</li>
+            </ol>
+
+            <h3>2. Fixation de l'adresse IP (Une fois sur le bureau Windows)</h3>
+            <p>Puisque c'est un serveur critique, son adressage doit être fixé manuellement :</p>
+            <ol>
+                <li>Ouvrir les connexions réseau (Touche Windows + R -> taper <code>ncpa.cpl</code> et valider).</li>
+                <li>Faire un clic droit sur l'adaptateur réseau Ethernet ➜ <strong>Propriétés</strong> ➜ Double-cliquer sur <strong>Protocole Internet version 4 (TCP/IPv4)</strong>.</li>
+                <li>Sélectionner "Utiliser l'adresse IP suivante" :</li>
+                <ul>
+                    <li><strong>Adresse IP :</strong> <code>10.0.60.10</code></li>
+                    <li><strong>Masque de sous-réseau :</strong> <code>255.255.255.0</code></li>
+                    <li><strong>Passerelle par défaut :</strong> <code>10.0.60.254</code> (L'adresse de l'interface pfSense dans ce VLAN)</li>
+                </ul>
+                <li>Dans la section DNS du bas, cocher "Utiliser l'adresse DNS suivante" :</li>
+                <ul>
+                    <li><strong>Serveur DNS préféré :</strong> <code>127.0.0.1</code> (Boucle locale, car ce serveur va lui-même devenir le serveur DNS principal de l'hôpital).</li>
+                </ul>
+                <li>Valider en cliquant sur OK sur les deux fenêtres.</li>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 18 : Test de connectivité (Validation du routage Inter-VLAN)</h2>
+            <p>Pour confirmer que le pare-feu pfSense orchestre correctement les communications entre la zone d'Administration (VLAN 30) et la zone des Serveurs (VLAN 60) :</p>
+            <ol>
+                <li>Ouvrons l'invite de commandes (cmd) sur le <strong>PC-ADMIN</strong>.</li>
+                <li>Lançons un ping en direction du nouveau serveur AD :</li>
+                <pre>ping 10.0.60.10</pre>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 19 : Phase de diagnostic et résolution des incidents réseau</h2>
+            <p>Lors de la première tentative de validation du routage inter-VLAN, le test d'écho (ping) initié depuis la zone d'Administration vers la zone des Serveurs a rencontré un échec (Host not reachable). Une démarche de diagnostic méthodique a été entreprise pour identifier et corriger les anomalies.</p>
+
+            <h3>1. Analyse et persistance de la configuration du client (VPCS)</h3>
+            <p>L'investigation a révélé une perte de la configuration réseau sur le nœud PC-ADMIN suite à son redémarrage électrique. Le simulateur VPCS n'enregistrant pas dynamiquement ses paramètres en mémoire, une réassignation et une sauvegarde définitive ont été appliquées :</p>
+            <pre>VPCS> ip dhcp
+DD_PFSENSE_IP_ASSIGNED -> 10.0.30.10
+# Sauvegarde impérative de la configuration dans la mémoire flash virtuelle
+VPCS> save</pre>
+            <p>La commande <code>save</code> est indispensable sur l'équipement VPCS sous EVE-NG pour figer l'adressage et éviter la perte des paramètres réseau aux prochains démarrages.</p>
+
+            <h3>2. Isolation des flux et gestion du filtrage sur le pare-feu</h3>
+            <p>La connectivité locale entre le serveur Hosp-AD-01 et sa passerelle par défaut (10.0.60.254) étant opérationnelle, le blocage résiduel provenait de la politique de sécurité par défaut du pfSense (Drop total entre interfaces internes).</p>
+            <p>Pour des raisons techniques d'architecture de laboratoire (absence d'interface graphique sur le client VPCS), l'accès à l'interface d'administration (GUI) du pfSense est toujours temporairement déporté sur son interface WAN, connectée au réseau de management physique :</p>
+
+            <ol>
+                <li>Connexion en SSH sur le pfSense via le terminal de gestion.</li>
+                <li>Accès à l'interpréteur de commandes (Option 8 Shell).</li>
+                <li>Désactivation temporaire des règles de filtrage pour autoriser l'accès initial au serveur web d'administration :</li>
+                <pre>pfctl -d</pre>
+                <li>Connexion via le navigateur de l'ordinateur physique sur l'adresse IP WAN du pfSense (<code>https://192.168.122.X</code>).</li>
+                <li>Création et application d'une règle de filtrage permanente dans l'onglet <strong>ADMIN</strong> (VLAN 30) :</li>
+                <ul>
+                    <li><strong>Action :</strong> Pass (Autoriser)</li>
+                    <li><strong>Protocol :</strong> ICMP (Requêtes d'écho)</li>
+                    <li><strong>Source :</strong> ADMIN net (Sous-réseau 10.0.30.0/24)</li>
+                    <li><strong>Destination :</strong> SERVERS net (Sous-réseau 10.0.60.0/24)</li>
+                </ul>
+            </ol>
+        </section>
+
+        <section>
+            <h2>Étape 20 : Recette et validation finale de l'infrastructure réseau</h2>
+            <p>Une fois les règles appliquées sur le pare-feu (provoquant la réactivation automatique et sécurisée du moteur de filtrage pf), le test d'interconnexion final a été relancé depuis le terminal du poste d'administration.</p>
+            <pre>VPCS> ping 10.0.60.10
+84 bytes from 10.0.60.10 icmp_seq=1 ttl=127 time=1.234 ms
+84 bytes from 10.0.60.10 icmp_seq=2 ttl=127 time=1.045 ms</pre>
+            
+            <p><strong>Conclusion technique :</strong> Ce test valide de manière définitive :</p>
+            <ul>
+                <li>Le bon marquage des trames (802.1Q) par le commutateur <strong>Hosp-SW-01</strong>.</li>
+                <li>La fonction de routage inter-VLAN opérée par le pare-feu <strong>pfSense</strong>.</li>
+                <li>L'ouverture sélective des flux de communication entre la zone d'Administration et le réseau des Serveurs de l'hôpital.</li>
+            </ul>
+            <p>L'infrastructure réseau et le serveur Windows étant pleinement opérationnels et interconnectés, la phase suivante concerne le déploiement des services d'annuaire de l'hôpital.</p>
+        </section>
+
+        <section>
+            <h2>Étape 21 : Installation du rôle Active Directory Domain Services (AD DS)</h2>
+            <p>Cette étape vise à transformer le serveur autonome Hosp-AD-01 en contrôleur de domaine pour centraliser la gestion des identités de l'établissement.</p>
+
+            <h3>1. Initialisation de l'assistant via le Gestionnaire de serveur</h3>
+            <ol>
+                <li>Sur le bureau de Hosp-AD-01, ouvrir le <strong>Gestionnaire de serveur</strong> (Server Manager).</li>
+                <li>Dans le tableau de bord, cliquer sur <strong>Gérer</strong> (Manage) en haut à droite, puis sélectionner <strong>Ajouter des rôles et fonctionnalités</strong> (Add Roles and Features).</li>
+                <li>Cliquer sur <strong>Suivant</strong> sur les trois premiers écrans (Avant de commencer, Type d'installation, et Sélection du serveur) en conservant les options par défaut (Installation basée sur un rôle ou une fonctionnalité, et sélection du serveur local).</li>
+            </ol>
+
+            <h3>2. Sélection du rôle et des fonctionnalités</h3>
+            <ol>
+                <li>Dans la liste des rôles serveurs, cocher la case <strong>Services de domaine Active Directory</strong> (Active Directory Domain Services).</li>
+                <li>Une fenêtre contextuelle s'affiche automatiquement pour proposer l'installation des outils d'administration requis (outils RSAT). Cliquer sur <strong>Ajouter des fonctionnalités</strong> (Add Features).</li>
+                <li>Cliquer sur <strong>Suivant</strong> sur l'écran des Fonctionnalités, puis sur l'écran d'introduction à AD DS.</li>
+                <li>Sur la page de confirmation, cocher la case "Redémarrer automatiquement le serveur de destination si nécessaire", puis cliquer sur <strong>Installer</strong>.</li>
+            </ol>
+            <p>L'installation des binaires du rôle commence. Une fois le processus terminé, un message indique que la configuration est requise.</p>
+        </section>
+
+        <!-- Étape 23 -->
+        <section>
+            <h2>Étape 23 : Promotion du serveur et création de la forêt Active Directory</h2>
+            
+            <h3>1. Configuration du déploiement</h3>
+            <p>Dans le <em>Gestionnaire de serveur</em>, cliquer sur le drapeau jaune des notifications en haut à droite, puis sélectionner <strong>Promouvoir ce serveur en contrôleur de domaine</strong>.</p>
+            <p>Sur la page <em>Configuration du déploiement</em>, sélectionner l'option : <strong>Ajouter une nouvelle forêt</strong>.</p>
+            <p>Saisir le nom de domaine racine officiel choisi pour l'infrastructure de l'hôpital :</p>
+            <ul>
+                <li><strong>Nom de domaine racine :</strong> <code>hosp.local</code></li>
+            </ul>
+
+            <h3>2. Options du contrôleur de domaine et mot de passe de secours</h3>
+            <p>Conserver les niveaux fonctionnels de la forêt et du domaine sur <strong>Windows Server 2016</strong> (ou version maximale proposée par défaut).</p>
+            <p>Vérifier que les cases <strong>Serveur DNS</strong> et <strong>Catalogue global (GC)</strong> sont automatiquement cochées.</p>
+            <p>Saisir le mot de passe de secours pour le mode de restauration des services d'annuaire (DSRM).</p>
+            
+            <div class="warning-box">
+                <strong>Note de sécurité :</strong> Utiliser le même mot de passe fort que le compte Administrateur local (<code>AdminHosp2026</code>) pour simplifier la gestion du laboratoire.
+            </div>
+
+            <h3>3. Options DNS et finalisation</h3>
+            <ul>
+                <li><strong>Options DNS :</strong> Ignorer le message d'avertissement concernant la délégation DNS (le serveur devenant lui-même la racine de sa zone, aucune délégation n'est nécessaire) et cliquer sur <em>Suivant</em>.</li>
+                <li><strong>Options supplémentaires :</strong> Laisser le système vérifier et remplir automatiquement le nom NetBIOS du domaine (qui sera configuré en <code>HOSP</code>). Cliquer sur <em>Suivant</em>.</li>
+                <li><strong>Chemins d'accès :</strong> Conserver les répertoires par défaut pour la base de données (<code>NTDS</code>), les fichiers journaux et le volume système (<code>SYSVOL</code>). Cliquer sur <em>Suivant</em>.</li>
+                <li><strong>Vérification des options :</strong> Passer en revue le résumé des configurations et cliquer sur <em>Suivant</em>.</li>
+            </ul>
+
+            <h3>4. Validation des prérequis et installation</h3>
+            <p>Le système exécute une vérification de conformité. Une fois le message <em>"Toutes les vérifications des prérequis ont été passées avec succès"</em> affiché, cliquer sur <strong>Installer</strong>.</p>
+            <p>À la fin du processus, le serveur va initier un redémarrage automatique obligatoire pour appliquer la structure d'annuaire.</p>
+            <p>Une fois que la machine virtuelle aura redémarré sur EVE-NG, l'écran de connexion Windows affichera désormais <code>HOSP\Administrateur</code>, confirmant que l'annuaire Active Directory est officiellement actif.</p>
+        </section>
+
+        <!-- Étape 24 -->
+        <section>
+            <h2>Étape 24 : Vérification post-déploiement et structuration de l'annuaire</h2>
+            
+            <h3>1. Validation des services Active Directory et DNS</h3>
+            <p>Après le redémarrage du contrôleur de domaine, les vérifications d'usage permettent de s'assurer de la bonne initialisation des services :</p>
+            <ul>
+                <li>Ouverture du <strong>Gestionnaire de serveur</strong>. Les onglets <em>AD DS</em> et <em>DNS</em> apparaissent désormais dans le volet de gauche, confirmant l'exécution des rôles.</li>
+                <li>Accès à la console des services via la combinaison <code>Touche Windows + R</code> ➜ saisie de <code>dnsmgmt.msc</code> pour valider la création automatique de la zone de recherche directe pour le domaine <code>hosp.local</code>.</li>
+            </ul>
+
+            <h3>2. Création de l'arborescence des Unités d'Organisation (OU)</h3>
+            <p>Afin de refléter la structure hiérarchique et géographique de l'hôpital, l'annuaire doit être organisé en Unités d'Organisation. Cette segmentation permettra d'appliquer des politiques de sécurité (GPO) distinctes selon les services.</p>
+            <ul>
+                <li>Accès à la console de gestion : <code>Touche Windows + R</code> ➜ saisie de <code>dsa.msc</code> pour ouvrir la console <em>Utilisateurs et ordinateurs Active Directory</em>.</li>
+                <li>Clic droit sur le nom de domaine <code>hosp.local</code> ➜ <strong>Nouveau</strong> ➜ <strong>Unité d'organisation</strong>.</li>
+                <li>Création d'une OU racine nommée <strong>HOSPITAL</strong> (laisser la case de protection contre la suppression accidentelle cochée).</li>
+                <li>À l'intérieur de l'OU <strong>HOSPITAL</strong>, création des sous-OU suivantes pour isoler les différents profils :
+                    <ul>
+                        <li><strong>Utilisateurs</strong> : Destinée à accueillir les comptes du personnel. Création des sous-OU de services : <code>Medical</code>, <code>Paramedical</code>, <code>Administration</code>.</li>
+                        <li><strong>Ordinateurs</strong> : Destinée à accueillir les stations de travail et terminaux du personnel.</li>
+                        <li><strong>Groupes</strong> : Destinée à centraliser les groupes de sécurité et de distribution.</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Étape 25 -->
+        <section>
+            <h2>Étape 25 : Création des premiers comptes utilisateurs et des groupes</h2>
+            
+            <h3>1. Création d'un groupe de sécurité</h3>
+            <p>Clic droit sur l'OU <strong>Groupes</strong> ➜ <strong>Nouveau</strong> ➜ <strong>Groupe</strong>.</p>
+            <p>Nom du groupe : <code>G_Medical_Lecture</code> (Type de groupe : Sécurité / Étendue : Globale). Ce groupe servira plus tard à accorder des accès en lecture aux dossiers médicaux.</p>
+
+            <h3>2. Création d'un compte utilisateur</h3>
+            <p>Clic droit sur la sous-OU <strong>Medical</strong> ➜ <strong>Nouveau</strong> ➜ <strong>Utilisateur</strong>.</p>
+            <p>Configuration de l'identité du <strong>Dr. Jean Dupont</strong> :</p>
+            <ul>
+                <li><strong>Prénom :</strong> Jean</li>
+                <li><strong>Nom :</strong> Dupont</li>
+                <li><strong>Nom d'ouverture de session (UPN) :</strong> <code>j.dupont</code> (ce qui donnera <code>j.dupont@hosp.local</code>)</li>
+                <li><strong>Mot de passe :</strong> Attribution d'un mot de passe initial complexe (ex: <code>WelcomeHosp2026</code>)</li>
+                <li>Cocher la case : <em>"L'utilisateur doit changer le mot de passe à la prochaine ouverture de session"</em>.</li>
+            </ul>
+
+            <h3>3. Assignation de l'utilisateur au groupe</h3>
+            <p>Clic droit sur l'utilisateur <code>j.dupont</code> ➜ <strong>Ajouter à un groupe</strong>. Saisir <code>G_Medical_Lecture</code>, cliquer sur <em>Vérifier les noms</em>, puis valider par <em>OK</em>.</p>
+            <p>La structure de l'annuaire est maintenant opérationnelle.</p>
+        </section>
+
+        <!-- Étape 26 -->
+        <section>
+            <h2>Étape 26 : Configuration réseau et intégration d'un poste client au domaine - Téléchargement des pilotes VirtIO et structuration du nœud QEMU</h2>
+            <p>Le déploiement du système client Windows 11 dans l'environnement EVE-NG nécessite une phase préparatoire rigoureuse en ligne de commande (SSH) pour allouer le stockage et injecter les pilotes de virtualisation nécessaires.</p>
+
+            <h3>1. Création du répertoire de destination et transfert de l'image ISO</h3>
+            <p>Sur le serveur EVE-NG (via SSH), création du dossier d'accueil du gabarit Windows 11 :</p>
+            <pre>mkdir -p /opt/unetlab/addons/qemu/win-11x64-PRO/</pre>
+            <p>Depuis votre machine d'administration locale, transfert de l'ISO Windows 11 vers le répertoire EVE-NG (renommé en <code>cdrom.iso</code>) :</p>
+            <pre>scp -r Win11_25H2_French_x64_v2.iso root@192.168.122.134:/opt/unetlab/addons/qemu/win-11x64-PRO/cdrom.iso</pre>
+
+            <h3>2. Génération du disque dur virtuel (Format QCOW2)</h3>
+            <p>De retour sur la console SSH du serveur EVE-NG, positionnement dans le répertoire et allocation d'un disque dur de 60 Go basé sur l'interface de stockage optimisée VirtIO :</p>
+            <pre>cd /opt/unetlab/addons/qemu/win-11x64-PRO/
+/opt/qemu/bin/qemu-img create -f qcow2 virtioa.qcow2 60G</pre>
+
+            <h3>3. Récupération des pilotes VirtIO</h3>
+            <p>Téléchargement de l'image ISO contenant les pilotes réseau et de stockage optimisés pour QEMU/KVM :</p>
+            <pre>wget https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.266-1/virtio-win-0.1.266.iso -O cdrom2.iso</pre>
+            <div class="warning-box">
+                <strong>Attention d'architecture :</strong> Le fichier des pilotes doit obligatoirement être nommé <code>cdrom2.iso</code> pour qu'EVE-NG le monte automatiquement comme second lecteur CD lors du démarrage du nœud.
+            </div>
+
+            <h3>4. Correction des permissions EVE-NG</h3>
+            <p>Exécution obligatoire du script de réinitialisation des droits d'EVE-NG afin de permettre à l'hyperviseur de lire et modifier l'ensemble des fichiers créés :</p>
+            <pre>/opt/unetlab/wrappers/unl_wrapper -a fixpermissions</pre>
+        </section>
+
+        <!-- Étape 27 -->
+        <section>
+            <h2>Étape 27 : Processus d'installation du système d'exploitation et contournement des prérequis</h2>
+            
+            <h3>1. Initialisation de l'environnement graphique</h3>
+            <p>Dans l'interface web d'EVE-NG, ajouter le nœud Windows (le dossier <code>win-11x64-PRO</code> apparaît désormais sélectionnable). Démarrer le nœud et ouvrir la console VNC.</p>
+
+            <h3>2. Contournement des restrictions matérielles (TPM 2.0 &amp; Secure Boot)</h3>
+            <p>Microsoft imposant la présence d'une puce TPM 2.0 et du démarrage sécurisé, l'installateur bloque initialement la procédure. Un contournement par la base de registre est appliqué :</p>
+            <ul>
+                <li>Sur l'écran d'erreur de l'installateur (<em>"Ce PC ne peut pas exécuter Windows 11"</em>), presser simultanément <strong>Maj + F10</strong> pour ouvrir l'invite de commandes.</li>
+                <li>Saisir <code>regedit</code> pour lancer l'Éditeur du Registre.</li>
+                <li>Naviguer jusqu'à l'arborescence : <code>HKEY_LOCAL_MACHINE ➜ SYSTEM ➜ Setup</code>.</li>
+                <li>Faire un clic droit sur <strong>Setup</strong> ➜ <strong>Nouveau</strong> ➜ <strong>Clé</strong>, et la nommer <code>LabConfig</code>.</li>
+                <li>À l'intérieur de <code>LabConfig</code>, créer deux valeurs <strong>DWORD 32 bits</strong> distinctes :
+                    <ul>
+                        <li>Nom : <code>BypassTPMCheck</code> ➜ Définir la valeur à <strong>1</strong>.</li>
+                        <li>Nom : <code>BypassSecureBootCheck</code> ➜ Définir la valeur à <strong>1</strong>.</li>
+                    </ul>
+                </li>
+                <li>Fermer l'éditeur de registre ainsi que l'invite de commandes, puis cliquer sur la flèche de retour en haut à gauche de l'assistant d'installation pour rafraîchir l'état.</li>
+            </ul>
+
+            <h3>3. Chargement des pilotes VirtIO et déploiement</h3>
+            <p>Reprendre l'assistant d'installation. Lorsque la fenêtre demande <em>"Où souhaitez-vous installer Windows ?"</em>, la liste des volumes est vide en raison de l'utilisation du contrôleur VirtIO.</p>
+            <ul>
+                <li>Cliquer sur <strong>Charger un pilote</strong> ➜ <strong>Parcourir</strong>.</li>
+                <li>Sélectionner le second lecteur CD (<code>cdrom2.iso</code>).</li>
+                <li>Naviguer dans le répertoire : <code>amd64 ➜ w11</code> puis valider.</li>
+                <li>Le volume virtuel de 60 Go (<code>virtioa.qcow2</code>) est désormais détecté. Finaliser l'installation classique du système d'exploitation.</li>
+            </ul>
+        </section>
+
+        <!-- Étape 28 -->
+        <section>
+            <h2>Étape 28 : Persistance de l'image (Commit du Master Template)</h2>
+            <p>Une fois l'installation de Windows 11 achevée et le premier compte d'administration locale configuré, les modifications écrites dans le disque temporaire de la VM doivent être fusionnées dans l'image de base pour servir de modèle réutilisable.</p>
+            <p>Éteindre proprement la machine virtuelle Windows 11 depuis le menu système. En ligne de commande sur le serveur EVE-NG, basculer dans le répertoire temporaire d'exécution de la machine :</p>
+            <pre>cd /opt/unetlab/tmp/0/1618dcf4-b0ba-4d47-8a05-c75acc8a712e/5/</pre>
+            <p>Exécuter la fusion des données vers l'image racine du gabarit :</p>
+            <pre>/opt/qemu/bin/qemu-img commit virtioa.qcow2</pre>
+            <div class="warning-box">
+                <strong>Optimisation de l'espace disque :</strong> Après le commit, vous pouvez nettoyer le dossier source <code>/opt/unetlab/addons/qemu/win-11x64-PRO/</code> en y supprimant les fichiers <code>cdrom.iso</code> et <code>cdrom2.iso</code> devenus inutiles pour le déploiement des futurs nœuds.
+            </div>
+        </section>
+
+        <!-- Étape 29 -->
+        <section>
+            <h2>Étape 29 : Configuration réseau et intégration du poste client au domaine</h2>
+            <p>Le nœud générique Windows 11 est maintenant déployé en tant que poste de travail de la zone d'Administration (VLAN 30). Son identification réseau est fixée sous le nom de machine <code>Hosp-CL-01</code>.</p>
+
+            <h3>1. Alignement des paramètres de couche 3 (IP et DNS)</h3>
+            <p>Sur le poste client Hosp-CL-01, accéder aux connexions réseau via la commande <code>ncpa.cpl</code>. Ouvrir les propriétés du protocole TCP/IPv4 de la carte réseau et renseigner les informations d'adressage fixe :</p>
+            <ul>
+                <li><strong>Adresse IP :</strong> <code>10.0.30.10</code></li>
+                <li><strong>Masque de sous-réseau :</strong> <code>255.255.255.0</code></li>
+                <li><strong>Passerelle par défaut :</strong> <code>10.0.30.254</code> (Interface VLAN 30 du pfSense)</li>
+                <li><strong>Serveur DNS préféré :</strong> <code>10.0.60.10</code> (Contrôleur de domaine Hosp-AD-01)</li>
+            </ul>
+
+            <h3>2. Phase de diagnostic et désactivation des pare-feu locaux (Étape corrective)</h3>
+            <p>Lors des premiers tests de connectivité inter-VLAN, bien que les règles du pare-feu pfSense autorisent explicitement tout le trafic provenant du réseau d'Administration, le protocole ICMP (ping) et les requêtes DNS (nslookup) ont échoué.</p>
+            <p>Par défaut, Windows Server et Windows 11 bloquent les flux entrants non sollicités et isolent la machine si elle est détectée sur un réseau public non identifié. Pour valider la maquette, les pare-feu applicatifs internes ont été temporairement désactivés sur les deux extrémités.</p>
+            <p>Sur le contrôleur de domaine <strong>Hosp-AD-01</strong> ET sur le client <strong>Hosp-CL-01</strong>, ouvrir une invite de commandes (cmd) en mode Administrateur et exécuter :</p>
+            <pre>netsh advfirewall set allprofiles state off</pre>
+
+            <h3>3. Tests d'interconnexion et de résolution de noms</h3>
+            <p>Suite à cette action corrective, la connectivité à travers le pare-feu pfSense est à nouveau testée depuis l'invite de commandes de Hosp-CL-01 :</p>
+            <pre>C:\&gt; ping 10.0.60.10
+C:\&gt; nslookup hosp.local</pre>
+            <p>Le diagnostic est entièrement validé : les paquets ICMP obtiennent une réponse et la commande <em>nslookup</em> retourne explicitement l'adresse IP <code>10.0.60.10</code> associée au nom de domaine de la forêt.</p>
+
+            <h3>4. Jonction au domaine de l'hôpital</h3>
+            <ul>
+                <li>Exécuter la commande <code>sysdm.cpl</code> pour ouvrir les <em>Propriétés système</em>.</li>
+                <li>Dans l'onglet <strong>Nom de l'ordinateur</strong>, cliquer sur le bouton <strong>Modifier</strong>.</li>
+                <li>Basculer l'option <em>Membre de</em> sur <strong>Domaine</strong> et renseigner : <code>hosp.local</code>.</li>
+                <li>Valider par OK ; renseigner les privilèges d'administration du domaine demandés à l'écran :
+                    <ul>
+                        <li><strong>Utilisateur :</strong> <code>HOSP\Administrateur</code></li>
+                        <li><strong>Mot de passe :</strong> <code>AdminHosp2026</code></li>
+                    </ul>
+                </li>
+                <li>Suite au message de validation <em>"Bienvenue dans le domaine hosp.local"</em>, appliquer les modifications et autoriser le redémarrage immédiat de la machine.</li>
+            </ul>
+
+            <h3>5. Première ouverture de session de l'utilisateur final (j.dupont)</h3>
+            <ul>
+                <li>Depuis l'écran de verrouillage ou après déconnexion de la session locale, cliquer sur l'option <strong>Autre utilisateur</strong> positionnée dans le coin inférieur gauche de l'écran.</li>
+                <li>L'interface de saisie affiche explicitement la mention de rattachement : <em>"Se connecter à : HOSP"</em>.</li>
+                <li>Renseigner les privilèges de l'agent de l'établissement préalablement provisionné :
+                    <ul>
+                        <li><strong>Nom d'utilisateur :</strong> <code>j.dupont</code> (ou <code>j.dupont@hosp.local</code>)</li>
+                        <li><strong>Mot de passe :</strong> <code>WelcomeHosp2026</code></li>
+                    </ul>
+                </li>
+                <li>Valider pour initier l'ouverture de session. L'assistant Windows procède à la création du profil utilisateur propre au domaine (<code>C:\Users\j.dupont</code>).</li>
+            </ul>
+
+            <h3>6. Validation et correction du nom d'hôte de la station de travail</h3>
+            <p>Après l'ouverture de la première session de l'utilisateur j.dupont, une vérification au sein du conteneur par défaut <strong>Computers</strong> de l'AD a révélé que la machine était apparue sous une nomenclature générique de type <code>DESKTOP-XXXXXXX</code>.</p>
+            <p>Pour aligner la machine avec la charte de nommage de l'hôpital (<code>Hosp-CL-01</code>), le compte <code>j.dupont</code> étant un utilisateur standard sans privilèges élevés, le système a légitimement sollicité un contrôle des comptes d'utilisateurs (UAC) pour effectuer la modification :</p>
+            <ul>
+                <li>Sur Hosp-CL-01, lancer la commande <code>sysdm.cpl</code>.</li>
+                <li>À l'invite de commande de l'UAC, renseigner les privilèges du compte d'administration globale du domaine pour autoriser l'élévation (<code>HOSP\Administrateur</code> / <code>AdminHosp2026</code>).</li>
+                <li>Dans la fenêtre des Propriétés système, cliquer sur Modifier.</li>
+                <li>Remplacer la chaîne de caractères dans le champ Nom de l'ordinateur par : <strong>Hosp-CL-01</strong>.</li>
+                <li>Valider les modifications, accepter l'avertissement et procéder au redémarrage du poste client.</li>
+            </ul>
+            <p>Une fois la console Active Directory actualisée (touche F5) sur Hosp-AD-01, le poste de travail de la zone d'Administration est désormais correctement et proprement répertorié sous l'identité <strong>Hosp-CL-01.hosp.local</strong>.</p>
+        </section>
+
+        <!-- Étape 30 -->
+        <section>
+            <h2>Étape 30 : Déploiement des GPO de durcissement initial et intégration du segment Biomédical</h2>
+            
+            <h3>1. Configuration des stratégies de groupe (GPO) sur Hosp-AD-01</h3>
+            <p>Conformément aux exigences de sécurité pour un Établissement de Santé d'Importance Vitale (OIV), la sécurisation des accès et des postes de travail est centralisée sur le contrôleur de domaine via la console de <em>Gestion des stratégies de groupe</em> (<code>gpmc.msc</code>).</p>
+            <p>Le déploiement a été divisé en deux types d'interventions distinctes : la modification de la stratégie globale du domaine pour les comptes (complexité des mots de passe, historique), et la création d'un objet dédié aux restrictions matérielles (verrouillage de session, blocage des ports USB) lié à l'OU <em>Ordinateurs</em>.</p>
+
+            <h3>2. Déploiement de la brique Biomédicale (VLAN 50)</h3>
+            <p>Pour simuler l'isolation du réseau d'imagerie médicale (PACS/Radiologie) qui transporte des flux sensibles non chiffrés (DICOM), un nœud Linux léger <code>Hosp-BIO-01</code> est interconnecté sur le segment étanche du laboratoire.</p>
+            <ul>
+                <li>Sur EVE-NG, démarrer l'équipement virtuel Linux affecté au VLAN 50.</li>
+                <li>Assigner manuellement les paramètres réseau statiques :
+                    <ul>
+                        <li>Adresse IP : <code>10.0.50.10</code></li>
+                        <li>Masque : <code>255.255.255.0</code></li>
+                        <li>Passerelle : <code>10.0.50.254</code> (Interface pfSense VLAN 50)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>3. Application de la matrice de flux sur le pfSense</h3>
+            <p>Afin de restreindre les droits d'initiation de connexions du VLAN 50, les règles de pare-feu pfSense sont éditées pour lui interdire l'accès aux réseaux internes (VLAN 30, VLAN 10), tout en maintenant l'accès aux serveurs d'annuaire et d'imagerie (VLAN 60).</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ordre</th>
+                        <th>Action</th>
+                        <th>Protocole</th>
+                        <th>Source</th>
+                        <th>Destination</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td><strong>PASS</strong></td>
+                        <td>Any</td>
+                        <td>VLAN50 net</td>
+                        <td>10.0.60.0/24</td>
+                        <td>Autorise l'accès aux Serveurs du VLAN 60 (DNS, Active Directory)</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><strong>BLOCK</strong></td>
+                        <td>Any</td>
+                        <td>VLAN50 net</td>
+                        <td>10.0.30.0/24</td>
+                        <td>Bloque immédiatement l'accès au VLAN 30 (Administration)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><strong>BLOCK</strong></td>
+                        <td>Any</td>
+                        <td>VLAN50 net</td>
+                        <td>10.0.10.0/24</td>
+                        <td>Bloque immédiatement l'accès au VLAN 10 (Management)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td><strong>PASS</strong></td>
+                        <td>Any</td>
+                        <td>VLAN50 net</td>
+                        <td>Any</td>
+                        <td>Autorise la sortie vers l'extérieur (Internet si nécessaire)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Section Perspectives / Teaser -->
+        <section>
+            <h2>Perspectives : En route vers le Projet 2 (SecOps &amp; Résilience)</h2>
+            <p>Le Projet 1 a permis de poser des fondations saines, étanches et robustes : le réseau "plat" n'existe plus, l'identité est centralisée et durcie, et le trafic inter-VLAN est soumis au principe du moindre privilège.</p>
+            <p>Mais dans un Établissement de Santé d'Importance Vitale (ESIV), durcir le réseau ne suffit pas. Face aux menaces modernes, nous devons être capables de Détecter, Réagir et Survivre. Le <strong>Projet 2</strong> propulsera cette infrastructure dans une dimension SecOps industrielle et hautement disponible.</p>
+
+            <h3>Les 4 Piliers Technologiques du Projet 2</h3>
+            <ul>
+                <li><strong>1. Haute Disponibilité Périmétrique (HA) :</strong> Remplacement de l'instance pfSense unique par un Cluster FortiGate HA (Active/Passive) avec synchronisation d'état matérielle et basculement automatique sans perte de session (Failover &amp; Multi-WAN).</li>
+                <li><strong>2. Supervision SOC active (SIEM &amp; IDS) :</strong> Déploiement du moteur de détection Wazuh (SIEM/HIDS) interconnecté avec les sondes de détection d'intrusion Suricata (IPS) pour analyser en temps réel les comportements suspects sur les serveurs et postes clients.</li>
+                <li><strong>3. Orchestration de la Réponse (SOAR) :</strong> Centralisation et tri des incidents via la stack souveraine TheHive &amp; Cortex pour corréler les alertes, automatiser l'analyse de fichiers malveillants et guider l'analyste SOC dans l'endiguement de la menace.</li>
+                <li><strong>4. Sauvegarde Immuable (WORM) :</strong> Mise en place de sauvegardes centralisées avec Bacula répliquées vers un stockage objet MinIO S3 durci avec activation de l'Object Lock. Même en cas de compromission totale de l'AD, les sauvegardes restent inviolables et insupprimables.</li>
+            </ul>
+
+            <div class="warning-box" style="border-left-color: var(--accent); background-color: var(--accent-light);">
+                Rendez-vous au Projet 2 pour découvrir comment transformer cette infrastructure réseau durcie en une véritable forteresse numérique, capable d'encaisser, de détecter et de restaurer ses services critiques en moins d'une heure après un sinistre cyber.
+            </div>
+        </section>
+
+        <footer>
+            <p>Conçu et réalisé par AGBOGAN Kossi Christian Daniel Esuté — Projet INITIUM 2026</p>
+        </footer>
+    </div>
+</body>
+</html>

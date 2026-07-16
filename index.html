@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christian Agbogan | Architecture & Sécurité des Systèmes d'Information</title>
+    <style>
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --border: #e2e8f0;
+            --text-title: #0f172a;
+            --text-body: #334155;
+            --text-light: #64748b;
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-body);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            padding: 4rem 1.5rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* En-tête : focus sur la posture */
+        header {
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: var(--text-title);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .pitch {
+            font-size: 1.15rem;
+            color: var(--text-body);
+            margin: 2rem 0;
+            line-height: 1.7;
+            font-weight: 400;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between; /* Pousse les éléments aux extrémités de la ligne */
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 0;
+            margin-top: 2rem;
+        }
+
+        .meta-info a {
+            color: var(--text-body);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s;
+        }
+
+        .meta-info a:hover {
+            color: var(--primary);
+        }
+
+        .meta-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-body);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        a.meta-item:hover {
+            color: var(--primary);
+        }
+
+        .meta-item svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* Philosophie de conception */
+        h2 {
+            font-size: 1.25rem;
+            color: var(--text-title);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        section {
+            margin-bottom: 4rem;
+        }
+
+        .philosophy-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .philosophy-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .philosophy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+        }
+
+        .philosophy-card h3 {
+            font-size: 1.05rem;
+            color: var(--text-title);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .philosophy-card p {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Études de cas (Projets) */
+        .case-studies {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .case-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .case-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .case-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .case-title {
+            font-size: 1.3rem;
+            color: var(--text-title);
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 1rem;
+        }
+
+        .case-desc {
+            font-size: 0.95rem;
+            color: var(--text-body);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .case-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .tech-stack {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-family: monospace;
+        }
+
+        .btn-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: 6rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+
+        /* Style pour la section de présentation rapide */
+        .about-teaser-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .about-teaser-card p {
+            font-size: 1.05rem;
+            color: var(--text-body);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .about-teaser-card .btn-link {
+            align-self: flex-start;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- En-tête : Présentation de ta démarche -->
+        <header>
+            <h1>AGBOGAN Kossi Christian Daniel Esuté</h1>
+            <div class="subtitle">Sécurité des Systèmes d'Information & Infrastructure</div>
+
+            <p class="pitch">
+                J'envisage la cybersécurité par le prisme de l'architecture. Plutôt que de multiplier les outils défensifs de manière isolée, je m'attache à concevoir des infrastructures intrinsèquement résilientes, où chaque mesure technique répond directement à une analyse de risque formalisée.
+            </p>
+
+            <div class="meta-info">
+                <!-- Localisation -->
+                <span class="meta-item">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    Dakar, Sénégal
+                </span>
+
+                <!-- LinkedIn -->
+                <a href="https://linkedin.com/in/christ-agbogan" target="_blank" class="meta-item">
+                    <svg viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                    LinkedIn
+                </a>
+
+                <!-- GitHub -->
+                <a href="https://github.com/douz-deville" target="_blank" class="meta-item">
+                    <svg viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+                    GitHub
+                </a>
+
+                <!-- Contact / Mail -->
+                <a href="mailto:kossi-christian.agbogan@ism.edu.sn" class="meta-item">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    Me contacter
+                </a>
+            </div>
+        </header>
+
+        <!-- Section Qui suis-je / À Propos -->
+        <section>
+            <h2>Qui suis-je ?</h2>
+            <div class="about-teaser-card">
+                <p>
+                    Je m'appelle <strong>Kossi Christian Daniel Esuté AGBOGAN</strong>. 
+                    Spécialisé dans la Sécurité des Systèmes d'Information et des Réseaux, je m'efforce de concevoir des architectures robustes et intrinsèquement résilientes. Mon objectif est de transformer la sécurité d'une contrainte technique en un pilier structurel de l'infrastructure d'entreprise.
+                </p>
+                <a href="about.html" class="btn-link">Découvrir mon parcours &amp; mes compétences →</a>
+            </div>
+        </section>
+
+        <!-- Philosophie de conception (Remplace la liste brute de compétences) -->
+        <section>
+            <h2>Principes de Conception</h2>
+            <div class="philosophy-grid">
+                
+                <div class="philosophy-card">
+                    <h3>Gouvernance & Alignement</h3>
+                    <p>Traduire l'analyse de risque opérationnelle en politiques de sécurité concrètes. Chaque décision technique s'appuie sur une modélisation préalable de la menace.</p>
+                </div>
+
+                <div class="philosophy-card">
+                    <h3>Cloisonnement Système</h3>
+                    <p>Déconstruire les architectures plates. L'étanchéité des réseaux et l'isolation des segments critiques constituent la première ligne de défense.</p>
+                </div>
+
+                <div class="philosophy-card">
+                    <h3>Identité de Confiance</h3>
+                    <p>Centraliser et durcir l'accès aux ressources. L'application stricte du moindre privilège régit la gestion des annuaires et des flux.</p>
+                </div>
+
+                <div class="philosophy-card">
+                    <h3>Détection Ciblée</h3>
+                    <p>Superviser avec méthode. Mettre en place des mécanismes d'alerte et de collecte corrélés aux scénarios de risques prioritaires de l'organisation.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Études de cas (Projets rédigés de manière éditoriale) -->
+        <section>
+            <h2>Études de cas</h2>
+            <div class="case-studies">
+                
+                <!-- Projet 1 -->
+                <div class="case-card">
+                    <span class="case-tag">Architecture Réseau & Identité</span>
+                    <a href="projet-1-initium/index.html" class="case-title">Projet INITIUM : Refonte et durcissement d'une infrastructure hospitalière</a>
+                    <p class="case-desc">
+                        À la suite d'un audit révélant des vulnérabilités critiques, ce projet détaille la restructuration globale d'un système d'information de santé. L'intervention se concentre sur l'étanchéité réseau par segmentation dynamique et sur l'implémentation d'une politique d'identité rigoureuse pour isoler les équipements médicaux sensibles.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">pfSense / Active Directory / VLAN / GPO</span>
+                        <a href="projet-1-initium/index.html" class="btn-link">Consulter l'architecture →</a>
+                    </div>
+                </div>
+
+                <!-- Projet 2 -->
+                <div class="case-card">
+                    <span class="case-tag">Gestion des Accès (IAM)</span>
+                    <span class="case-title" style="color: var(--text-title);">Fédération d'identité souveraine et authentification unifiée</span>
+                    <p class="case-desc">
+                        Conception d'une infrastructure d'identité centralisée et sécurisée hors cloud. Ce travail technique explore l'interconnexion de protocoles d'annuaire d'entreprise avec des solutions de fédération SSO pour garantir un contrôle d'accès granulaire et chiffré sur l'ensemble des applicatifs.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">FreeIPA / Keycloak / LDAP / OIDC</span>
+                        <span style="color: var(--text-light); font-size: 0.85rem; font-style: italic;">En cours de documentation</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Pied de page -->
+        <footer>
+            <p>&copy; 2026 AGBOGAN Kossi Christian Daniel Esuté. Tous droits réservés.</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

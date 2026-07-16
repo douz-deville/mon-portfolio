@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À Propos — Christian Agbogan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --code-bg: #1c1c1e;
+            --code-text: #f4f4f5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.625;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+        }
+
+        .highlight-box {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .skill-card {
+            background: #f1f0ec;
+            padding: 1.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .skill-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        .skill-card ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .skill-card li {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .skill-card li::before {
+            content: "→";
+            color: var(--accent);
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation alignée à gauche et à droite -->
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR À L'ACCUEIL</a>
+            <a href="mailto:kossi-christian.agbogan@ism.edu.sn">ME CONTACTER →</a>
+        </nav>
+
+        <header>
+            <div class="meta">PROFIL TECHNIQUE</div>
+            <h1>À propos de moi</h1>
+            <p style="font-size: 1.15rem; color: var(--text-muted); line-height: 1.7;">
+                Je m'appelle <strong>Kossi Christian Daniel Esuté AGBOGAN</strong>. 
+                Passionné par la conception et la sécurisation d'infrastructures d'information, j'évolue dans le domaine de la Sécurité des Systèmes d'Information et des Réseaux.
+            </p>
+        </header>
+
+        <section>
+            <h2>Ma Vision</h2>
+            <p>
+                Pour moi, la cybersécurité ne s'ajoute pas comme une couche logicielle après coup. Elle doit être intégrée dès la genèse de l'infrastructure. Mon approche repose sur la construction d'architectures réseau intrinsèquement résilientes, la segmentation stricte des flux (principe du moindre privilège) et l'automatisation de la surveillance.
+            </p>
+            <div class="highlight-box">
+                Mon but est de concevoir des environnements robustes capables d'encaisser, d'isoler et de répondre de manière autonome aux menaces d'aujourd'hui, notamment les attaques par ransomwares et les compromissions internes.
+            </div>
+        </section>
+
+        <section>
+            <h2>Expertises &amp; Technologies</h2>
+            <p>Mon parcours m'a amené à manipuler, configurer et administrer un large éventail d'outils et de concepts :</p>
+            
+            <div class="skills-grid">
+                <!-- Réseau & Sécurité -->
+                <div class="skill-card">
+                    <h3>Réseau &amp; Pare-feu</h3>
+                    <ul>
+                        <li>Segmentation VLAN</li>
+                        <li>pfSense / FortiGate (HA)</li>
+                        <li>Architecture Inter-VLAN</li>
+                        <li>Routage statique &amp; dynamique</li>
+                    </ul>
+                </div>
+
+                <!-- Systèmes & Identité -->
+                <div class="skill-card">
+                    <h3>Systèmes &amp; Annuaire</h3>
+                    <ul>
+                        <li>Active Directory (AD DS)</li>
+                        <li>Windows Server 2016+</li>
+                        <li>Group Policy Objects (GPO)</li>
+                        <li>Virtualisation (KVM / QEMU / EVE-NG)</li>
+                    </ul>
+                </div>
+
+                <!-- Supervision / SecOps -->
+                <div class="skill-card">
+                    <h3>Supervision &amp; SOC</h3>
+                    <ul>
+                        <li>SIEM Wazuh / HIDS</li>
+                        <li>Sonde IDS Suricata</li>
+                        <li>Incident Response (TheHive)</li>
+                        <li>Sauvegarde Immuable (MinIO WORM)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Mon Parcours Académique</h2>
+            <p>
+                Actuellement étudiant à l'<strong>ISM (Institut Supérieur de Management)</strong> à Dakar, Sénégal, j'approfondis mes compétences théoriques et pratiques en sécurité informatique. C'est à travers des projets rigoureux et des maquettages intensifs sur des environnements comme EVE-NG que je valide mes choix d'architecture technique.
+            </p>
+        </section>
+
+        <footer>
+            © 2026 Kossi Christian Daniel Esuté AGBOGAN. Tous droits réservés.
+        </footer>
+    </div>
+</body>
+</html>
