@@ -493,7 +493,7 @@
                 </tbody>
             </table>
 
-            <p><strong>Quelques précisions techniques importantes pour tes notes :</strong><br>
+            <p><strong>Quelques précisions techniques importantes :</strong><br>
             - <strong>VLAN Tag :</strong> C'est le numéro unique (la norme 802.1Q) qui va être injecté dans l'en-tête de chaque paquet réseau pour que le switch et le pfSense sachent à quel service de l'hôpital appartient la donnée.<br>
             - <strong>VLAN Priority :</strong> On laisse la valeur par défaut à 0 (qui correspond au trafic standard sans priorité, appelé Best Effort). En production hospitalière, on utiliserait des priorités plus hautes (comme 5 ou 6) pour la voix sur IP (VoIP) ou la télémétrie cardiaque critique, mais pour notre laboratoire, 0 est parfait.<br>
             - <strong>Description :</strong> On met exactement ces noms en majuscules. Cela permettra de se retrouver instantanément à l'étape suivante lorsque nous assignerons ces tags à des interfaces logiques.</p>
@@ -554,7 +554,7 @@
             <h2>Étape 7.5 : Résolution du blocage de l'accès WebGUI (IP WAN)</h2>
             <p>Après la validation de l'assistant initial, le pare-feu active par sécurité ses mécanismes de protection restrictifs. Dans un environnement de laboratoire virtuel où l'administration s'effectue par la patte externe (WAN), ces protections provoquent un blocage immédiat de l'interface graphique.</p>
 
-            <h3>1. Déblocage d'urgence via la console Termius</h3>
+            <h3>Déblocage d'urgence via la console Termius</h3>
             <p>Pour reprendre la main temporairement sans perdre la configuration, il faut désactiver le filtrage actif en ligne de commande :</p>
             <ol>
                 <li>Ouvrir la session Terminal <strong>Host-Initium-pfSense</strong>.</li>
@@ -564,17 +564,7 @@
                 <p><em>(La console affiche la confirmation "pf disabled", l'accès au navigateur est instantanément restauré).</em></p>
             </ol>
 
-            <h3>2. Pérennisation des accès dans l'interface Web</h3>
-            <p>Pour éviter que le blocage ne se reproduise au prochain redémarrage du système, les vérifications d'accès doivent être désactivées de manière définitive :</p>
-            <ol>
-                <li>Retourner sur le navigateur web et actualiser la page d'administration.</li>
-                <li>Naviguer vers le menu : <strong>System > Advanced</strong>.</li>
-                <li>Dans l'onglet <strong>Admin Access</strong>, faire défiler la page jusqu'à la section <strong>WebGUI Anti-Lockout / DNS Rebind / Browser HTTP_REFERER Enforcement</strong>.</li>
-                <li>Cocher la case : <strong>Disable DNS Rebind Checks</strong>.</li>
-                <li>Cocher la case : <strong>Disable HTTP_REFERER enforcement</strong>.</li>
-                <li>Descendre tout en bas de la page et cliquer sur le bouton bleu <strong>Save</strong>.</li>
-            </ol>
-            <p><strong>Note technique :</strong> Ces manipulations désactivent la vérification de la provenance des requêtes HTTP et la protection contre le rebind DNS, une configuration indispensable pour administrer confortablement un pfSense virtualisé depuis son système hôte.</p>
+            
         </section>
 
         <section>

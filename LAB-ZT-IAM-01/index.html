@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB-ZT-IAM-01 — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 4rem;
+        }
+
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+
+        .lead {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 700px;
+        }
+
+        .author-tag {
+            margin-top: 1.5rem;
+            display: inline-block;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .stack-tag {
+            margin-top: 1.5rem;
+            margin-left: 0.5rem;
+            display: inline-block;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            border-radius: 4px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.04);
+        }
+
+        .card h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card h2::after {
+            content: "→";
+            color: var(--accent);
+            font-weight: 300;
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover h2::after {
+            transform: translateX(4px);
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        footer a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AU PORTFOLIO</a>
+        </nav>
+
+        <header>
+            <div class="meta">LAB PERSONNEL — NIVEAU 1</div>
+            <h1>LAB-ZT-IAM-01</h1>
+            <p class="lead">Conception et validation d'une architecture Zero Trust : point d'entrée unique, gestion centralisée des identités (IAM) et vérification cryptographique systématique au niveau applicatif.</p>
+            <div class="author-tag">Par AGBOGAN Kossi Christian Daniel Esuté</div>
+            <div class="stack-tag">Keycloak · Nginx · Flask · KVM/libvirt</div>
+        </header>
+
+        <div class="grid">
+            <a href="overview.html" class="card">
+                <div>
+                    <h2>Vue Synthétique</h2>
+                    <p>Le problème résolu, l'importance du modèle Zero Trust pour une organisation, et les compétences démontrées. Destiné aux profils non-techniques et recruteurs.</p>
+                </div>
+            </a>
+            <a href="guide.html" class="card">
+                <div>
+                    <h2>Guide Technique Complet</h2>
+                    <p>Déroulé d'implémentation complet pas-à-pas : réseau KVM, configuration Keycloak, API Flask, reverse proxy Nginx et résolution des incidents rencontrés.</p>
+                </div>
+            </a>
+        </div>
+
+        <footer>
+            <div>Mise à jour : 25 Juillet 2026</div>
+            <div>Projet LAB-ZT-IAM-01 — Tous droits réservés</div>
+        </footer>
+    </div>
+</body>
+</html>

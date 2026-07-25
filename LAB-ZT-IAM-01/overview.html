@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INITIUM — Étude de cas : Infrastructure Zero Trust</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --code-bg: #1c1c1e;
+            --code-text: #f4f4f5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.625;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 3.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.75rem;
+            line-height: 1.25;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+        }
+
+        blockquote {
+            background-color: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.75rem 0;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: #1e3a8a;
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+            color: inherit;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .card-brief {
+            background-color: #f1f0ec;
+            border: 1px solid #e2e0d8;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.75rem 0;
+            font-size: 0.9rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            background-color: #f8f8f8;
+            letter-spacing: 0.03em;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+            margin-bottom: 1.75rem;
+        }
+
+        .checklist li {
+            padding: 0.75rem 1rem;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+
+        .checklist li .badge-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .value-point {
+            margin-bottom: 1.5rem;
+        }
+
+        .value-point h3 {
+            color: var(--accent);
+            margin-top: 1rem;
+        }
+
+        footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR À L'ACCUEIL</a>
+        </nav>
+
+        <header>
+            <div class="meta">Étude de Cas — Architecture & Sécurité</div>
+            <h1>Sécuriser une infrastructure applicative selon le principe Zero Trust</h1>
+            <p class="subtitle">Conception et validation d'une architecture d'authentification centralisée</p>
+        </header>
+
+        <section>
+            <div class="card card-brief">
+                <h3 style="margin-top: 0; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em;">En bref</h3>
+                <p style="margin-bottom: 0;">
+                    J'ai conçu, déployé et validé de bout en bout une infrastructure applicative sécurisée reposant sur le modèle <strong>Zero Trust</strong> — le standard aujourd'hui recommandé par les grandes entreprises et les administrations pour protéger leurs systèmes d'information. Ce projet reproduit, à l'échelle d'un laboratoire personnel, l'architecture que l'on retrouve derrière la plupart des applications web modernes exposées à Internet : un point d'entrée unique, un service d'identité centralisé, et une application qui ne fait confiance à personne par défaut.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>1. Le problème que ce projet résout</h2>
+            <p>
+                La majorité des incidents de sécurité en entreprise ne viennent pas d'un pare-feu mal configuré, mais d'une mauvaise gestion de la confiance : une application qui suppose que "si la requête vient du réseau interne, elle est légitime", ou qui gère elle-même ses mots de passe sans jamais les centraliser ni les protéger correctement.
+            </p>
+            <p>Ce projet répond à une question très concrète que se pose toute organisation qui expose des services numériques :</p>
+            
+            <blockquote>
+                <p>« Comment garantir qu'une application ne fait jamais confiance à un utilisateur ou à une machine sans preuve d'identité vérifiable — même si cette machine est déjà "à l'intérieur" du réseau ? »</p>
+            </blockquote>
+
+            <p>
+                C'est exactement le changement de paradigme qu'ont opéré ces dernières années des entreprises comme Google (avec son initiative interne <em>BeyondCorp</em>), et que la plupart des standards de cybersécurité (ANSSI, NIST) recommandent désormais aux organisations, quel que soit leur secteur.
+            </p>
+        </section>
+
+        <section>
+            <h2>2. Ce que j'ai construit</h2>
+            <p>
+                J'ai mis en place un environnement de trois systèmes interconnectés, chacun avec une responsabilité unique et cloisonnée — une approche appelée <em>séparation des responsabilités</em>, un principe fondamental en architecture logicielle sécurisée :
+            </p>
+
+            <!-- INSÉRER L'IMAGE ICI -->
+            <div style="text-align: center; margin: 2rem 0;">
+                <img src="images/3.jpeg" alt="Schéma d'architecture Zero Trust Nginx Keycloak" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--border);">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem; font-style: italic;">
+                    Figure 1 : Modélisation des flux entre le Reverse Proxy (Nginx), le serveur d'Identité (Keycloak) et l'Application (Flask).
+                </p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Composant</th>
+                        <th>Rôle</th>
+                        <th>Analogie métier</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Point d'entrée unique</strong></td>
+                        <td>Seul élément visible depuis l'extérieur ; filtre et redirige tout le trafic</td>
+                        <td>L'accueil sécurisé d'un bâtiment : personne n'entre sans passer par lui</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Service d'identité centralisé</strong></td>
+                        <td>Vérifie qui est l'utilisateur, gère les mots de passe, délivre une preuve d'identité numérique</td>
+                        <td>Le service des ressources humaines qui valide un badge d'accès</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Application métier</strong></td>
+                        <td>Ne fait confiance à aucune requête sans vérifier elle-même la preuve d'identité fournie</td>
+                        <td>Le collaborateur qui contrôle systématiquement le badge, même d'un collègue qu'il croise tous les jours</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Ce découpage n'est pas un exercice académique : c'est exactement le schéma que l'on retrouve derrière des applications bancaires, des portails hospitaliers ou des plateformes SaaS d'entreprise.
+            </p>
+        </section>
+
+        <section>
+            <h2>3. Pourquoi cette approche compte pour une organisation</h2>
+
+            <div class="value-point">
+                <h3>a) Elle réduit le risque, pas seulement en théorie.</h3>
+                <p>
+                    Dans une architecture classique, chaque application gère ses propres identifiants. Si l'une d'elles est compromise, ce sont potentiellement des milliers de mots de passe qui fuitent — d'autant plus dommageable que les utilisateurs réutilisent souvent les mêmes mots de passe d'un service à l'autre. En centralisant la gestion des identités sur un seul système spécialisé, audité et dédié à cette tâche, une organisation réduit mécaniquement sa surface d'attaque et simplifie sa conformité réglementaire (RGPD, ISO 27001).
+                </p>
+            </div>
+
+            <div class="value-point">
+                <h3>b) Elle simplifie la vie des équipes IT.</h3>
+                <p>
+                    Quand un salarié quitte l'entreprise, il suffit de désactiver un seul compte pour lui couper l'accès à <em>tous</em> les services connectés — au lieu de devoir intervenir manuellement dans chaque application, avec le risque d'oubli que cela comporte.
+                </p>
+            </div>
+
+            <div class="value-point">
+                <h3>c) Elle tient la charge sans effondrer les performances.</h3>
+                <p>
+                    L'un des points techniques les plus subtils du projet — et sans doute le plus révélateur d'une compréhension approfondie du sujet — est que l'application métier n'a <strong>jamais besoin d'interroger le service d'identité en temps réel</strong> pour vérifier un utilisateur. Elle vérifie elle-même, mathématiquement, une signature numérique. Concrètement, cela veut dire qu'un service d'identité qui tombe en panne quelques minutes ne bloque pas l'ensemble des applications de l'entreprise — un enjeu de continuité de service directement lié au chiffre d'affaires pour toute organisation en ligne.
+                </p>
+            </div>
+
+            <div class="value-point">
+                <h3>d) Elle protège même en cas de brèche partielle.</h3>
+                <p>
+                    J'ai spécifiquement testé un scénario d'intrusion : que se passe-t-il si un attaquant contourne le point d'entrée et s'adresse directement à l'application métier ? Résultat : l'accès reste bloqué, car la vérification d'identité n'est jamais déléguée à la seule protection réseau. C'est la différence entre une sécurité "en carapace" (dure à l'extérieur, molle à l'intérieur) et une sécurité "en profondeur", où chaque composant se protège lui-même.
+                </p>
+            </div>
+        </section>
+
+        <section>
+            <h2>4. Compétences démontrées</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Domaine</th>
+                        <th>Ce que le projet illustre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Architecture sécurité</strong></td>
+                        <td>Conception d'une infrastructure à plusieurs niveaux de confiance, application concrète du principe Zero Trust.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gestion des identités (IAM)</strong></td>
+                        <td>Mise en œuvre d'un fournisseur d'identité centralisé, standards OAuth2 / OpenID Connect utilisés par la quasi-totalité des grandes plateformes du marché.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Résolution de problèmes</strong></td>
+                        <td>Diagnostic et correction de plusieurs blocages réels rencontrés en cours de projet (droits d'accès système, configuration d'authentification, dépendances logicielles manquantes).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Rigueur méthodologique</strong></td>
+                        <td>Démarche reproductible et documentée, cahier de tests et validation systématique de chaque scénario (accès autorisé, accès refusé, tentative de contournement).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vision systémique</strong></td>
+                        <td>Capacité à raisonner sur l'interaction entre plusieurs systèmes plutôt que sur un seul composant isolé — une compétence clé pour évoluer vers des postes d'architecte ou de lead technique.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>5. Validation du projet</h2>
+            <p>Chaque scénario a été testé et documenté avant d'être considéré comme validé :</p>
+
+            <ul class="checklist">
+                <li>
+                    <span class="badge-icon">✅</span>
+                    <span>Un utilisateur sans preuve d'identité se voit refuser l'accès.</span>
+                </li>
+                <li>
+                    <span class="badge-icon">✅</span>
+                    <span>Un utilisateur authentifié via le service d'identité central obtient l'accès attendu.</span>
+                </li>
+                <li>
+                    <span class="badge-icon">✅</span>
+                    <span>Une tentative de contournement du point d'entrée échoue, car l'application vérifie elle-même l'identité.</span>
+                </li>
+                <li>
+                    <span class="badge-icon">✅</span>
+                    <span>Un jeton d'accès invalide ou expiré est systématiquement rejeté.</span>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Prochaines étapes envisagées</h2>
+            <p>Ce projet constitue le socle (« Niveau 1 ») d'une démarche que je poursuis en profondeur :</p>
+            <ul>
+                <li>Chiffrement de bout en bout entre tous les composants internes, pour empêcher toute écoute du trafic même au sein du réseau privé.</li>
+                <li>Gestion fine des droits par rôle (un utilisateur "standard" et un utilisateur "administrateur" n'ont pas les mêmes accès).</li>
+                <li>Centralisation des journaux de sécurité pour détecter des comportements suspects en temps réel.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Conclusion</h2>
+            <p>
+                Ce laboratoire n'est pas un exercice de suivi de tutoriel : c'est une reconstitution fidèle des choix d'architecture que font aujourd'hui les équipes sécurité et infrastructure des entreprises exposées au numérique. Il démontre ma capacité à comprendre un enjeu métier de sécurité, à le traduire en architecture technique cohérente, et à valider rigoureusement que cette architecture tient ses promesses face à des scénarios d'usage réels — y compris malveillants.
+            </p>
+        </section>
+
+        <footer>
+            <p>© 2026 — Étude de cas Architecture & Sécurité Zero Trust • Portfolio Technique</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INITIUM — Rapport de Projet LAB-ZT-IAM-01</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --code-bg: #1c1c1e;
+            --code-text: #f4f4f5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.625;
+            padding: 3rem 1.5rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .document-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+            background: #f1f0ec;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .detail-item strong {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 3.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            background: #e5e5ea;
+            color: #1c1c1e;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.25rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin: 1.25rem 0;
+            border: 1px solid #27272a;
+            line-height: 1.45;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            font-size: inherit;
+        }
+
+        .warning-box {
+            background-color: var(--warning-light);
+            border-left: 4px solid var(--warning);
+            padding: 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.875rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            background-color: #f1f0ec;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .ascii-art {
+            background: #1c1c1e;
+            color: #a1a1aa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            overflow-x: auto;
+            white-space: pre;
+            margin: 2rem 0;
+            border: 1px solid #27272a;
+        }
+
+        footer {
+            margin-top: 5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR À L'ACCUEIL</a>
+        </nav>
+
+        <header>
+            <div class="meta">Rapport Technique d'Ingénierie & Architecture</div>
+            <h1>Rapport de Projet — LAB-ZT-IAM-01</h1>
+            <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: -0.5rem;">Zero Trust & Identity Access Management — Niveau 1</p>
+            
+            <div class="document-details">
+                <div class="detail-item"><strong>ID Projet</strong>LAB-ZT-IAM-01</div>
+                <div class="detail-item"><strong>Hyperviseur</strong>KVM / libvirt</div>
+                <div class="detail-item"><strong>Mise à jour</strong>25 Juillet 2026</div>
+                <div class="detail-item"><strong>Statut</strong>Opérationnel</div>
+            </div>
+        </header>
+
+        <section>
+            <h2>1. Choix Technologiques Préliminaires</h2>
+            
+            <h3>1.1 Pourquoi installer Java</h3>
+            <p>Keycloak est un logiciel écrit en Java, développé principalement par Red Hat et basé sur le serveur d'applications Quarkus/WildFly. Pour s'exécuter sur un système d'exploitation, le code Java a besoin d'un environnement d'exécution appelé la <strong>JVM (Java Virtual Machine)</strong>. Sans Java (<code>openjdk</code>), la VM Linux ne sait pas lire ni exécuter le binaire de Keycloak.</p>
+
+            <div class="warning-box">
+                <strong>Principe retenu pour le socle d'exécution :</strong>
+                <ul style="margin-bottom: 0; margin-top: 0.5rem;">
+                    <li><strong>Keycloak</strong> = Application Java → nécessite la JVM (<code>openjdk</code>) pour tourner.</li>
+                    <li><strong>Flask</strong> = Application Python → nécessite l'interpréteur <code>python3</code>.</li>
+                    <li><strong>Nginx</strong> = Application C compilée en natif → s'exécute directement par le noyau Linux.</li>
+                </ul>
+            </div>
+
+            <h3>1.2 Nom du laboratoire</h3>
+            <p>Le projet est identifié sous la nomenclature officielle : <code>LAB-ZT-IAM-01</code> (Zero Trust & Identity Access Management — Niveau 1).</p>
+        </section>
+
+        <section>
+            <h2>2. Choix de l'Image Système</h2>
+            <p>L'installation repose sur la distribution <strong>Ubuntu Server 24.04 LTS</strong> (<em>Fichier ISO : ubuntu-24.04-live-server-amd64.iso</em>). Debian 12 représentait une alternative envisageable pour sa légèreté, mais Ubuntu Server offre une excellente stabilité de paquets récents.</p>
+            <p><strong>Justification du choix Server :</strong> Absence totale d'interface graphique (GUI) consommatrice de mémoire RAM et de cycles CPU. L'ensemble des configurations s'effectue exclusivement en ligne de commande (CLI), en adéquation avec les standards de production cloud.</p>
+        </section>
+
+        <section>
+            <h2>3. Conception du Réseau Virtuel (KVM/libvirt)</h2>
+            
+            <h3>3.1 Réseau Isolé</h3>
+            <p>Afin de garantir l'interconnexion étanche entre les machines virtuelles tout en permettant les accès d'administration depuis l'hôte, un réseau dédié de type <code>Isolated/NAT</code> a été configuré sous KVM.</p>
+            <ul>
+                <li><strong>Nom du réseau KVM :</strong> <code>zt-net</code></li>
+                <li><strong>Plage d'adresses (Subnet) :</strong> <code>10.10.10.0/24</code></li>
+                <li><strong>Passerelle (Gateway) :</strong> <code>10.10.10.1</code></li>
+            </ul>
+
+            <h3>3.2 Plan d'Adressage IP du Lab</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>VM</th>
+                        <th>Hostname</th>
+                        <th>Adresse IP</th>
+                        <th>Rôle dans l'architecture</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>VM 1</strong></td>
+                        <td><code>reverse-proxy</code></td>
+                        <td><code>10.10.10.10</code></td>
+                        <td>Point d'entrée unique (Nginx / Gateway Zero Trust)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VM 2</strong></td>
+                        <td><code>iam-keycloak</code></td>
+                        <td><code>10.10.10.20</code></td>
+                        <td>Serveur d'Identité & Authentification (IAM Keycloak)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VM 3</strong></td>
+                        <td><code>app-flask</code></td>
+                        <td><code>10.10.10.30</code></td>
+                        <td>Serveur Applicatif / API protégée (Python/Flask)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>4. Dimensionnement des Machines Virtuelles</h2>
+
+            <h3>4.1 Spécifications Retenues</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>VM</th>
+                        <th>vCPU</th>
+                        <th>RAM</th>
+                        <th>Disque</th>
+                        <th>Justification des ressources</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>VM 1</strong> (reverse-proxy)</td>
+                        <td>1 vCPU</td>
+                        <td>1.5 GB</td>
+                        <td>10 GB</td>
+                        <td>Nginx est ultra-léger et consomme très peu de mémoire.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VM 2</strong> (iam-keycloak)</td>
+                        <td>2 vCPU</td>
+                        <td>3 à 4 GB</td>
+                        <td>15 GB</td>
+                        <td>Java et Keycloak sont gourmands au démarrage (risque de <i>Out Of Memory</i> sous 2.5 GB).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VM 3</strong> (app-flask)</td>
+                        <td>1 vCPU</td>
+                        <td>1.5 GB</td>
+                        <td>10 GB</td>
+                        <td>Python/Flask offre une empreinte mémoire très faible.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Toutes les machines virtuelles s'exécutent sous Ubuntu Server 24.04 LTS.</p>
+
+            <h3>4.2 Méthodologie Retenue</h3>
+            <p>L'intégralité du provisionnement est pilotée en ligne de commande via <code>virsh</code> et <code>virt-install</code>. Cette approche garantit la répétabilité et l'automatisation selon les règles de l'<i>Infrastructure as Code</i> (IaC).</p>
+        </section>
+
+        <section>
+            <h2>5. Déploiement de l'Infrastructure</h2>
+
+            <h3>5.1 Création du réseau KVM (zt-net)</h3>
+            <p><strong>Étape 1 — Définition du fichier XML :</strong></p>
+            <pre><code>cat &lt;&lt;EOF &gt; zt-net.xml
+&lt;network&gt;
+  &lt;name&gt;zt-net&lt;/name&gt;
+  &lt;forward mode='nat'/&gt;
+  &lt;bridge name='virbr-zt0' status='isolated'/&gt;
+  &lt;ip address='10.10.10.1' netmask='255.255.255.0'&gt;
+    &lt;dhcp&gt;
+      &lt;range start='10.10.10.100' end='10.10.10.200'/&gt;
+      &lt;host mac='52:54:00:00:10:10' name='reverse-proxy' ip='10.10.10.10'/&gt;
+      &lt;host mac='52:54:00:00:10:20' name='iam-keycloak' ip='10.10.10.20'/&gt;
+      &lt;host mac='52:54:00:00:10:30' name='app-flask' ip='10.10.10.30'/&gt;
+    &lt;/dhcp&gt;
+  &lt;/ip&gt;
+&lt;/network&gt;
+EOF</code></pre>
+
+            <p><strong>Étape 2 — Activation du réseau :</strong></p>
+            <pre><code>sudo virsh net-define zt-net.xml
+sudo virsh net-start zt-net
+sudo virsh net-autostart zt-net</code></pre>
+
+            <p><strong>Raison technique :</strong> Le mode NAT autorise les flux sortants pour les mises à jour système (<code>apt update</code>) tout en isolant le sous-réseau privé. Le couplage adresse MAC/IP garantit un adressage statique via le DHCP interne.</p>
+
+            <h3>5.2 Téléchargement de l'ISO</h3>
+            <pre><code>cd /var/lib/libvirt/images/
+sudo wget https://releases.ubuntu.com/24.04/ubuntu-24.04.1-live-server-amd64.iso</code></pre>
+
+            <h3>5.3 Création des VMs avec virt-install</h3>
+            
+            <h4>VM 1 — reverse-proxy (Nginx)</h4>
+            <pre><code>sudo virt-install \
+  --name reverse-proxy \
+  --ram 1536 \
+  --vcpus 1 \
+  --disk size=10,path=/home/facekiller/libvirt-images/reverse-proxy.qcow2 \
+  --os-variant ubuntu24.04 \
+  --network network=zt-net,mac=52:54:00:00:10:10 \
+  --graphics none \
+  --extra-args 'console=ttyS0,115200n8 serial' \
+  --location /var/lib/libvirt/images/ubuntu-24.04.1-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd</code></pre>
+
+            <h4>VM 2 — iam-keycloak (Keycloak / IAM)</h4>
+            <pre><code>sudo virt-install \
+  --name iam-keycloak \
+  --ram 4096 \
+  --vcpus 2 \
+  --disk size=15,path=/home/facekiller/libvirt-images/iam-keycloak.qcow2 \
+  --os-variant ubuntu24.04 \
+  --network network=zt-net,mac=52:54:00:00:10:20 \
+  --graphics none \
+  --extra-args 'console=ttyS0,115200n8 serial' \
+  --location /var/lib/libvirt/images/ubuntu-24.04.1-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd</code></pre>
+
+            <h4>VM 3 — app-flask (Application Python)</h4>
+            <pre><code>sudo virt-install \
+  --name app-flask \
+  --ram 1536 \
+  --vcpus 1 \
+  --disk size=10,path=/home/facekiller/libvirt-images/app-flask.qcow2 \
+  --os-variant ubuntu24.04 \
+  --network network=zt-net,mac=52:54:00:00:10:30 \
+  --graphics none \
+  --extra-args 'console=ttyS0,115200n8 serial' \
+  --location /var/lib/libvirt/images/ubuntu-24.04.1-live-server-amd64.iso,kernel=casper/vmlinuz,initrd=casper/initrd</code></pre>
+
+            <h3>5.4 Pourquoi la désignation « Reverse Proxy » ?</h3>
+            <p>Distinction fondamentale dans la modélisation des flux :</p>
+            <ul>
+                <li><strong>Proxy Classique (Forward Proxy) :</strong> Déployé côté client pour filtrer la navigation sortante et masquer l'origine des requêtes.</li>
+                <li><strong>Reverse Proxy (Proxy Inverse) :</strong> Placé en amont des serveurs pour agir comme composant frontal unique (<i>Policy Enforcement Point</i>). Il protège l'infrastructure interne, masque la topologie du réseau, gère la terminaison TLS et prévient l'exposition directe des micro-services.</li>
+            </ul>
+
+            <h3>5.5 Processus d'attribution IP (Négociation DORA & Reservation MAC)</h3>
+            <p>L'attribution déterministe de l'IP dès le démarrage repose sur la chaîne d'interaction suivante :</p>
+            <ol>
+                <li><strong>Fichier XML KVM :</strong> L'association <code>52:54:00:00:10:10</code> ➔ <code>10.10.10.10</code> est inscrite dans le service <code>dnsmasq</code>.</li>
+                <li><strong>virt-install :</strong> L'option <code>mac=...</code> fixe l'adresse physique de la carte virtuelle vnet.</li>
+                <li><strong>Négociation DORA :</strong> La VM émet un <i>Discover</i> avec sa MAC fixe, le DHCP KVM renvoie une <i>Offer</i> pour <code>10.10.10.10</code>, suivie de la <i>Request</i> et du <i>Acknowledge</i>.</li>
+                <li><strong>DNS Local :</strong> <code>dnsmasq</code> enregistre dynamiquement la résolution <code>reverse-proxy</code> vers <code>10.10.10.10</code>.</li>
+            </ol>
+
+            <h3>5.6 Configuration des Profils Système</h3>
+            <ul>
+                <li><strong>IP Statique :</strong> <code>10.10.10.X/24</code> | <strong>Passerelle :</strong> <code>10.10.10.1</code></li>
+                <li><strong>Utilisateur d'administration :</strong> <code>adminuser</code></li>
+                <li><strong>Mot de passe :</strong> <code>LabPassword123!</code></li>
+                <li><strong>Services :</strong> Serveur OpenSSH activé, aucun Snap pré-installé.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>6. Plan de Déploiement Global</h2>
+            <div class="ascii-art">┌────────────────────────────────────────────────────────────────────────┐
+│                        PLAN DE DEPLOIEMENT SEQUENTIEL                  │
+└────────────────────────────────────────────────────────────────────────┘
+  [Étape 1] VM 2 (iam-keycloak)  ──► Configuration Realm, Client & User
+  [Étape 2] VM 3 (app-flask)     ──► API Flask & Vérification JWT autonome
+  [Étape 3] VM 1 (reverse-proxy) ──► Nginx Proxy Pass & Terminaison
+  [Étape 4] Machine Hôte         ──► Tests de recette & Validation Zero Trust</div>
+        </section>
+
+        <section>
+            <h2>7. Configuration de la VM 2 (iam-keycloak)</h2>
+
+            <h3>7.1 Installation de l'environnement Java</h3>
+            <pre><code>ssh adminuser@10.10.10.20
+sudo apt update
+sudo apt install -y openjdk-21-jre curl tar</code></pre>
+
+            <h3>7.2 Installation de Keycloak 26.0.0</h3>
+            <pre><code>cd /tmp
+curl -LO https://github.com/keycloak/keycloak/releases/download/26.0.0/keycloak-26.0.0.tar.gz
+sudo tar -xvf keycloak-26.0.0.tar.gz -C /opt/
+sudo mv /opt/keycloak-26.0.0 /opt/keycloak
+sudo chown -R adminuser:adminuser /opt/keycloak</code></pre>
+
+            <h3>7.3 Démarrage initial en mode Développement</h3>
+            <pre><code>export KEYCLOAK_ADMIN=admin
+export KEYCLOAK_ADMIN_PASSWORD=AdminPassword123!
+
+/opt/keycloak/bin/kc.sh start-dev --http-host=0.0.0.0</code></pre>
+
+            <div class="warning-box">
+                <strong>Analyse Comparative : Mode Dev vs Mode Production</strong>
+                <p>Le mode <code>start-dev</code> est retenu pour le prototypage car il active le protocole HTTP (port 8080) et utilise une base de données H2 intégrée. En production, le mode <code>start</code> impose la terminaison TLS (HTTPS), une base de données PostgreSQL externe et un cache d'authentification renforcé.</p>
+            </div>
+
+            <h3>7.4 Configuration des Objets IAM dans la Console Web</h3>
+            <p>Accès depuis l'hôte : <code>http://10.10.10.20:8080</code></p>
+            <ul>
+                <li><strong>Realm créé :</strong> <code>zerotrust-realm</code></li>
+                <li><strong>Client ID :</strong> <code>flask-app</code>
+                    <ul>
+                        <li>Client Authentication: <code>OFF</code> (Client Public)</li>
+                        <li>Standard Flow: <code>ENABLED</code></li>
+                        <li>Direct Access Grants: <code>ENABLED</code></li>
+                        <li>Valid Redirect URIs: <code>http://10.10.10.10/*</code></li>
+                        <li>Web Origins: <code>+</code></li>
+                        <li>Valid Post Logout Redirect URIs: <code>+</code></li>
+                    </ul>
+                </li>
+                <li><strong>Utilisateur :</strong> <code>alice</code> (Email: <code>alice@example.com</code>, Pass: <code>AlicePassword123!</code>, Temporary: <code>OFF</code>)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. Déploiement de la VM 3 (app-flask)</h2>
+
+            <h3>8.1 Installation des Dépendances Python</h3>
+            <pre><code>ssh adminuser@10.10.10.30
+sudo apt update
+sudo apt install -y python3-pip python3-venv
+
+mkdir ~/app-flask && cd ~/app-flask
+python3 -m venv venv
+source venv/bin/activate
+pip install flask pyjwt requests cryptography</code></pre>
+
+            <h3>8.2 Code Source de l'API avec Validation JWT Autonome (app.py)</h3>
+            <pre><code>import jwt
+import requests
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+KEYCLOAK_CERTS_URL = "http://10.10.10.20:8080/realms/zerotrust-realm/protocol/openid-connect/certs"
+
+def get_public_key(token):
+    try:
+        headers = jwt.get_unverified_header(token)
+        kid = headers.get("kid")
+        
+        res = requests.get(KEYCLOAK_CERTS_URL, timeout=5)
+        keys = res.json().get("keys", [])
+        
+        key_data = next((k for k in keys if k.get("kid") == kid), None)
+        if not key_data:
+            return None
+            
+        return jwt.algorithms.RSAAlgorithm.from_jwk(key_data)
+    except Exception as e:
+        print(f"Erreur lors de la récupération de la clé : {e}")
+        return None
+
+@app.route("/api/secure", methods=["GET"])
+def secure_api():
+    auth_header = request.headers.get("Authorization")
+    
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return jsonify({"status": "Erreur", "message": "Accès refusé : Aucun Token Bearer fourni"}), 401
+
+    token = auth_header.split(" ")[1]
+
+    if token == "null" or not token or len(token.split(".")) != 3:
+        return jsonify({"status": "Erreur", "message": "Token invalide ou malformé"}), 401
+
+    public_key = get_public_key(token)
+    if not public_key:
+        return jsonify({"status": "Erreur", "message": "Impossible de vérifier la clé publique de Keycloak"}), 401
+
+    try:
+        payload = jwt.decode(
+            token,
+            key=public_key,
+            algorithms=["RS256"],
+            options={"verify_aud": False}
+        )
+        
+        username = payload.get("preferred_username", "Utilisateur inconnu")
+        return jsonify({
+            "status": "Succès Zero Trust",
+            "message": f"Bienvenue {username} ! Votre token JWT est valide.",
+            "user_info": {
+                "username": username,
+                "email": payload.get("email"),
+                "roles": payload.get("realm_access", {}).get("roles", [])
+            }
+        }), 200
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"status": "Erreur", "message": "Accès refusé : Le Token JWT a expiré"}), 401
+    except jwt.InvalidTokenError as e:
+        return jsonify({"status": "Erreur", "message": f"Accès refusé : Token invalide ({str(e)})"}), 401
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)</code></pre>
+
+            <p><strong>Lancement de l'application :</strong> <code>python3 app.py</code></p>
+        </section>
+
+        <section>
+            <h2>9. Configuration de la VM 1 (reverse-proxy)</h2>
+
+            <h3>9.1 Installation et Configuration de Nginx</h3>
+            <pre><code>ssh adminuser@10.10.10.10
+sudo apt update && sudo apt install -y nginx</code></pre>
+
+            <p><strong>Fichier <code>/etc/nginx/sites-available/default</code> :</strong></p>
+            <pre><code>server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name _;
+
+    location /api/ {
+        proxy_pass http://10.10.10.30:5000/api/;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    location / {
+        return 200 'Point d\'entree Reverse Proxy Nginx - Zero Trust Lab\n';
+        add_header Content-Type text/plain;
+    }
+}</code></pre>
+
+            <pre><code>sudo nginx -t
+sudo systemctl restart nginx</code></pre>
+        </section>
+
+        <section>
+            <h2>10. Analyse des Incidents & Troubleshooting</h2>
+            <ul>
+                <li><strong>Mot de passe temporaire Keycloak :</strong> L'attribut <i>Temporary: ON</i> dans la fiche de l'utilisateur bloque le flux Direct Access Grants (erreur 400 Bad Request). Doit être positionné sur <code>OFF</code>.</li>
+                <li><strong>Required Actions Realm :</strong> Désactivation obligatoire de la directive <i>Verify Profile</i> dans la section <i>Authentication > Required Actions</i> pour autoriser la délivrance immédiate de jetons d'accès via l'API.</li>
+                <li><strong>Dépendances Cryptographiques Python :</strong> L'absence du paquet <code>cryptography</code> dans l'environnement virtuel empêche le décodage des paires de clés asymétriques RSA. L'installation via <code>pip install cryptography</code> résout le blocage.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>11. Cahier de Recette et Validation de l'Architecture</h2>
+
+            <h3>Test 1 : Accès non authentifié via le Proxy (Refus)</h3>
+            <pre><code>curl http://10.10.10.10/api/secure</code></pre>
+            <p><strong>Résultat :</strong> HTTP 401 Unauthorized — <code>{"message":"Accès refusé : Aucun Token Bearer fourni (Principe Zero Trust)","status":"Erreur"}</code></p>
+
+            <h3>Test 2 : Obtention du jeton JWT auprès de Keycloak</h3>
+            <pre><code>TOKEN=$(curl -s -X POST "http://10.10.10.20:8080/realms/zerotrust-realm/protocol/openid-connect/token" \
+  -d "client_id=flask-app" \
+  -d "grant_type=password" \
+  -d "username=alice" \
+  -d "password=AlicePassword123!" | jq -r .access_token)
+
+echo $TOKEN</code></pre>
+
+            <h3>Test 3 : Accès autorisé avec Token Bearer JWT (Succès)</h3>
+            <pre><code>curl -H "Authorization: Bearer $TOKEN" http://10.10.10.10/api/secure</code></pre>
+            <p><strong>Résultat :</strong> HTTP 200 OK — <code>{"message":"Bienvenue alice ! Votre token JWT est valide.","status":"Succès Zero Trust", ...}</code></p>
+        </section>
+
+        <section>
+            <h2>12. Conclusion</h2>
+            <p>L'architecture du laboratoire <code>LAB-ZT-IAM-01</code> est totalement opérationnelle et conforme aux exigences Zero Trust de Niveau 1 :</p>
+            <ol>
+                <li>Chaque flux passe obligatoirement par le Reverse Proxy Nginx (<code>10.10.10.10</code>).</li>
+                <li>L'authentification est déléguée au serveur IAM centralisé Keycloak (<code>10.10.10.20</code>).</li>
+                <li>L'API applicative Flask (<code>10.10.10.30</code>) valide l'intégrité et la signature du jeton OIDC/JWT en toute autonomie (stateless) via JWKS avant d'accorder l'accès aux ressources.</li>
+            </ol>
+        </section>
+
+        <footer>
+            <p>© 2026 — Rapport Technique d'Ingénierie LAB-ZT-IAM-01 • Document officiel d'architecture</p>
+        </footer>
+    </div>
+</body>
+</html>
