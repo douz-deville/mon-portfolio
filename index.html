@@ -266,6 +266,48 @@
             gap: 0.5rem;
         }
 
+        .view-all-card {
+            background: transparent;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .view-all-card:hover {
+            border-color: var(--primary);
+            background: var(--bg-card);
+        }
+
+        .view-all-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: color 0.15s;
+        }
+
+        .view-all-card:hover .view-all-link {
+            color: var(--primary);
+        }
+
+        .view-all-link svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+            transition: transform 0.15s;
+        }
+
+        .view-all-card:hover .view-all-link svg {
+            transform: translateX(3px);
+        }
+
         
     </style>
 </head>
@@ -349,25 +391,23 @@
             </div>
         </section>
 
-        <!-- Études de cas (Projets rédigés de manière éditoriale) -->
+        <!-- Section Labs (anciennement "Études de cas") -->
         <section>
-            <h2>Études de cas</h2>
+            <h2>Labs</h2>
             <div class="case-studies">
-                
-                <!-- Projet 1 -->
+
                 <div class="case-card">
                     <span class="case-tag">Architecture Réseau & Identité</span>
-                    <a href="projet-1-initium/index.html" class="case-title">Projet INITIUM : Refonte et durcissement d'une infrastructure hospitalière</a>
+                    <a href="labs/projet-1-initium/index.html" class="case-title">Projet INITIUM : Refonte et durcissement d'une infrastructure hospitalière</a>
                     <p class="case-desc">
                         À la suite d'un audit révélant des vulnérabilités critiques, ce projet détaille la restructuration globale d'un système d'information de santé. L'intervention se concentre sur l'étanchéité réseau par segmentation dynamique et sur l'implémentation d'une politique d'identité rigoureuse pour isoler les équipements médicaux sensibles.
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">pfSense / Active Directory / VLAN / GPO</span>
-                        <a href="projet-1-initium/index.html" class="btn-link">Consulter l'architecture →</a>
+                        <a href="labs/projet-1-initium/index.html" class="btn-link">Consulter l'architecture →</a>
                     </div>
                 </div>
 
-                <!-- Projet 2 -->
                 <div class="case-card">
                     <span class="case-tag">Gestion des Accès (IAM)</span>
                     <span class="case-title" style="color: var(--text-title);">Fédération d'identité souveraine et authentification unifiée</span>
@@ -380,17 +420,50 @@
                     </div>
                 </div>
 
-                <!-- Projet 3 -->
                 <div class="case-card">
                     <span class="case-tag">Zero Trust & Sécurité Applicative</span>
-                    <a href="LAB-ZT-IAM-01/index.html" class="case-title">LAB-ZT-IAM-01 : Architecture Zero Trust appliquée à une API protégée</a>
+                    <a href="labs/LAB-ZT-IAM-01/index.html" class="case-title">LAB-ZT-IAM-01 : Architecture Zero Trust appliquée à une API protégée</a>
                     <p class="case-desc">
-                                            Ce laboratoire personnel reproduit, à l'échelle d'une infrastructure à trois niveaux, le modèle Zero Trust adopté par les organisations les plus exposées au numérique. Le projet couvre la mise en place d'un point d'entrée réseau unique, la centralisation de la gestion des identités, et la validation cryptographique systématique de chaque requête au niveau applicatif — sans jamais accorder de confiance implicite au réseau interne.
+                        Ce laboratoire personnel reproduit, à l'échelle d'une infrastructure à trois niveaux, le modèle Zero Trust adopté par les organisations les plus exposées au numérique. Le projet couvre la mise en place d'un point d'entrée réseau unique, la centralisation de la gestion des identités, et la validation cryptographique systématique de chaque requête au niveau applicatif — sans jamais accorder de confiance implicite au réseau interne.
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">Keycloak / Nginx / Flask / KVM-libvirt / JWT-OIDC</span>
-                        <a href="LAB-ZT-IAM-01/index.html" class="btn-link">Consulter l'architecture →</a>
+                        <a href="labs/LAB-ZT-IAM-01/index.html" class="btn-link">Consulter l'architecture →</a>
                     </div>
+                </div>
+
+                <div class="view-all-card">
+                    <a href="labs/index.html" class="view-all-link">
+                        <span>Voir tous les labs</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Nouvelle section Articles -->
+        <section>
+            <h2>Articles</h2>
+            <div class="case-studies">
+
+                <div class="case-card">
+                    <span class="case-tag">IAM · Zero Trust · Keycloak</span>
+                    <a href="articles/idp-zero-trust/index.html" class="case-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a>
+                    <p class="case-desc">
+                        Comment un Identity Provider comme Keycloak devient le point central de confiance numérique, et pourquoi la vraie question n'est pas « qui es-tu » mais « comment le prouves-tu, et comment je continue à vérifier ».
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">Réflexion technique</span>
+                        <a href="articles/idp-zero-trust/index.html" class="btn-link">Lire l'article →</a>
+                    </div>
+                </div>
+
+                <div class="view-all-card">
+                    <a href="articles/index.html" class="view-all-link">
+                        <span>Voir tous les articles</span>
+                        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+                    </a>
                 </div>
 
             </div>

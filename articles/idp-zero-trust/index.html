@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identité et Zero Trust — pourquoi centraliser ne suffit pas — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+        }
+
+        .hero-image-container {
+            margin: 0 0 2.5rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .hero-image-caption {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background-color: #fcfbf9;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">26 Juillet 2026</span>
+                <div class="tags-container">
+                    <span class="tag">IAM</span>
+                    <span class="tag">Zero Trust</span>
+                    <span class="tag">Keycloak</span>
+                    <span class="tag">OAuth2</span>
+                    <span class="tag">OIDC</span>
+                </div>
+            </div>
+            <h1>Identité et Zero Trust — pourquoi centraliser ne suffit pas</h1>
+        </header>
+
+        <article>
+            <!-- Lien / Container d'image placé en début d'article -->
+            <figure class="hero-image-container">
+                <Image src="images/flux_utilisateur_keycloak_applications.png" alt="Architecture Keycloak OAuth2 et flux de validation JWT entre Gateway et Microservices" caption="Flux de validation des jetons JWT entre Keycloak, le Reverse Proxy et les microservices" />
+                <figcaption class="hero-image-caption">Architecture du flux de délégation d'identité OAuth 2.0 / Keycloak</figcaption>
+            </figure>
+
+            <section>
+                <h2>Le modèle qui ne suffit plus</h2>
+                <p>
+                    Pendant longtemps, la gestion des identités numériques tenait en une équation simple : un utilisateur, un compte, une application. Chaque application possédait sa propre base d'utilisateurs, son propre mécanisme de connexion, sa propre logique de droits.
+                </p>
+                <p>
+                    Ce modèle fonctionnait tant que le nombre d'applications restait limité. Il s'effondre dès qu'une organisation grandit un peu : un même utilisateur doit aujourd'hui accéder à une application interne, à un environnement cloud public, à des outils collaboratifs, à des API exposées à des partenaires, à des applications métier spécifiques. Multiplier les bases d'utilisateurs indépendantes, c'est multiplier les points de défaillance :
+                </p>
+                <ul>
+                    <li><strong>Mots de passe réutilisés :</strong> des mots de passe différents pour chaque service, donc une tentation constante de les réutiliser ou de les simplifier.</li>
+                    <li><strong>Comptes orphelins :</strong> des accès qu'on oublie de désactiver quand un utilisateur change de rôle ou quitte l'organisation.</li>
+                    <li><strong>Angle mort de sécurité :</strong> aucune vision transversale de qui a accès à quoi.</li>
+                    <li><strong>Audit complexe :</strong> un suivi de sécurité qui devient un exercice de reconstitution, application par application, plutôt qu'une vue d'ensemble.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Centraliser l'identité : un premier pas, pas une solution</h2>
+                <p>
+                    La réponse standard consiste à faire converger l'authentification vers un point unique : un Identity Provider (IdP). Keycloak, dans le cas qui m'intéresse ici, joue ce rôle.
+                </p>
+                <p>
+                    Mais il faut être précis sur ce qu'un IdP centralise réellement, parce qu'il opère en réalité sur deux plans qu'on a tendance à confondre :
+                </p>
+                <ul>
+                    <li><strong>L'authentification :</strong> vérifier qui tu es — mot de passe, MFA, biométrie éventuellement.</li>
+                    <li><strong>L'autorisation :</strong> décider ce que tu as le droit de faire une fois identifié — rôles, permissions, scopes.</li>
+                </ul>
+                <p>
+                    Un IdP mature gère les deux, mais ce sont deux décisions distinctes, prises à des moments différents, et qui répondent à des questions différentes. Confondre les deux, c'est le premier piège conceptuel de l'IAM.
+                </p>
+                <p>
+                    Le second piège, plus profond, est de croire que la centralisation elle-même résout le problème de confiance entre applications. Ce n'est pas le cas. Avoir un référentiel d'identité unique ne dit rien sur la manière dont une application tierce va vérifier, de façon fiable et sans intermédiaire à chaque requête, qu'un utilisateur est bien celui qu'il prétend être.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le vrai verrou technique</h2>
+                <p>
+                    La question qui compte vraiment est celle-ci : <strong>comment une application peut-elle faire confiance à une identité vérifiée par un autre système, sans jamais voir le mot de passe de l'utilisateur, et sans avoir à interroger l'IdP à chaque requête ?</strong>
+                </p>
+                <p>
+                    La réponse repose sur un mécanisme cryptographique précis : le jeton signé (JWT — JSON Web Token), délivré selon des standards ouverts, OAuth 2.0 pour la délégation d'autorisation et OpenID Connect pour l'authentification qui s'appuie dessus.
+                </p>
+                <p>
+                    Concrètement, un JWT se compose de trois parties : un en-tête, une charge utile (les informations sur l'identité et ses droits), et une signature. Cette signature est produite par l'IdP à l'aide d'une clé privée qu'il est seul à détenir. N'importe quelle application peut ensuite vérifier cette signature à l'aide de la clé publique correspondante — sans jamais avoir besoin de contacter l'IdP en temps réel, et sans jamais avoir accès au secret de l'utilisateur.
+                </p>
+                <p>
+                    C'est ce point précis qui change tout : la confiance ne repose plus sur un canal de communication permanent avec une autorité centrale, mais sur une preuve cryptographique vérifiable localement, à chaque requête, par chaque application de façon indépendante. C'est une délégation de confiance, pas une simple centralisation de base de données.
+                </p>
+            </section>
+
+            <section>
+                <h2>De la confiance ponctuelle à la confiance continue</h2>
+                <p>
+                    Une fois ce mécanisme en place, une dernière question reste ouverte : la confiance accordée à la connexion doit-elle rester valable pendant toute la durée d'une session ? L'approche Zero Trust répond non, et structure la réponse autour de trois principes qui se combinent :
+                </p>
+                <p>
+                    <strong>Never trust, always verify.</strong> La vérification ne s'arrête pas à l'authentification initiale. Un jeton a une durée de vie courte, un renouvellement (refresh) est requis régulièrement, et chaque requête est revalidée — jamais présumée légitime parce qu'elle vient d'un utilisateur déjà connecté un peu plus tôt.
+                </p>
+                <p>
+                    <strong>Least privilege.</strong> Un jeton ne transporte que les droits strictly nécessaires à l'action en cours, pas l'ensemble des permissions dont dispose l'utilisateur dans l'absolu. Réduire la portée de chaque accès réduit mécaniquement l'impact d'un jeton compromis.
+                </p>
+                <p>
+                    <strong>Assume breach.</strong> L'architecture se conçoit en partant du principe que le réseau interne est déjà compromis, ou le sera un jour. Cela signifie qu'aucune requête, même émise depuis l'intérieur du périmètre réseau, n'est validée sans vérification cryptographique explicite — l'appartenance au réseau interne n'est plus, en soi, une preuve de confiance.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    J'ai reproduit concrètement cette architecture dans mon lab personnel : un reverse-proxy Nginx en point d'entrée unique, Keycloak comme Identity Provider, et une API Flask qui valide la signature d'un JWT à chaque requête entrante — sans jamais accorder de confiance implicite au fait que la requête provienne du réseau interne.
+                </p>
+
+                <a href="../../labs/LAB-ZT-IAM-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Voir l'implémentation pratique pas à pas de cette architecture.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 26 Juillet 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
