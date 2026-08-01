@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cycle de vie d'un token JWT — signature, validation et confiance dans le temps — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        /* Hero Image Container at top of article */
+        .hero-image-container {
+            margin: 0 0 2.5rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .hero-image-caption {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background-color: #fcfbf9;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        .inline-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .inline-link:hover {
+            text-decoration: underline;
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">1 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">JWT</span>
+                    <span class="tag">OAuth2</span>
+                    <span class="tag">Zero Trust</span>
+                </div>
+            </div>
+            <h1>Cycle de vie d'un token JWT — signature, validation et confiance dans le temps</h1>
+        </header>
+
+        <article>
+            <!-- Image d'illustration du cycle de vie JWT placée en haut -->
+            <figure class="hero-image-container">
+                <img src="images/connexion_idp_tokens.png" alt="Cycle de vie d'un token JWT, validation JWKS et rotation des cles" />
+            </figure>
+
+            <section>
+                <h2>Le contexte, en une phrase</h2>
+                <p>
+                    Dans une architecture d'identité déléguée — décrite plus en détail dans <a href="../idp-zero-trust/index.html" class="inline-link">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a> — une application ne vérifie plus un mot de passe, elle vérifie un token émis par un Identity Provider. Cette approche résout le problème de la confiance entre systèmes, mais elle en ouvre un autre, tout aussi important : comment cette confiance se maintient-elle après l'authentification initiale, pendant toute la durée où le token reste utilisable ?
+                </p>
+            </section>
+
+            <section>
+                <h2>D'où vient la clé publique, concrètement</h2>
+                <p>
+                    Dire qu'une application "vérifie la signature avec la clé publique de l'IdP" élude une question pratique : comment l'application obtient-elle cette clé, et comment sait-elle laquelle utiliser si l'IdP en possède plusieurs ?
+                </p>
+                <p>
+                    La réponse tient dans un endpoint standardisé, le <strong>JWKS</strong> (JSON Web Key Set), généralement exposé par l'IdP à une URL prévisible comme <code>/realms/&lt;realm&gt;/protocol/openid-connect/certs</code> chez Keycloak, ou plus généralement découvrable via le document de configuration OpenID Connect (<code>/.well-known/openid-configuration</code>). Ce document JSON liste l'ensemble des clés publiques actuellement valides, chacune associée à un identifiant unique, le <code>kid</code> (key ID).
+                </p>
+                <p>
+                    C'est ce <code>kid</code> qui fait le lien entre un token précis et la bonne clé : l'en-tête du JWT contient lui-même un champ <code>kid</code>, qui indique quelle clé du JWKS utiliser pour vérifier sa signature. L'application n'a donc pas besoin de connaître à l'avance une clé fixe — elle interroge le JWKS (ou consulte un cache local qu'elle rafraîchit périodiquement), retrouve la clé correspondant au <code>kid</code> du token reçu, et vérifie la signature avec.
+                </p>
+                <p>
+                    Cette indirection a une raison d'être précise : la <strong>rotation des clés</strong>. Un IdP change régulièrement sa paire de clés de signature, pour limiter la fenêtre d'exposition si une clé privée venait à être compromise. Pendant une période de transition, le JWKS expose simultanément l'ancienne et la nouvelle clé publique, le temps que tous les tokens signés avec l'ancienne clé expirent naturellement. Sans le mécanisme <code>kid</code> + JWKS, chaque rotation de clé casserait la vérification de tous les tokens en circulation au moment du changement.
+                </p>
+            </section>
+
+            <section>
+                <h2>Vérifier un jeton : deux contrôles, pas un seul</h2>
+                <p>
+                    Une fois la bonne clé publique récupérée, vérifier un JWT reste malgré tout une opération en deux temps distincts, pas une vérification unique.
+                </p>
+                <p>
+                    <strong>D'abord, la vérification de signature</strong>, avec la clé retrouvée via le <code>kid</code>. C'est un calcul cryptographique binaire : la signature est valide, ou elle ne l'est pas. Ce contrôle garantit que le token vient bien de l'Identity Provider et qu'il n'a pas été modifié depuis son émission.
+                </p>
+                <p>
+                    <strong>Ensuite, seulement si la signature est valide, la validation des claims.</strong> Cette étape regarde le contenu du payload :
+                </p>
+                <ul>
+                    <li><code>exp</code> (expiration) — le token n'est plus accepté après cette date,</li>
+                    <li><code>nbf</code> (not before) — le token n'est pas encore valide avant cette date, utile pour des jetons pré-émis à activer plus tard,</li>
+                    <li><code>iat</code> (issued at) — sert notamment à détecter des tokens anormalement anciens ou à appliquer une tolérance de dérive d'horloge (clock skew) entre serveurs,</li>
+                    <li><code>aud</code> (audience) — l'application ou l'API à laquelle le token est destiné,</li>
+                    <li><code>iss</code> (issuer) — l'IdP qui a émis le token, à recouper avec celui attendu.</li>
+                </ul>
+                <p>
+                    <strong>Pourquoi cette distinction compte :</strong> un token peut avoir une signature parfaitement authentique — donc légitimement émis par l'IdP, non modifié — tout en étant expiré, ou destiné à une autre application. Un token dont l'audience n'est pas vérifiée peut être accepté par une application à laquelle il n'était pas destiné, alors même que sa signature est irréprochable. C'est une faille réelle et fréquente, indépendante de la robustesse cryptographique de la signature elle-même. Une application doit implémenter les deux contrôles, explicitement, l'un et l'autre.
+                </p>
+                <p>
+                    Et surtout : toute cette vérification — récupération de la clé via le <code>kid</code>, signature, claims — se fait localement, sans appeler l'Identity Provider à chaque requête. C'est ce qui rend ces architectures performantes et scalables.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le compromis que ce modèle introduit</h2>
+                <p>
+                    Cette absence d'appel systématique à l'IdP a un revers. Si l'application fait confiance à un token uniquement sur la base d'une vérification locale, que se passe-t-il si ce token est compromis avant son expiration ?
+                </p>
+                <p>
+                    Contrairement à une session serveur classique, où révoquer l'accès signifie simplement supprimer une entrée côté serveur, un JWT ne dépend d'aucun état côté serveur — sa validité repose uniquement sur sa signature et ses claims. On ne peut pas, à proprement parler, "supprimer" un jeton déjà émis : il reste cryptographiquement valide jusqu'à son expiration, quoi qu'il arrive.
+                </p>
+                <p>
+                    C'est ce compromis précis qui structure le reste de l'architecture — durée de vie des tokens, mécanisme de renouvellement, et éventuellement révocation.
+                </p>
+            </section>
+
+            <section>
+                <h2>Durée de vie courte et renouvellement</h2>
+                <p>
+                    La parade la plus courante à ce problème n'est pas d'empêcher la compromission, mais d'en limiter la fenêtre d'exploitation : l'Access Token a une durée de vie volontairement courte, typiquement de l'ordre de quelques minutes. Un token compromis n'est donc exploitable que pendant cette fenêtre réduite, pas indéfiniment.
+                </p>
+                <p>
+                    Le problème évident d'une durée de vie aussi courte est qu'elle obligerait l'utilisateur à se réauthentifier en permanence. C'est là qu'intervient le <strong>Refresh Token</strong> : un jeton séparé, à durée de vie beaucoup plus longue, dont le seul rôle est d'obtenir un nouvel Access Token auprès de l'IdP sans redemander les identifiants de l'utilisateur.
+                </p>
+                <p>
+                    Ce second jeton déplace le problème plutôt que de le résoudre entièrement : si un Access Token compromis n'est exploitable que quelques minutes, un Refresh Token compromis, lui, permettrait d'obtenir indéfiniment de nouveaux Access Tokens. Deux mécanismes limitent ce risque :
+                </p>
+                <ul>
+                    <li>le Refresh Token est stocké et transmis dans des conditions plus strictes que l'Access Token (jamais exposé côté client dans un contexte web classique, par exemple),</li>
+                    <li>la <strong>rotation des Refresh Tokens</strong> : à chaque utilisation, l'IdP invalide l'ancien Refresh Token et en émet un nouveau. Si un Refresh Token déjà utilisé est présenté une seconde fois, c'est un signal fort de vol — l'IdP peut alors révoquer immédiatement toute la chaîne de tokens associée à cette session.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Révoquer avant l'expiration, quand c'est nécessaire</h2>
+                <p>
+                    Pour les cas où attendre l'expiration naturelle d'un Access Token n'est pas acceptable — une session utilisateur compromise détectée en temps réel, un employé dont l'accès doit être coupé immédiatement — certaines architectures réintroduisent un point de contact avec l'IdP : un <strong>endpoint d'introspection</strong> (RFC 7662), que l'application interroge pour confirmer qu'un token est toujours valide, ou un <strong>endpoint de révocation</strong> (RFC 7009), que l'IdP utilise pour invalider un token avant son terme.
+                </p>
+                <p>
+                    Le coût de cette option est direct : elle réintroduit, au moins partiellement, l'aller-retour réseau vers l'IdP que la vérification locale par signature permettait justement d'éviter. Il n'existe pas de solution qui cumule performance maximale et révocation immédiate sans contrepartie — chaque architecture choisit un point d'équilibre entre les deux, généralement en réservant l'introspection aux opérations les plus sensibles plutôt qu'à chaque requête.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Dans mon lab personnel, l'API Flask récupère les clés publiques de Keycloak via son endpoint JWKS et valide la signature ainsi que les claims d'un JWT à chaque requête entrante — sans jamais accorder de confiance implicit au fait que la requête provienne du réseau interne.
+                </p>
+
+                <a href="../../labs/LAB-ZT-IAM-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Voir la mise en œuvre pratique de cette validation de tokens et de la gestion du JWKS dans mon laboratoire.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 1 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
