@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Du login à l'émission du jeton — le parcours complet d'une authentification — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        .inline-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .inline-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Sequence Steps Component */
+        .sequence-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 2rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .sequence-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .sequence-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sequence-number {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .sequence-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--text);
+        }
+
+        .sequence-body {
+            color: #27272a;
+            font-size: 0.975rem;
+            margin-bottom: 0;
+            padding-left: 2.25rem;
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .sequence-body {
+                padding-left: 0;
+                margin-top: 0.5rem;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../articles.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">4 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">IAM</span>
+                    <span class="tag">LDAP</span>
+                    <span class="tag">JWT</span>
+                    <span class="tag">OIDC</span>
+                    <span class="tag">Architecture</span>
+                </div>
+            </div>
+            <h1>Du login à l'émission du jeton — le parcours complet d'une authentification</h1>
+        </header>
+
+        <article>
+            <section>
+                <h2>Assembler ce que les articles précédents ont posé séparément</h2>
+                <p>
+                    Cette série a traité, chacun de son côté, l'annuaire comme source d'identité, LDAP comme protocole d'interrogation, l'Identity Provider comme émetteur de jetons signés, et les principes de défense en profondeur qui encadrent l'ensemble. Ce qui manque encore, c'est la vue d'assemblage : que se passe-t-il, concrètement, entre le moment où un utilisateur saisit son mot de passe et celui où une application décide de lui accorder l'accès ?
+                </p>
+            </section>
+
+            <section>
+                <h2>Le parcours, étape par étape</h2>
+                
+                <ol class="sequence-list">
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">1</span>
+                            <span class="sequence-title">Soumission des identifiants</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>L'utilisateur soumet ses identifiants à l'application.</strong> Dans une architecture moderne, l'application elle-même ne reçoit presque jamais directement le mot de passe — elle redirige l'utilisateur vers un Identity Provider, comme décrit dans <a href="../idp-zero-trust/index.html" class="inline-link">le tout premier article de ce site</a>.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">2</span>
+                            <span class="sequence-title">Interrogation de l'annuaire</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>L'Identity Provider interroge l'annuaire.</strong> C'est ici que la chaîne se connecte à <a href="../directory-services-ldap/index.html" class="inline-link">l'article sur LDAP</a> : l'IdP effectue d'abord une recherche (search) pour retrouver le DN correspondant à l'identifiant fourni, puis tente un bind avec ce DN et le mot de passe saisi. Cette étape répond à une seule question, binaire : ces identifiants sont-ils valides.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">3</span>
+                            <span class="sequence-title">Décision de session par l'IdP</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>L'IdP transforme ce résultat binaire en une décision de session.</strong> C'est un point de bascule important, et souvent sous-estimé : LDAP ne sait dire que "identifiants valides" ou "invalides" — c'est l'IdP, pas l'annuaire, qui décide ensuite de la durée de la session, des facteurs supplémentaires à exiger (MFA, conforme aux mécanismes de pré-authentification décrits dans <a href="../pre-auth-post-auth-defense-in-depth/index.html" class="inline-link">l'article sur la défense en profondeur</a>), et du contenu à inclure dans le jeton final.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">4</span>
+                            <span class="sequence-title">Construction et signature du jeton</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>L'IdP construit et signe le jeton.</strong> Selon le protocole utilisé — SAML pour les architectures d'entreprise plus anciennes, OIDC/JWT pour les architectures modernes — l'IdP assemble une assertion ou un token contenant l'identité vérifiée et, potentiellement, des informations de rôle ou de groupe récupérées depuis l'annuaire à l'étape 2. Cette signature s'appuie sur les mécanismes cryptographiques détaillés dans <a href="../jwt-token-lifecycle/index.html" class="inline-link">l'article sur le cycle de vie des tokens</a> — clé privée de l'IdP, JWKS exposé pour la vérification, <code>kid</code> pour identifier la bonne clé.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">5</span>
+                            <span class="sequence-title">Transmission et vérification locale</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>Le jeton est transmis à l'application, qui le vérifie localement.</strong> L'application ne recontacte ni l'annuaire ni, dans le cas général, l'IdP — elle vérifie la signature et les claims du jeton reçu, exactement comme détaillé précédemment.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item">
+                        <div class="sequence-header">
+                            <span class="sequence-number">6</span>
+                            <span class="sequence-title">Décision d'accès applicative</span>
+                        </div>
+                        <p class="sequence-body">
+                            <strong>L'application prend sa décision d'accès.</strong> À partir des claims du jeton — audience, rôles inclus, scopes — l'application applique ses propres règles d'autorisation, potentiellement du RBAC comme décrit dans le premier article de cette série IAM.
+                        </p>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Trois notions qu'on confond souvent, et qui apparaissent chacune à un endroit précis de ce parcours</h2>
+                <p>
+                    <strong>Authentification</strong> — l'étape 2 et 3 : prouver qui vous êtes.
+                </p>
+                <p>
+                    <strong>Session</strong> — construite à l'étape 3, matérialisée par le jeton émis à l'étape 4 : pendant combien de temps, et dans quelles conditions, cette preuve d'identité reste-t-elle exploitable sans redemander les identifiants.
+                </p>
+                <p>
+                    <strong>Autorisation</strong> — l'étape 6 : ce que l'identité vérifiée a le droit de faire, une fois la session établie.
+                </p>
+                <p>
+                    Ces trois notions sont souvent utilisées de façon interchangeable dans le langage courant ("je me suis connecté" peut vouloir dire les trois à la fois), mais elles correspondent à des décisions prises par des composants différents, à des moments différents de ce parcours — l'annuaire ne décide que la première, l'IdP construit la deuxième, l'application applique la troisième.
+                </p>
+            </section>
+
+            <section>
+                <h2>Où SAML et JWT se distinguent dans ce parcours</h2>
+                <p>
+                    Le déroulé ci-dessus reste valable pour les deux protocoles, mais leur mécanique de transport diffère : SAML transmet une assertion XML signée, généralement via une redirection de navigateur (le fameux "POST binding"), pensée pour des architectures d'entreprise et de SSO web classique. OIDC transmet un JWT, plus compact, plus adapté aux API et aux applications mobiles, et c'est le protocole utilisé tout au long de cette série. Le principe de fond — délégation de confiance via preuve cryptographique signée par un tiers reconnu — reste identique dans les deux cas ; ce qui change, c'est le format et le canal de transport.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> implémente l'intégralité de ce parcours à l'exception de l'étape 2 : Keycloak gère sa propre base d'utilisateurs interne plutôt que d'interroger un annuaire LDAP externe, ce qui correspond à la limite déjà notée dans <a href="../directory-services-ldap/index.html" class="inline-link">l'article sur LDAP</a>. Les étapes 3 à 6 — construction du jeton, signature, vérification côté API Flask, décision d'accès — sont, elles, directement observables dans le lab.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Observer en direct les étapes du parcours d'authentification et l'échange de jetons.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 4 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>

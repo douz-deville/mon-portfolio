@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification Pass-Through, synchronisation de mots de passe ou fédération — quel modèle choisir — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        /* Standardized Table Styling */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0 2rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--text);
+            padding: 0.85rem 1.15rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.85rem 1.15rem;
+            border-bottom: 1px solid var(--border);
+            color: #27272a;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .inline-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .inline-link:hover {
+            text-decoration: underline;
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../articles.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">4 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">IAM</span>
+                    <span class="tag">LDAP</span>
+                    <span class="tag">Fédération</span>
+                    <span class="tag">Architecture</span>
+                </div>
+            </div>
+            <h1>Authentification Pass-Through, synchronisation de mots de passe ou fédération — quel modèle choisir</h1>
+        </header>
+
+        <article>
+            <section>
+                <h2>Un choix d'architecture, pas un détail d'implémentation</h2>
+                <p>
+                    Quand une organisation connecte son annuaire interne (Active Directory, LDAP) à des services externes ou cloud, elle doit choisir <em>comment</em> l'identité y transite. Trois modèles existent, avec des compromis de sécurité et de disponibilité suffisamment différents pour justifier de les comparer explicitement plutôt que de choisir par défaut.
+                </p>
+            </section>
+
+            <section>
+                <h2>Pass-Through Authentication (PTA) : le bind direct, exposed</h2>
+                <p>
+                    Dans ce modèle, le service externe — ou un agent placé en périphérie du réseau interne — transmet en temps réel les identifiants saisés par l'utilisateur jusqu'à l'annuaire interne, qui exécute un bind LDAP classique (décrit dans <a href="../directory-services-ldap/index.html" class="inline-link">l'article précédent</a>) pour les valider. Le mot de passe de l'utilisateur ne quitte jamais réellement l'infrastructure interne sous une forme stockée — il transite, vérifié à la volée, à chaque tentative de connexion.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : aucune copie du mot de passe, même hachée, ne réside en dehors de l'annuaire d'origine. Une politique de mot de passe modifiée dans l'annuaire interne s'applique instantanément, sans synchronisation.
+                </p>
+                <p>
+                    <strong>Contrepartie</strong> : ce modèle crée une dépendance de disponibilité forte. Si l'annuaire interne ou l'agent de communication est indisponible, aucune authentification n'est possible via ce canal — un simple problème réseau interne devient une panne d'authentification visible depuis l'extérieur.
+                </p>
+            </section>
+
+            <section>
+                <h2>Password Hash Synchronization : la copie du hash</h2>
+                <p>
+                    Ici, l'organisation copie périodiquement une version hachée des mots de passe depuis l'annuaire interne vers le service externe, qui peut alors valider les authentifications localement, sans solliciter l'annuaire interne à chaque connexion.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : le service externe fonctionne indépendamment de la disponibilité de l'infrastructure interne au moment de l'authentification — une coupure réseau interne n'empêche pas les utilisateurs de se connecter.
+                </p>
+                <p>
+                    <strong>Contrepartie</strong>, et c'est le point qui mérite d'être souligné avec précision : ce n'est pas le mot de passe en clair qui est copié, mais son hash. La robustesse de cette approche dépend donc entièrement de la robustesse de l'algorithme de hachage utilisé côté annuaire source — un hash faible ou mal salé copié vers un second système double, de fait, la surface qu'un attaquant peut cibler pour tenter de le casser hors ligne. Ce n'est pas une faille en soi, mais un compromis à documenter explicitement plutôt qu'à ignorer.
+                </p>
+            </section>
+
+            <section>
+                <h2>Fédération : ni mot de passe, ni hash, seulement un jeton</h2>
+                <p>
+                    Ce modèle est celui déjà détaillé dans les premiers articles de ce site : l'utilisateur s'authentifie exclusivement auprès de son annuaire ou de son Identity Provider interne, qui délivre ensuite un jeton signé (SAML ou JWT selon le protocole) au service externe. Le service externe ne voit jamais le mot de passe, ni même une forme dérivée réutilisable ailleurs — seulement une preuve d'authentification limitée dans le temps et dans sa portée.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : c'est le modèle qui expose le moins de matière sensible au service externe, et qui permet le contrôle le plus fin (durée de validité du jeton, audience, révocation via les mécanismes déjà décrits dans <a href="../jwt-token-lifecycle/index.html" class="inline-link">l'article sur le cycle de vie des tokens</a>).
+                </p>
+                <p>
+                    <strong>Contrepartie</strong> : la fédération demande une intégration protocolaire plus lourde de part et d'autre (configuration SAML ou OIDC, gestion des certificats de signature, métadonnées d'échange) — un coût d'implémentation initial plus élevé que PTA ou la synchronisation de hash, qui reposent sur des mécanismes plus anciens et souvent déjà en place.
+                </p>
+            </section>
+
+            <section>
+                <h2>Comment ces trois modèles se positionnent entre eux</h2>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Critère</th>
+                                <th>PTA</th>
+                                <th>Password Hash Sync</th>
+                                <th>Fédération</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Donnée exposée au service externe</strong></td>
+                                <td>Aucune (vérification à distance)</td>
+                                <td>Hash du mot de passe</td>
+                                <td>Jeton limité dans le temps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dépendance à la disponibilité interne</strong></td>
+                                <td>Forte</td>
+                                <td>Faible</td>
+                                <td>Faible à modérée</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Application immédiate d'un changement de politique</strong></td>
+                                <td>Oui</td>
+                                <td>Différée (délai de sync)</td>
+                                <td>Oui</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coût d'intégration initial</strong></td>
+                                <td>Modéré</td>
+                                <td>Faible</td>
+                                <td>Élevé</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Granularité du contrôle d'accès</strong></td>
+                                <td>Faible (juste bind)</td>
+                                <td>Faible</td>
+                                <td>Élevée (claims, scopes, audience)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Aucun de ces trois modèles n'est strictement supérieur aux deux autres — le choix dépend de ce que l'organisation priorise : exposition minimale de données sensibles, tolérance aux pannes réseau internes, ou coût d'intégration initial. Il n'est d'ailleurs pas rare qu'une organisation utilise plusieurs de ces modèles simultanément, selon les services concernés.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> relève exclusivement du modèle fédération — Keycloak, en tant qu'Identity Provider, émet des JWT sans jamais transmettre de mot de passe ni de hash à l'API Flask qui les consomme. Le lab n'implémente ni PTA ni synchronisation de hash, ces deux modèles supposant un second système d'identité externe que l'architecture actuelle du lab ne comporte pas.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Explorer l'architecture basée sur la fédération et l'émission de jetons de sécurité JWT.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 4 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>

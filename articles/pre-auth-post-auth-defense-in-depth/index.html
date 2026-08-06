@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avant et après l'authentification — la défense en profondeur dans une architecture d'identité — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        .inline-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .inline-link:hover {
+            text-decoration: underline;
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../articles.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">4 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">IAM</span>
+                    <span class="tag">Zero Trust</span>
+                    <span class="tag">Sécurité</span>
+                </div>
+            </div>
+            <h1>Avant et après l'authentification — la défense en profondeur dans une architecture d'identité</h1>
+        </header>
+
+        <article>
+            <section>
+                <h2>Un seul instant ne suffit pas à sécuriser tout le reste</h2>
+                <p>
+                    Les articles précédents de cette série ont beaucoup insisté sur l'instant de l'authentification : bind LDAP, émission de jetons, fédération. Mais réduire la sécurité d'une architecture d'identité à cet instant unique serait une erreur — une bonne partie des contrôles qui protègent réellement un système se situent avant que l'authentification ne commence, et une bonne partie continues de s'appliquer bien après qu'elle a réussi. C'est le principe de <strong>défense en profondeur</strong> appliqué spécifiquement à l'identité : aucune couche seule ne doit porter toute la responsabilité de la sécurité.
+                </p>
+            </section>
+
+            <section>
+                <h2>Avant l'authentification : filtrer avant même de vérifier</h2>
+                <p>
+                    Plusieurs mécanismes interviennent avant même qu'une tentativa de connexion soit évaluée sur le fond :
+                </p>
+                <p>
+                    <strong>La limitation de débit (rate limiting)</strong> empêche un attaquant de tester des milliers de mots de passe en un temps court sur un même compte — une contre-mesure directe aux attaques par force brute et par bourrage d'identifiants (credential stuffing), où des identifiants volés ailleurs sont testés en masse sur un service différent.
+                </p>
+                <p>
+                    <strong>L'authentification par ticket, à la Kerberos</strong>, change la nature même de ce qui est vérifié en amont : plutôt que de transmettre un mot de passe à chaque service, un utilisateur obtient un ticket auprès d'une autorité centrale (le Key Distribution Center) une fois par session, puis présente ce ticket à chaque service ultérieur. C'est un modèle de pré-authentification au sens propre — une preuve d'identité déjà validée est présentée, plutôt qu'une preuve brute réévaluée à chaque fois.
+                </p>
+                <p>
+                    <strong>La confiance conditionnée à l'appareil (device trust)</strong> vérifie, avant même de proposer un écran de connexion, si l'appareil utilisé est reconnu, à jour, et conforme à une politique de sécurité — un appareil non conforme peut se voir refuser la tentative de connexion avant même que des identifiants ne soient saisis.
+                </p>
+                <p>
+                    Ce que ces mécanismes ont en commun : ils réduisent la surface exposée à l'étape d'authentification proprement dite, en filtrant en amont ce qui a le droit d'atteindre cette étape.
+                </p>
+            </section>
+
+            <section>
+                <h2>Après l'authentification : la vérification ne s'arrête pas là</h2>
+                <p>
+                    Une fois l'identité confirmée, une seconde couche de contrôles prend le relais — c'est le terrain déjà couvert par les principes Zero Trust décrits dans les tout premiers articles de ce site, mais qu'il vaut la peine de reformuler ici sous l'angle spécifique du "après" :
+                </p>
+                <p>
+                    <strong>Le MFA</strong> (authentification multi-facteurs) peut intervenir non seulement à la connexion initiale, mais aussi de façon adaptative, en cours de session, si une action jugée sensible est déclenchée — un changement de mot de passe, un virement bancaire, un accès à une ressource classée critique.
+                </p>
+                <p>
+                    <strong>Le RBAC</strong>, déjà détaillé dans le premier article de cette série IAM, s'applique en continu après l'authentification : chaque action, pas seulement la connexion, est confrontée au rôle de l'utilisateur.
+                </p>
+                <p>
+                    <strong>Les claims portés par un jeton</strong> (audience, scope, expiration — voir <a href="../jwt-token-lifecycle/index.html" class="inline-link">l'article sur le cycle de vie des tokens</a>) constituent une forme de contrôle post-authentification distribué : chaque application qui reçoit le jeton réévalue elle-même, localement, si la preuve d'identité présentée reste valable et suffisante pour l'action demandée.
+                </p>
+            </section>
+
+            <section>
+                <h2>Pourquoi séparer les deux couches, plutôt que de tout miser sur l'authentification</h2>
+                <p>
+                    L'intérêt de cette distinction pré/post n'est pas seulement organisationnel. Elle correspond à une hypothèse de sécurité réaliste : aucun mécanisme d'authentification, aussi robuste soit-il, n'est infaillible à 100 % — un mot de passe peut fuiter, un appareil peut être compromis, un jeton peut être intercepté. La défense en profondeur part du principe qu'un contrôle isolé finira, statistiquement, par échouer un jour, et que la sécurité globale du système ne doit donc jamais reposer sur une seule couche.
+                </p>
+                <p>
+                    C'est directement le principe <strong>assume breach</strong> déjà présenté dans les premiers articles de cette série, mais rendu ici concret : ce n'est pas seulement le réseau interne qu'on suppose potentiellement compromis, c'est chaque couche individuelle de l'architecture d'identité, y compris l'authentification elle-même.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> implémente une couche de contrôle post-authentification — la validation systématique de signature et de claims à chaque requête côté API Flask — mais aucun contrôle pré-authentification de ce que décrit cet article (pas de rate limiting configuré, pas de vérification de conformité d'appareil). C'est une limite assumée du lab actuel, et une extension naturelle si je voulais illustrer concrètement la défense en profondeur plutôt que seulement en décrire les principes.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Examiner les mécanismes de vérification des jetons et de contrôle d'accès post-authentification.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 4 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>

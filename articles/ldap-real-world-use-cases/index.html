@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LDAP dans le monde réel — WiFi, VPN, connexion Linux et impression — Article</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        /* Figure Container */
+        .article-image-container {
+            margin: 2rem 0 2.5rem 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .article-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .article-image-caption {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background-color: #fcfbf9;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        .inline-link {
+            color: var(--accent);
+            text-decoration: none;
+            border-bottom: 1px transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .inline-link:hover {
+            text-decoration: underline;
+        }
+
+        .lab-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem 1.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .lab-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
+        }
+
+        .lab-box-content p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .lab-box-title {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.35rem !important;
+            font-size: 1.05rem !important;
+        }
+
+        .lab-box-arrow {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            .lab-box {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../articles.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">4 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">IAM</span>
+                    <span class="tag">LDAP</span>
+                    <span class="tag">réseau</span>
+                </div>
+            </div>
+            <h1>LDAP dans le monde réel — WiFi, VPN, connexion Linux et impression</h1>
+        </header>
+
+        <article>
+            <section>
+                <h2>De la théorie à l'usage quotidien</h2>
+                <p>
+                    <a href="../directory-services-ldap/index.html" class="inline-link">L'article précédent</a> a détaillé le fonctionnement interne de LDAP — l'arbre DIT, les opérations bind et search, pourquoi le protocole est pensé pour la lecture. Ce niveau de détail peut donner l'impression que LDAP est un sujet cantonné aux équipes IAM. C'est loin d'être le cas : LDAP est probablement le protocole d'identité le plus sollicité dans une infrastructure d'entreprise, simplement parce qu'il est invoqué en silence, à chaque fois qu'un service a besoin de vérifier qui vous êtes.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le WiFi d'entreprise : 802.1X et RADIUS</h2>
+                <p>
+                    Quand un poste se connecte à un réseau WiFi d'entreprise sécurisé, ce n'est presque jamais un mot de passe WiFi partagé qui est vérifié, mais une identité individuelle. Le mécanisme standard, <strong>802.1X</strong>, délègue cette vérification à un serveur <strong>RADIUS</strong> (FreeRADIUS étant une implémentation open source courante), qui ne stocke généralement pas les identités lui-même : il interroge l'annuaire d'entreprise via LDAP pour valider les identifiants présentés.
+                </p>
+                <p>
+                    La chaîne complète ressemble à : poste utilisateur → point d'accès WiFi → serveur RADIUS → annuaire LDAP. RADIUS et LDAP jouent ici des rôles distincts et complémentaires — RADIUS gère le protocole d'accès réseau proprement dit (négociation, comptabilité de session), LDAP reste la source d'identité interrogée en coulisses. C'est la même distinction protocole/source de vérité qu'on retrouve partout ailleurs dans cet article.
+                </p>
+
+                <figure class="article-image-container">
+                    <Image src="image_agent_tag_5650700554245532590" alt="Schéma d'authentification 802.1X montrant les composants Supplicant, Authenticator Switch et RADIUS / LDAP" caption="Composants et flux d'authentification 802.1X / RADIUS avec annuaire central" />
+                    <figcaption class="article-image-caption">Architecture standard d'accès réseau 802.1X avec délégation de l'identité vers un annuaire</figcaption>
+                </figure>
+            </section>
+
+            <section>
+                <h2>VPN et connexion à distance</h2>
+                <p>
+                    Un VPN d'entreprise pose la même question qu'un réseau WiFi : qui essaie de se connecter, et a-t-il le droit de le faire ? La plupart des solutions VPN d'entreprise (qu'elles soient basées sur IPsec ou sur des passerelles applicatives plus récentes) supportent une intégration LDAP directe ou via RADIUS, pour éviter de maintenir une base d'identifiants VPN séparée de l'annuaire principal — un problème classique de synchronisation qu'on retrouverait sinon.
+                </p>
+            </section>
+
+            <section>
+                <h2>Connexion aux machines Linux et SSH</h2>
+                <p>
+                    Sur un parc de serveurs Linux, authentifier chaque compte localement, machine par machine, devient vite ingérable à l'échelle d'une infrastructure. Des mécanismes comme <strong>SSSD</strong> (System Security Services Daemon) ou, plus anciennement, <strong>PAM-LDAP</strong>, permettent à une machine Linux de déléguer l'authentification des connexions locales et SSH à un annuaire LDAP ou Active Directory central. L'intérêt pratique est direct : désactiver un compte dans l'annuaire révoque immédiatement son accès SSH sur l'ensemble du parc, sans avoir à intervenir serveur par serveur.
+                </p>
+            </section>
+
+            <section>
+                <h2>Recherche d'adresses e-mail et annuaires internes</h2>
+                <p>
+                    Un usage plus discret, mais tout aussi répandu : les carnets d'adresses d'entreprise, qu'on retrouve dans les clients de messagerie ou les systèmes de visioconférence, interrogent fréquemment un annuaire LDAP pour proposer une recherche de contacts par nom, département ou fonction — la fonctionnalité "rechercher un collègue" repose, la plupart du temps, sur une requête LDAP de type search exécutée en arrière-plan.
+                </p>
+            </section>
+
+            <section>
+                <h2>Imprimantes et périphériques réseau</h2>
+                <p>
+                    Même des équipements qui semblent éloignés du sujet de l'identité, comme des imprimantes réseau d'entreprise, s'appuient souvent sur LDAP — notamment pour l'authentification à l'impression (badger ou saisir un code pour récupérer un document imprimé, afin d'éviter qu'un document sensible reste sur le bac de sortie), ou pour restreindre l'usage de certaines fonctions à des groupes d'utilisateurs précis.
+                </p>
+            </section>
+
+            <section>
+                <h2>Ce point commun, et sa limite</h2>
+                <p>
+                    Ce qui relie tous ces cas d'usage : LDAP agit comme un référentiel d'identité central, interrogé par des systèmes très différents (réseau, système d'exploitation, messagerie, périphériques) qui n'ont, autrement, aucune raison de se faire confiance mutuellement. C'est exactement le rôle de tiers de confiance déjà évoqué dans les articles précédents de cette série — appliqué ici à des protocoles réseau et systèmes plus anciens que les jetons OAuth2/OIDC, mais répondant au même besoin structurel.
+                </p>
+                <p>
+                    La limite, aussi, est la même que celle décrite précédemment : LDAP répond "ces identifiants sont-ils valides", pas "quelle session accorder, pour combien de temps, avec quels droits". Chacun des systèmes ci-dessus doit construire lui-même sa propre couche de session par-dessus cette réponse binaire — ce qui explique en partie pourquoi les architectures modernes tendent à centraliser cette logique de session dans un Identity Provider plutôt que de la dupliquer dans chaque protocole métier.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> ne couvre aucun de ces cas d'usage réseau — il se concentre sur l'authentification applicative via Keycloak et la validation de JWT. Étendre le lab avec une intégration LDAP réelle, par exemple via SSSD sur une VM Linux du lab, serait une piste concrète pour illustrer ce que cet article décrit en théorie.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="lab-box">
+                    <div class="lab-box-content">
+                        <p class="lab-box-title">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p>Voir la mise en œuvre pratique de l'Access Management et des tokens JWT dans mon laboratoire.</p>
+                    </div>
+                    <span class="lab-box-arrow">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 4 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
