@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGDLP dans Active Directory — Organiser les identités et les permissions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        pre {
+            background-color: #1e1e24;
+            color: #f8f8f2;
+            font-family: var(--font-mono);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .highlight-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .highlight-card p {
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f4f4f6;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+                /* Container de l'image (figure) */
+        .article-image-container {
+            margin: 2rem 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* L'image elle-même */
+        .article-image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        /* La légende de l'image (figcaption) */
+        .article-image-container figcaption {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 0 1rem;
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">15 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">Active Directory</span>
+                    <span class="tag">AGDLP</span>
+                    <span class="tag">IAM</span>
+                    <span class="tag">Sécurité</span>
+                </div>
+            </div>
+            <h1>AGDLP dans Active Directory : organiser les identités et les permissions</h1>
+
+            <!-- Emplacement de l'image d'en-tête (Pont AD -> LDAP -> Keycloak -> Applications) -->
+            <figure class="article-image-container">
+                <img src="images/agdlp.png" alt="Schéma illustrant le pont AD -> LDAP -> Keycloak -> Applications">
+                <figcaption>Architecture AGDLP : imbrication des comptes, groupes globaux et groupes locaux de domaine pour la gestion des permissions dans Active Directory</figcaption>            </figure>
+
+        </header>
+
+        <article>
+            <section>
+                <p>
+                    Dans Active Directory, l'une des difficultés principales n'est pas simplement de créer des utilisateurs ou des groupes. Le véritable enjeu est de concevoir une structure de permissions qui reste compréhensible, maintenable et évolutive lorsque l'organisation grandit.
+                </p>
+                <p>
+                    C'est précisément ce que cherche à résoudre la méthode <strong>AGDLP</strong> :
+                </p>
+
+                <div class="highlight-card">
+                    <p><strong>A → G → DL → P</strong></p>
+                    <p><strong>Account → Global → Domain Local → Permission</strong></p>
+                </div>
+
+                <p>L'idée fondamentale est de séparer deux questions qui sont souvent mélangées :</p>
+                <ul>
+                    <li><strong>Qui</strong> a besoin d'accéder à une ressource ?</li>
+                    <li>À <strong>quelle ressource</strong> et avec <strong>quel niveau d'accès</strong> ?</li>
+                </ul>
+                <p>
+                    Dans une architecture AGDLP bien conçue, le <em>Global Security Group</em> répond principalement à la première question, tandis que le <em>Domain Local Security Group</em> représente la seconde. Les permissions sont ensuite attribuées au groupe Domain Local. Microsoft définit bien les groupes Global et Domain Local selon des portées différentes, et les groupes de sécurité peuvent être utilisés dans les ACL pour contrôler l'accès aux ressources. (Microsoft Learn)
+                </p>
+            </section>
+
+            <section>
+                <h2>1. Le problème que cherche à résoudre AGDLP</h2>
+                <p>Imaginons une entreprise avec un serveur de fichiers :</p>
+
+<pre><code>\\FILESERVER
+│
+├── RH
+├── Comptabilite
+├── Direction
+└── IT</code></pre>
+
+                <p>Il existe différents utilisateurs :</p>
+                <ul>
+                    <li>Alice → RH</li>
+                    <li>Bob → RH</li>
+                    <li>Claire → Comptabilité</li>
+                    <li>David → IT</li>
+                </ul>
+
+                <p>On pourrait simplement donner directement des permissions aux utilisateurs :</p>
+                <ul>
+                    <li>Alice → RH → Modify</li>
+                    <li>Bob → RH → Modify</li>
+                    <li>Claire → Comptabilité → Read</li>
+                    <li>David → IT → Full Control</li>
+                </ul>
+
+                <p>
+                    Cela fonctionne. Mais lorsque l'entreprise possède 100, 500 ou 5 000 utilisateurs, cette méthode devient difficile à administrer :
+                </p>
+                <ul>
+                    <li>Si Alice quitte le service RH, il faut rechercher toutes les permissions qu'elle possède.</li>
+                    <li>Si un nouveau dossier RH est créé, il faut recommencer à attribuer les permissions.</li>
+                    <li>Si 50 personnes doivent accéder à une ressource, on ne veut pas gérer 50 comptes individuellement dans les ACL.</li>
+                </ul>
+                <p>
+                    AGDLP introduit donc une couche d'abstraction indispensable.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. La structure fondamentale</h2>
+                <p>La structure devient :</p>
+
+<pre><code>Account
+   ↓
+Global Security Group
+   ↓
+Domain Local Security Group
+   ↓
+Permission</code></pre>
+
+                <p>Ou, avec un exemple concret :</p>
+
+<pre><code>Alice ─┐
+Bob   ─┤
+Claire ─┘
+   ↓
+GG_RH
+   ↓
+DL_RH_Modify
+   ↓
+\\FILESERVER\RH$
+   ↓
+Modify</code></pre>
+
+                <p>Chaque niveau possède une responsabilité différente :</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élément</th>
+                                <th>Question à laquelle il répond</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Account</strong></td>
+                                <td>Qui est l'utilisateur ?</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Global Group</strong></td>
+                                <td>À quel rôle/fonction appartient-il ?</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Domain Local Group</strong></td>
+                                <td>Quelle ressource et quel niveau d'accès ?</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Permission</strong></td>
+                                <td>Qu'est-ce que Windows autorise réellement ?</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>C'est cette séparation claire qui rend AGDLP extrêmement efficace et maintenable.</p>
+            </section>
+
+            <section>
+                <h2>3. A — Account : l'identité</h2>
+                <p>
+                    Le premier élément est le compte utilisateur (ex: <code>Alice</code>, <code>Bob</code>, <code>Claire</code>, <code>David</code>). Un compte représente une identité individuelle.
+                </p>
+                <p>
+                    On évite généralement de mettre directement les comptes utilisateurs dans les ACL des ressources. On préfère les regrouper selon leur fonction ou leur besoin d'accès.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. G — Global Security Group : « qui a besoin d'accès ? »</h2>
+                <p>
+                    C'est probablement l'aspect le plus important à comprendre. Un <strong>Global Security Group</strong> sert généralement à représenter un ensemble d'utilisateurs ayant une caractéristique commune.
+                </p>
+                <p>
+                    Par exemple, <code>GG_RH</code> peut représenter <em>« Les utilisateurs du département RH »</em> :
+                </p>
+
+<pre><code>GG_RH
+├── Alice
+├── Bob
+└── Sophie</code></pre>
+
+                <p>
+                    Le groupe ne dit pas encore précisément à quelle ressource les utilisateurs auront accès. Il décrit plutôt qui ils sont du point de vue de l'organisation : <code>GG_RH</code> = <strong>QUI ?</strong> (Qui a besoin d'un accès particulier ?).
+                </p>
+                <p>
+                    Exemples de groupes globaux : <code>GG_RH</code>, <code>GG_Comptabilite</code>, <code>GG_IT</code>, <code>GG_Direction</code>, <code>GG_Managers</code>. Ces groupes représentent des populations ou des rôles.
+                </p>
+                <p>
+                    Microsoft indique qu'un groupe Global peut contenir des comptes du même domaine ainsi que d'autres groupes Global du même domaine. Il peut ensuite être membre de groupes Domain Local. (Microsoft Learn)
+                </p>
+            </section>
+
+            <section>
+                <h2>5. Pourquoi utiliser un Global Group ?</h2>
+                <p>Supposons qu'Alice soit membre du service RH :</p>
+
+<pre><code>Alice → GG_RH</code></pre>
+
+                <p>
+                    Si Alice change de département et passe à l'IT, on modifie simplement son appartenance de groupe :
+                </p>
+                <ul>
+                    <li><strong>Avant :</strong> <code>Alice → GG_RH</code></li>
+                    <li><strong>Après :</strong> <code>Alice → GG_IT</code></li>
+                </ul>
+                <p>
+                    Les permissions des ressources n'ont absolument pas besoin d'être modifiées individuellement. C'est une séparation extrêmement importante : <strong>l'appartenance de l'utilisateur à un rôle est totalement indépendante de la configuration des ressources.</strong>
+                </p>
+            </section>
+
+            <section>
+                <h2>6. DL — Domain Local Security Group : « à quoi et à quel niveau ? »</h2>
+                <p>
+                    Le <strong>Domain Local Security Group</strong> joue un rôle différent. Il représente généralement un accès à une ressource particulière avec un niveau de permission déterminé.
+                </p>
+                <p>Par exemple :</p>
+                <ul>
+                    <li><code>DL_RH_Read</code></li>
+                    <li><code>DL_RH_Modify</code></li>
+                    <li><code>DL_RH_FullControl</code></li>
+                </ul>
+                
+                <p>
+                    On peut les interpréter comme :
+                </p>
+                <ul>
+                    <li><code>DL_RH_Read</code> = accès au dossier RH en lecture</li>
+                    <li><code>DL_RH_Modify</code> = accès au dossier RH en modification</li>
+                    <li><code>DL_RH_FullControl</code> = contrôle total sur le dossier RH</li>
+                </ul>
+
+                <p>On peut donc retenir :</p>
+                <ul>
+                    <li><strong>Global</strong> = QUI ?</li>
+                    <li><strong>Domain Local</strong> = QUOI + QUEL NIVEAU ?</li>
+                </ul>
+
+                <p>
+                    C'est une simplification pédagogique, mais elle permet de comprendre très rapidement la logique d'AGDLP.
+                </p>
+                <p>
+                    Techniquement, un groupe Domain Local peut recevoir des permissions sur des ressources situées dans <strong>son propre domaine</strong>. Il peut également contenir des comptes et des groupes provenant de domaines appropriés selon les règles de portée d'Active Directory.
+                </p>
+            </section>
+
+            <section>
+                <h2>7. P — Permission : l'autorisation réelle</h2>
+                <p>Le dernier niveau est la permission.</p>
+                <p>Par exemple :</p>
+
+<pre><code>DL_RH_Read
+   ↓
+Dossier RH
+   ↓
+Read</code></pre>
+
+                <p>ou :</p>
+
+<pre><code>DL_RH_Modify
+   ↓
+Dossier RH
+   ↓
+Modify</code></pre>
+
+                <p>
+                    La permission est finalement attribuée au <strong>Domain Local Security Group</strong>, et non directement aux utilisateurs.
+                </p>
+                <p>
+                    Microsoft distingue bien les permissions des droits utilisateur : les permissions sont attribuées à des groupes de sécurité pour contrôler l'accès à une ressource et son niveau, comme Lecture ou Contrôle total.
+                </p>
+            </section>
+
+            <section>
+                <h2>8. Exemple complet</h2>
+                <p>Prenons une entreprise fictive : <code>TechCorp</code></p>
+                <p>Le département RH possède un partage : <code>\\FILESERVER\RH$</code></p>
+                <p>Les employés RH sont : Alice, Bob et Sophie.</p>
+
+                <h3>Étape 1 — Accounts</h3>
+                <p><code>Alice</code>, <code>Bob</code>, <code>Sophie</code></p>
+
+                <h3>Étape 2 — Global Security Group</h3>
+                <p>On crée <code>GG_RH</code>, puis :</p>
+
+<pre><code>GG_RH
+├── Alice
+├── Bob
+└── Sophie</code></pre>
+
+                <p>Cela signifie : <em>« Ces trois utilisateurs appartiennent au groupe fonctionnel RH. »</em></p>
+
+                <h3>Étape 3 — Domain Local Security Group</h3>
+                <p>On crée <code>DL_RH_Modify</code>, puis :</p>
+
+<pre><code>GG_RH
+  ↓
+DL_RH_Modify</code></pre>
+
+                <p>Cela signifie : <em>« Les membres du groupe RH obtiennent l'accès correspondant au groupe DL_RH_Modify. »</em></p>
+
+                <h3>Étape 4 — Permission</h3>
+                <p>Enfin :</p>
+
+<pre><code>DL_RH_Modify
+   ↓
+\\FILESERVER\RH$
+   ↓
+Modify</code></pre>
+
+                <p>La chaîne complète devient :</p>
+
+<pre><code>Alice ─┐
+Bob   ───┼──→ GG_RH
+Sophie ┘       ↓
+          DL_RH_Modify
+               ↓
+        \\FILESERVER\RH$
+               ↓
+            Modify</code></pre>
+
+                <p>C'est <strong>AGDLP</strong>.</p>
+            </section>
+
+            <section>
+                <h2>9. Pourquoi ne pas faire simplement User → Permission ?</h2>
+                <p>Parce que cela mélange deux concepts.</p>
+                <p>Imagine :</p>
+
+<pre><code>Alice  → RH → Modify
+Bob    → RH → Modify
+Sophie → RH → Modify</code></pre>
+
+                <p>L'ACL du dossier devient dépendante des personnes.</p>
+                <p>Avec AGDLP :</p>
+
+<pre><code>Alice ─┐
+Bob   ───┼──→ GG_RH → DL_RH_Modify → RH → Modify
+Sophie ┘</code></pre>
+
+                <p>
+                    L'ACL ne connaît plus Alice, Bob et Sophie individuellement. Elle connaît seulement <code>DL_RH_Modify</code>. C'est beaucoup plus propre.
+                </p>
+            </section>
+
+            <section>
+                <h2>10. Le grand avantage : séparer l'organisation de la ressource</h2>
+                <p>C'est probablement <strong>le concept le plus important d'AGDLP</strong>.</p>
+
+                <p>Supposons que le groupe <code>GG_RH</code> représente les employés RH. Il peut être utilisé pour plusieurs ressources :</p>
+
+<pre><code>GG_RH
+ ├──→ DL_RH_Files_Read    ──→ RH Documents
+ │
+ ├──→ DL_RH_Files_Modify  ──→ RH Working Files
+ │
+ └──→ DL_RH_Application   ──→ Application RH</code></pre>
+
+                <p>Le groupe <code>GG_RH</code> répond toujours à : <strong>« Qui sont les personnes concernées ? »</strong></p>
+                <p>Les groupes Domain Local répondent à : <strong>« Quels accès ces personnes doivent-elles recevoir ? »</strong></p>
+                <p>C'est cette séparation qui rend l'architecture flexible.</p>
+            </section>
+
+            <section>
+                <h2>11. Le même utilisateur peut avoir plusieurs accès</h2>
+                <p>Un utilisateur n'est pas limité à un seul Global Group. Par exemple :</p>
+
+<pre><code>Alice
+ ├── GG_RH
+ └── GG_Managers</code></pre>
+
+                <p>Elle peut ensuite obtenir :</p>
+
+<pre><code>GG_RH ──→ DL_RH_Modify ──→ RH$ (Modify)</code></pre>
+
+                <p>et :</p>
+
+<pre><code>GG_Managers ──→ DL_Management_Read ──→ Management$ (Read)</code></pre>
+
+                <p>Alice possède donc plusieurs accès sans que son compte soit directement présent dans les ACL.</p>
+            </section>
+
+            <section>
+                <h2>12. Exemple avec plusieurs niveaux d'accès</h2>
+                <p>Supposons <code>\\FILESERVER\RH$</code> avec trois niveaux : Read, Modify, Full Control.</p>
+                <p>On peut construire :</p>
+
+<pre><code>GG_RH_Read      ──→ DL_RH_Read        ──→ RH$ → Read
+GG_RH_Employees ──→ DL_RH_Modify      ──→ RH$ → Modify
+GG_RH_Admins    ──→ DL_RH_FullControl ──→ RH$ → Full Control</code></pre>
+
+                <p>Cela permet de représenter clairement les différents besoins.</p>
+            </section>
+
+            <section>
+                <h2>13. Pourquoi le Domain Local est particulièrement adapté aux permissions</h2>
+                <p>Il faut comprendre la logique de portée.</p>
+                <p>
+                    Un groupe Global est conçu pour représenter des membres provenant de <strong>son propre domaine</strong>, tandis qu'un groupe Domain Local est conçu pour recevoir des membres et être utilisé pour accorder des permissions dans <strong>son domaine</strong>.
+                </p>
+                <p>C'est donc une séparation naturelle :</p>
+
+<pre><code>GLOBAL (identité / fonction)
+   ↓
+DOMAIN LOCAL (ressource / permission)
+   ↓
+PERMISSION</code></pre>
+            </section>
+
+            <section>
+                <h2>14. AGDLP n'est donc pas seulement une règle de groupes</h2>
+                <p>Il faut éviter de voir AGDLP comme : <em>« Je dois obligatoirement mettre un groupe dans un autre groupe parce que Microsoft l'impose. »</em></p>
+                <p>Ce n'est pas cela. AGDLP est surtout une <strong>méthode d'architecture des permissions</strong>.</p>
+                <p>Elle cherche à créer une séparation logique :</p>
+
+<div class="highlight-card">
+    <p style="text-align: center;"><strong>Identités → Rôles → Accès → Permissions</strong></p>
+</div>
+
+                <p>Chaque couche possède sa responsabilité.</p>
+            </section>
+
+            <section>
+                <h2>15. AGDLP et le principe du moindre privilège</h2>
+                <p>AGDLP facilite également l'application du <strong>principe du moindre privilège</strong>.</p>
+                <p>Au lieu de donner <code>GG_RH → Full Control</code>, on peut définir exactement ce dont le groupe a besoin :</p>
+
+<pre><code>GG_RH ──→ DL_RH_Read ──→ Read</code></pre>
+
+                <p>ou :</p>
+
+<pre><code>GG_RH ──→ DL_RH_Modify ──→ Modify</code></pre>
+
+                <p>L'objectif est de ne pas donner davantage de droits que nécessaire.</p>
+            </section>
+
+            <section>
+                <h2>16. Une bonne convention de nommage</h2>
+                <p>Une convention simple permet de rendre la structure immédiatement lisible.</p>
+                <p>Par exemple : <code>GG_RH</code>, <code>GG_IT</code>, <code>GG_Comptabilite</code> pour les Global Groups.</p>
+                <p>Et : <code>DL_RH_Read</code>, <code>DL_RH_Modify</code>, <code>DL_RH_FullControl</code>, <code>DL_Compta_Read</code>, <code>DL_Compta_Modify</code> pour les Domain Local Groups.</p>
+
+                <p>En regardant <code>DL_RH_Modify</code>, un administrateur comprend immédiatement :</p>
+                <ul>
+                    <li><code>DL</code> → Domain Local</li>
+                    <li><code>RH</code> → ressource/contexte RH</li>
+                    <li><code>Modify</code> → niveau d'accès</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>17. Le résultat dans une vraie architecture</h2>
+                <p>On pourrait donc avoir :</p>
+
+<pre><code>USERS : Alice, Bob, Sophie
+  ↓
+GG_RH
+  ↓
+DL_RH_Modify
+  ↓
+\\FILESERVER\RH$ (Modify)</code></pre>
+
+                <p>Et parallèlement :</p>
+
+<pre><code>USERS : David, Eric
+  ↓
+GG_IT
+  ↓
+DL_IT_Modify
+  ↓
+\\FILESERVER\IT$ (Modify)</code></pre>
+
+                <p>Les utilisateurs sont donc organisés d'un côté, tandis que les ressources et permissions sont organisées de l'autre.</p>
+            </section>
+
+            <section>
+                <h2>18. Que se passe-t-il lorsqu'un employé change de service ?</h2>
+                <p>C'est là que la méthode devient particulièrement intéressante.</p>
+                <p>Supposons que <code>Alice</code> passe de RH à IT.</p>
+                <p>On retire simplement Alice de <code>GG_RH</code> et on l'ajoute à <code>GG_IT</code>.</p>
+                <p>Elle obtient alors les accès correspondant aux groupes IT. La configuration des permissions du serveur de fichiers n'a pas besoin d'être réécrite pour Alice.</p>
+            </section>
+
+            <section>
+                <h2>19. Ce que cela donne pour l'administration</h2>
+                <p><strong>Sans AGDLP :</strong> Utilisateur → Ressource → Permission (L'administrateur doit gérer beaucoup de relations individuelles).</p>
+                <p><strong>Avec AGDLP :</strong> Utilisateur → Groupe Global → Groupe Domain Local → Ressource → Permission.</p>
+                <p>L'administration devient beaucoup plus structurée :</p>
+                <ul>
+                    <li>Une modification de personnel se fait principalement au niveau des <strong>Global Groups</strong>.</li>
+                    <li>Une modification de la stratégie d'accès se fait principalement au niveau des <strong>Domain Local Groups</strong>.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>20. Une nuance importante : AGDLP n'est pas une obligation technique</h2>
+                <p>Active Directory <strong>autorise</strong> d'autres architectures. Par exemple, techniquement, tu peux avoir <code>User → Security Group → Permission</code> ou même attribuer directement une permission à un utilisateur.</p>
+                <p>
+                    AGDLP est plutôt une <strong>bonne pratique d'organisation</strong>, particulièrement utile dans les environnements où les permissions deviennent nombreuses et complexes.
+                </p>
+            </section>
+
+            <section>
+                <h2>21. La phrase à retenir</h2>
+                <div class="highlight-card">
+                    <p>
+                        <strong>« Le Global Security Group représente principalement qui a besoin d'accéder à quelque chose, tandis que le Domain Local Security Group représente à quelle ressource cet accès s'applique et avec quel niveau de permission. La permission est ensuite attribuée au Domain Local Group. »</strong>
+                    </p>
+                </div>
+
+                <p>En résumé :</p>
+
+<pre><code>        QUI ?
+          ↓
+    Global Group
+          ↓
+   QUOI + NIVEAU ?
+          ↓
+  Domain Local Group
+          ↓
+     Permission</code></pre>
+
+                <p>
+                    C'est cette séparation entre <strong>« qui a besoin d'accès »</strong> et <strong>« à quoi / avec quel niveau d'accès »</strong> qui constitue le cœur conceptuel d'AGDLP.
+                </p>
+            </section>
+
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 15 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
