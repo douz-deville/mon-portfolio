@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aging & Scavenging DNS dans Active Directory — Comprendre la péremption des enregistrements</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        pre {
+            background-color: #1e1e24;
+            color: #f8f8f2;
+            font-family: var(--font-mono);
+            padding: 1.25rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .highlight-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .highlight-card p {
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f4f4f6;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Styles pour l'image et la légende */
+        .article-image-container {
+            margin: 2.5rem 0;
+            padding: 0;
+        }
+
+        .article-image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .article-image-container figcaption {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">18 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">Active Directory</span>
+                    <span class="tag">DNS</span>
+                    <span class="tag">Aging & Scavenging</span>
+                    <span class="tag">Sécurité</span>
+                </div>
+            </div>
+            <h1>Aging & Scavenging DNS dans Active Directory : comprendre la péremption des enregistrements</h1>
+        </header>
+
+        <article>
+            <section>
+                <p>
+                    Dans un environnement Active Directory, le DNS n'est pas une simple base de correspondances nom ↔ IP figée. Il vit, se met à jour, et surtout — <strong>il devrait vieillir</strong>. Sans mécanisme de nettoyage, une zone DNS intégrée à Active Directory accumule au fil des mois des enregistrements fantômes : des postes réformés, des IP réattribuées, des machines qui n'existent plus mais dont le nom continue de répondre.
+                </p>
+
+                <!-- Zone d'image d'en-tête -->
+                <figure class="article-image-container">
+                    <img src="images/dns_aging_scavenging.png" alt="Schéma illustrant le cycle de vie de l'Aging et du Scavenging DNS dans Active Directory">
+                    <figcaption>Représentation chronologique du cycle Aging (No-Refresh + Refresh) et du balayage de nettoyage Scavenging</figcaption>
+                </figure>
+
+                <p>Deux mécanismes complémentaires règlent ce problème :</p>
+
+                <div class="highlight-card">
+                    <p><strong>Aging (le vieillissement) :</strong> le mécanisme de compte à rebours qui détermine si un enregistrement DNS est toujours vivant ou s'il est devenu obsolète (<em>stale</em>).</p>
+                    <p><strong>Scavenging (le nettoyage) :</strong> le processus qui passe à intervalles réguliers pour supprimer définitivement les enregistrements déclarés obsolètes par l'Aging.</p>
+                </div>
+
+                <p>
+                    L'un détecte, l'autre supprime. Ils ne font jamais la même chose, et comprendre pourquoi ils sont séparés est la clé de tout cet article.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. Comment fonctionne l'Aging</h2>
+                <p>
+                    Quand une machine dynamique (un PC) enregistre son IP dans le DNS, Windows lui attribue une date de création : l'<strong>horodatage (timestamp)</strong>.
+                </p>
+                <p>
+                    L'Aging se décompose en deux périodes consécutives, chacune fixée par défaut à <strong>7 jours</strong> :
+                </p>
+
+<pre><code>[--- 7 jours : No-Refresh ---][--- 7 jours : Refresh ---] ---> Enregistrement périmé (Stale)
+^                                                          ^
+Enregistrement créé/mis à jour                             Compte à rebours écoulé</code></pre>
+
+                <h3>a) Intervalle de non-rafraîchissement (No-Refresh) — 7 jours</h3>
+                <p>
+                    Pendant ces 7 jours, si le PC tente de rafraîchir son enregistrement DNS <strong>sans changer d'adresse IP</strong>, le serveur DNS refuse de mettre à jour la date.
+                </p>
+
+                <h3>b) Intervalle de rafraîchissement (Refresh) — 7 jours</h3>
+                <p>Pendant cette deuxième fenêtre, le serveur DNS accepte que le PC rafraîchisse sa date :</p>
+                <ul>
+                    <li><strong>Si le PC est allumé</strong>, il envoie un signal (<em>« Je suis toujours là »</em>) : l'horodatage repart à zéro, et le cycle recommence.</li>
+                    <li><strong>Si le PC est éteint, jeté ou déconnecté</strong>, la période s'écoule sans aucune mise à jour. L'enregistrement devient officiellement <strong>périmé (Stale)</strong>.</li>
+                </ul>
+
+                <h3>Le No-Refresh ne bloque pas les changements d'IP</h3>
+                <p>
+                    Une confusion fréquente : penser que la période No-Refresh empêche un PC de changer d'adresse. C'est faux. La règle du No-Refresh s'applique <strong>uniquement si l'adresse IP reste identique</strong> :
+                </p>
+                <ul>
+                    <li><strong>Si l'IP ne change pas :</strong> le serveur refuse de mettre à jour l'horodatage, pour économiser de la bande passante et éviter de surcharger la réplication Active Directory.</li>
+                    <li><strong>Si l'IP change :</strong> (le PC passe du Wi-Fi à l'Ethernet, change de sous-réseau, obtient un nouveau bail DHCP), il s'agit d'une véritable modification d'enregistrement. Le serveur DNS l'accepte immédiatement et met à jour l'horodatage, <strong>même si le PC était encore dans sa période No-Refresh</strong>.</li>
+                </ul>
+
+                <div class="highlight-card">
+                    <p><strong>À retenir :</strong> No-Refresh signifie <em>« ne rafraîchis pas la date si rien n'a changé »</em>, et non <em>« interdiction de modifier l'adresse IP »</em>.</p>
+                </div>
+
+                <h3>Pourquoi le serveur refuse-t-il de mettre à jour la date ?</h3>
+                <p>
+                    Quand le PC de Julie s'allume le matin, il envoie une requête : <em>« Je suis <code>julie-pc</code> avec l'IP <code>192.168.1.50</code> »</em>.
+                </p>
+                <ul>
+                    <li><strong>Ce que voit le PC :</strong> le serveur DNS répond "C'est validé".</li>
+                    <li><strong>Ce qui se passe réellement dans l'AD :</strong> le serveur ne modifie pas la date stockée en base. Il garde la date de la semaine précédente.</li>
+                </ul>
+                <p>
+                    La raison est purement structurelle : dans un DNS intégré à Active Directory, chaque enregistrement DNS est aussi un <strong>objet Active Directory</strong>. Modifier sa date de mise à jour, c'est donc modifier un objet AD — ce qui déclenche une <strong>réplication</strong> vers tous les autres contrôleurs de domaine du réseau. Si 2 000 postes rafraîchissaient leur horodatage chaque matin à l'allumage, cela générerait une tempête de réplication totalement inutile, pour une information qui n'a strictly pas changé. Le No-Refresh existe donc uniquement pour absorber ce bruit.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. Comment fonctionne le Scavenging</h2>
+                <p>
+                    Une fois qu'un enregistrement devient périmé, <strong>il ne disparaît pas automatiquement</strong>. Il reste dans la base DNS tant que le Scavenging n'a pas tourné.
+                </p>
+                <p>
+                    Le Scavenging est une tâche programmée sur le serveur DNS (par exemple, exécutée tous les 7 jours). À chaque déclenchement, il applique cette vérification à tous les enregistrements de la zone :
+                </p>
+
+<pre><code>Si (Date actuelle) > (Horodatage + No-Refresh + Refresh)
+→ Supprimer l'enregistrement</code></pre>
+            </section>
+
+            <section>
+                <h2>3. Exemple concret pas à pas</h2>
+                <p>
+                    Prenons le cas du PC de Julie (<code>julie-pc</code>), avec les réglages par défaut (No-Refresh = 7j, Refresh = 7j, Scavenging exécuté tous les 7j).
+                </p>
+
+                <p><strong>Cycle de vie normal :</strong></p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jour</th>
+                                <th>Événement</th>
+                                <th>Ce qui se passe en arrière-plan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Jour 1 (Lundi)</strong></td>
+                                <td>Julie branche son PC. IP : <code>192.168.1.50</code>.</td>
+                                <td>L'enregistrement est créé. Horodatage = Jour 1.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jour 3 (Mercredi)</strong></td>
+                                <td>Julie redémarre son PC.</td>
+                                <td>Le PC tente de rafraîchir le DNS. <strong>Refusé</strong> (période No-Refresh active). L'horodatage reste Jour 1.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jour 8 (Lundi suivant)</strong></td>
+                                <td>Entrée dans la période de Refresh.</td>
+                                <td>Le PC est allumé, il rafraîchit son bail DNS. <strong>Accepté.</strong> L'horodatage devient Jour 8. Le cycle repart à zéro.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p><strong>Scénario de départ (Julie part en congé avec son PC au Jour 8) :</strong></p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jour</th>
+                                <th>Événement</th>
+                                <th>Ce qui se passe en arrière-plan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Jour 8 à 15</strong></td>
+                                <td>Période No-Refresh (7 jours).</td>
+                                <td>Le PC est éteint. Rien ne se passe.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jour 15 à 22</strong></td>
+                                <td>Période Refresh (7 jours).</td>
+                                <td>Le PC est toujours éteint, aucun rafraîchissement n'a lieu.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jour 22</strong></td>
+                                <td>Fin des 14 jours cumulés.</td>
+                                <td>L'enregistrement <code>julie-pc</code> est marqué <strong>obsolète (Stale)</strong>. Il reste visible dans la console, mais considéré comme "fantôme".</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jour 28</strong></td>
+                                <td>Exécution automatique du Scavenging.</td>
+                                <td>Le serveur balaie la zone DNS, repère l'entrée <code>julie-pc</code> périmée depuis le Jour 22, et la <strong>supprime définitivement</strong>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>4. À quoi sert de marquer un enregistrement « périmé » s'il continue de répondre ?</h2>
+                <p>
+                    C'est le point le plus contre-intuitif du mécanisme : entre le Jour 22 et le Jour 28, l'enregistrement <code>julie-pc</code> est officiellement stale, <strong>mais le serveur DNS continue de le renvoyer normalement</strong> si quelqu'un le demande. Le statut "périmé" n'est pas un interrupteur qui désactive un enregistrement en temps réel — c'est uniquement un <strong>critère de filtrage pour le Scavenging</strong>.
+                </p>
+                <p>Deux raisons structurelles expliquent ce choix :</p>
+
+                <p><strong>a) La performance du serveur DNS.</strong></p>
+                <p>
+                    Pour répondre en quelques millisecondes à des milliers de requêtes par seconde, le moteur DNS doit rester extrêmement rapide. S'il devait recalculer, à chaque requête, la formule <code>(Timestamp + No-Refresh + Refresh &lt; Date actuelle)</code>, le processeur du contrôleur de domaine s'effondrerait sous la charge. Le serveur se contente donc de lire l'enregistrement tel qu'il est en mémoire, sans vérification en temps réel.
+                </p>
+
+                <p><strong>b) Le traitement par lots (batch processing).</strong></p>
+                <p>
+                    Supprimer un objet dans Active Directory consomme des ressources et génère du trafic de réplication. Le système évite donc de supprimer les entrées une par une en temps réel. Il attend l'exécution programmée du Scavenging, qui scanne alors la base globalement, repère en une seule passe tous les enregistrements périmés, et les supprime d'un coup.
+                </p>
+
+                <div class="highlight-card">
+                    <p><strong>L'analogie du frigo :</strong> c'est exactement la date de péremption sur une brique de lait. À minuit passé, le lait devient théoriquement périmé — mais la brique ne disparaît pas magiquement du frigo. Si tu l'ouvres sans regarder la date, tu peux encore t'en servir (le DNS continue de donner l'IP). Elle restera là jusqu'à ce que tu fasses le ménage hebdomadaire (le Scavenging) et jettes ce qui est périmé.</p>
+                </div>
+
+                <p>
+                    C'est précisément cette fenêtre entre "périmé" et "supprimé" — combinée à l'absence totale de Scavenging dans de nombreux environnements réels — qui ouvre une véritable surface d'attaque.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. Pourquoi le trafic peut être envoyé vers une IP obsolète, même si le PC est bien allumé</h2>
+                <p>
+                    On pourrait se dire : <em>« Si un admin veut joindre un PC, c'est qu'il est allumé — donc il a forcément un enregistrement DNS à jour. Pourquoi le trafic irait-il vers une ancienne IP ? »</em> Deux scénarios contredisent cette logique.
+                </p>
+
+                <h3>a) Le problème des enregistrements multiples (Multi-A Records)</h3>
+                <p>
+                    Quand <code>julie-pc</code> revient de congés et se branche sur un autre réseau, DHCP lui attribue une nouvelle IP, par exemple <code>192.168.1.99</code> :
+                </p>
+                <ul>
+                    <li>Le PC enregistre sa nouvelle IP : <code>julie-pc → 192.168.1.99</code>.</li>
+                    <li><strong>Sans Scavenging</strong>, l'ancien enregistrement <code>julie-pc → 192.168.1.50</code> reste également présent.</li>
+                    <li><strong>Résultat :</strong> la zone DNS contient désormais deux IP différentes pour le même nom. Quand quelqu'un tape <code>ping julie-pc</code>, le serveur applique un comportement de répartition (round-robin) et renvoie une fois sur deux l'ancienne IP — celle qui ne correspond plus à Julie.</li>
+                </ul>
+
+                <h3>b) Les scripts d'administration qui interrogent des PC éteints</h3>
+                <p>
+                    Un administrateur n'ouvre pas toujours une session manuelle sur un poste en direct. Il lance souvent des scripts automatisés (déploiement d'antivirus, audit PowerShell) qui parcourent l'ensemble des ordinateurs inscrits dans l'annuaire :
+                </p>
+                <ol>
+                    <li><code>julie-pc</code> est éteinte, dans un tiroir, depuis des mois.</li>
+                    <li>Le script interroge le DNS : <em>« Donne-moi l'IP de <code>julie-pc</code> »</em>.</li>
+                    <li>Le DNS répond <code>192.168.1.50</code> — l'adresse fantôme restée en mémoire, faute de Scavenging.</li>
+                    <li>Entre-temps, le serveur DHCP a réattribué cette même IP à une toute autre machine — potentiellement celle d'un attaquant connecté au réseau.</li>
+                    <li>Le script d'administration tente de s'authentifier à distance sur <code>192.168.1.50</code> avec des privilèges d'administrateur du domaine, livrant ses identifiants à qui répond à cette adresse.</li>
+                </ol>
+
+                <p>C'est ce dernier point qui transforme un simple problème d'hygiène DNS en risque de sécurité critique.</p>
+            </section>
+
+            <section>
+                <h2>6. Risques cybersécurité liés à l'absence de Scavenging</h2>
+                <p>
+                    Si le Scavenging n'est pas activé, la base DNS se remplit progressivement d'enregistrements fantômes. Cela ouvre plusieurs angles d'attaque concrets.
+                </p>
+
+                <h3>a) Usurpation d'identité et attaque Man-in-the-Middle (MitM)</h3>
+                <ol>
+                    <li><code>julie-pc</code> avait l'IP <code>192.168.1.50</code>. Le PC est réformé ou déconnecté.</li>
+                    <li>L'enregistrement <code>julie-pc.techcorp.local → 192.168.1.50</code> reste indéfiniment en base.</li>
+                    <li>DHCP réattribue cette IP à une nouvelle machine — ou un attaquant branche un équipement malveillant et s'approprie cette adresse.</li>
+                    <li>Un administrateur (ou un script) tente d'accéder à <code>\\julie-pc\c$</code> ou d'exécuter une commande PowerShell à distance sur <code>julie-pc</code>.</li>
+                    <li>Le trafic part vers <code>192.168.1.50</code>. L'attaquant reçoit la connexion, intercepte le hachage d'authentification (NTLMv2) et peut tenter de le casser hors ligne ou de le rejouer (relais NTLM).</li>
+                </ol>
+
+                <h3>b) Repli vers des protocoles vulnérables (LLMNR / NBT-NS)</h3>
+                <p>
+                    Si une machine tente de joindre un hôte via son nom DNS mais que l'IP enregistrée ne répond plus (la machine physique est éteinte depuis longtemps), Windows peut basculer vers des protocoles de résolution de noms locaux plus anciens : LLMNR ou NBT-NS. Un attaquant à l'écoute du réseau (avec un outil comme Responder) peut répondre à la place de la machine manquante et capturer les identifiants de l'utilisateur.
+                </p>
+
+                <h3>c) Reconnaissance et cartographie pour l'attaquant</h3>
+                <p>
+                    Lors de la phase de reconnaissance, un attaquant disposant d'un accès basique au domaine peut extraire l'intégralité de la zone DNS (via des outils comme BloodHound, AdFind ou PowerView). Une base DNS non nettoyée lui fournit une cartographie complète de l'historique du réseau — y compris d'anciens sous-réseaux ou serveurs oubliés, potentiellement porteurs de vulnérabilités jamais corrigées.
+                </p>
+
+                <h3>d) Aveuglement du SOC lors d'un incident</h3>
+                <p>
+                    En cas d'alerte remontée par un pare-feu ou un SIEM sur une IP donnée, les analystes effectuent généralement une résolution DNS inversée pour identifier la machine concernée. Si le DNS renvoie le nom d'un poste déconnecté depuis six mois, l'investigation est faussée — et l'attaque réellement en cours passes inaperçue.
+                </p>
+            </section>
+
+            <section>
+                <h2>7. Activer le Scavenging : les deux conditions obligatoires</h2>
+                <p>
+                    Le Scavenging ne s'active pas à un seul endroit — il exige une configuration à <strong>deux niveaux distincts</strong>, et l'omission de l'un des deux suffit à le rendre totalement inopérant :
+                </p>
+                <ol>
+                    <li><strong>Au niveau de la zone DNS :</strong> clic droit sur la zone (ex. <code>techcorp.local</code>) → <em>Properties</em> → onglet <em>Aging</em> → cocher <em>Scavenge stale resource records</em>.</li>
+                    <li><strong>Au niveau du serveur DNS :</strong> clic droit sur le contrôleur de domaine → <em>Set Aging/Scavenging for All Zones</em> → activer et définir la fréquence du balayage.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    L'Aging et le Scavenging ne sont pas une simple fonctionnalité de "ménage" cosmétique dans Active Directory. C'est un contrôle de sécurité à part entière, au même titre qu'une politique de mots de passe ou une gestion rigoureuse des groupes (voir l'article sur <a href="../agdlp/index.html">AGDLP dans Active Directory</a>).
+                </p>
+                <p>
+                    Un DNS qui n'oublie jamais rien devient, avec le temps, une carte au trésor pour un attaquant : des IP fantômes prêtes à être détournées, une cartographie complète de l'historique réseau, et un SOC qui enquête sur les mauvaises machines. Configurer l'Aging et le Scavenging correctement, c'est s'assurer que la mémoire du réseau reste fidèle à sa réalité présente — ni plus, ni moins.
+                </p>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 18 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
