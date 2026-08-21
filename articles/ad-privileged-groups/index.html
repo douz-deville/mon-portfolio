@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6;
+            --text: #1c1c1e;
+            --text-muted: #636366;
+            --accent: #1a56db;
+            --accent-light: #eff6ff;
+            --border: #e5e5ea;
+            --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            padding: 3rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .back-nav {
+            margin-bottom: 3rem;
+        }
+
+        .back-nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            transition: color 0.2s ease;
+        }
+
+        .back-nav a:hover {
+            color: var(--accent);
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 2rem;
+        }
+
+        .meta-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        article section {
+            margin-bottom: 2.5rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 2.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+        }
+
+        p {
+            margin-bottom: 1.25rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.25rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            color: #27272a;
+            font-size: 1.025rem;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+            background-color: var(--accent-light);
+            color: var(--accent);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .highlight-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .highlight-card p {
+            margin-bottom: 0.75rem;
+        }
+
+        .highlight-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            padding: 0.85rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f4f4f6;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .article-image-container {
+            margin: 2.5rem 0;
+            padding: 0;
+        }
+
+        .article-image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .article-image-container figcaption {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.4;
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 640px) {
+            h1 {
+                font-size: 1.85rem;
+            }
+            footer {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">21 Août 2026</span>
+                <div class="tags-container">
+                    <span class="tag">Active Directory</span>
+                    <span class="tag">Privilege Escalation</span>
+                    <span class="tag">Tier 0</span>
+                    <span class="tag">Sécurité</span>
+                </div>
+            </div>
+            <h1>Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation</h1>
+        </header>
+
+        <article>
+            <section>
+                <p>
+                    Dans Active Directory, tous les groupes ne se valent pas. Sept d'entre eux concentrent à eux seuls la quasi-totalité du risque de compromission totale d'un domaine — et le plus dangereux n'est pas toujours celui qu'on croit. Certains sont évidents (<code>Domain Admins</code>), d'autres se présentent comme de simples rôles opérationnels (<code>Backup Operators</code>, <code>Server Operators</code>) alors qu'ils offrent, dans les faits, un chemin direct vers le contrôle total du domaine.
+                </p>
+
+                <!-- Zone d'image d'en-tête -->
+                <figure class="article-image-container">
+                    <img src="images/ad_privileged_groups_hierarchy.png" alt="Schéma illustrant l'architecture des groupes privilégiés Active Directory et des Built-in Operators">
+                    <figcaption>Cartographie des privilèges AD : de la portée forêt (Enterprise/Schema Admins) aux droits locaux d'OS et Built-in Operators</figcaption>
+                </figure>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Groupe</th>
+                                <th>Portée (Scope)</th>
+                                <th>Niveau (Tier)</th>
+                                <th>Vecteur de risque / usage principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Enterprise Admins</strong></td>
+                                <td>Forêt (Root)</td>
+                                <td>Tier 0</td>
+                                <td>Contrôle absolu sur la totalité de la forêt Active Directory.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Schema Admins</strong></td>
+                                <td>Forêt (Root)</td>
+                                <td>Tier 0</td>
+                                <td>Modification de la structure de la base de données AD.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Domain Admins</strong></td>
+                                <td>Domaine</td>
+                                <td>Tier 0</td>
+                                <td>Contrôle total sur un domaine spécifique et ses machines jointes.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Administrators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Tier 0</td>
+                                <td>Gestionnaires directs des contrôleurs de domaine (DC).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account Operators</strong></td>
+                                <td>Domaine</td>
+                                <td>Élevé</td>
+                                <td>Création/gestion de comptes non protégés <em>(PrivEsc potentiel)</em>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Backup Operators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Critique</td>
+                                <td>Contourne le NTFS pour lire la base AD (<code>ntds.dit</code>) <em>(PrivEsc direct)</em>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Server Operators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Critique</td>
+                                <td>Gestion des services et sessions sur les DC <em>(PrivEsc direct)</em>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>1. Deux vocabulaires qu'il ne faut pas confondre</h2>
+                <p>
+                    Avant d'aller plus loin, il faut désamorcer une confusion très fréquente : <strong>« Built-in » et « Tier 0 » ne mesurent pas la même chose.</strong>
+                </p>
+                <ul>
+                    <li><strong>« Built-in »</strong> désigne une <strong>origine technique dans l'annuaire</strong> : c'est simplement le nom du conteneur (<code>CN=Builtin</code>) où Windows range les groupes système précréés historiquement par l'OS, avec des identifiants (SID) fixes comme <code>S-1-5-32-544</code> pour <code>Administrators</code>. À l'inverse, <code>CN=Users</code> est le conteneur par défaut où Active Directory génère les groupes globaux de domaine comme <code>Domain Admins</code> (RID 512).</li>
+                    <li><strong>« Tier 0 »</strong> désigne un <strong>niveau de privilège</strong>, dans le modèle de sécurité par paliers (<em>tiering</em>) recommandé par l'ANSSI et Microsoft : tout groupe capable de contrôler un contrôleur de domaine ou la base Active Directory elle-même est classé Tier 0, quel que soit son conteneur d'origine.</li>
+                </ul>
+                <p>
+                    Autrement dit : <code>Administrators</code> est Built-in <strong>et</strong> Tier 0. <code>Domain Admins</code> n'est pas Built-in (il vit dans <code>CN=Users</code>) mais il est <strong>tout autant</strong> Tier 0. Le terme "Built-in" ne dit rien sur le niveau de dangerosité d'un groupe — c'est uniquement une étiquette d'emplacement.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. Le compte `Administrator` et le groupe `Administrators` : deux choses différentes</h2>
+                <p>
+                    Un compte est une identité ; un groupe est un conteneur de droits. La confusion entre les deux est fréquente, en particulier parce que le nom se ressemble.
+                </p>
+                <ul>
+                    <li><strong>Le compte <code>Administrator</code> :</strong> une identité individuelle, présente par défaut sur chaque installation Windows — y compris un simple PC qui n'a jamais rejoint de domaine AD. Son identifiant (SID) se termine par <code>-500</code>.</li>
+                    <li><strong>Le groupe <code>Administrators</code> :</strong> le conteneur qui détient les droits techniques absolus sur le système local (SID <code>S-1-5-32-544</code>). C'est ce groupe — pas le compte — qui porte réellement les privilèges Windows bas niveau : installer des pilotes, lire la mémoire système, modifier le registre.</li>
+                </ul>
+                <p>
+                    Par défaut, le compte <code>Administrator</code> est simplement le <strong>premier membre inscrit</strong> dans le groupe <code>Administrators</code>. Ce mécanisme existe sur toute machine Windows, domaine ou pas — un poste isolé, jamais joint à un AD, a lui aussi son compte <code>Administrator</code> et son groupe <code>Administrators</code> locaux.
+                </p>
+            </section>
+
+            <section>
+                <h2>3. Pourquoi `Domain Admins` est imbriqué dans `Administrators`</h2>
+                <p>
+                    C'est ici que la hiérarchie technique devient intéressante — et légèrement contre-intuitive.
+                </p>
+                <p><strong>Techniquement, le groupe <code>Administrators</code> est au-dessus de <code>Domain Admins</code>.</strong></p>
+                <ul>
+                    <li><strong>L'origine des privilèges :</strong> c'est <code>Administrators</code> qui détient nativement les privilèges système bas niveau sur les contrôleurs de domaine (charger des pilotes, lire la mémoire kernel, gérer les services). <code>Domain Admins</code> ne possède pas ces droits par lui-même — il les <strong>hérite</strong> uniquement parce qu'il est membre d'<code>Administrators</code>.</li>
+                    <li><strong>Le test de séparation :</strong> si on retire <code>Domain Admins</code> du groupe <code>Administrators</code>, ses membres perdent immédiatement la capacité d'administrer les contrôleurs de domaine — impossible de s'y connecter en RDP, de gérer les services système ou d'agir sur la mémoire du DC.</li>
+                    <li><strong>Le pouvoir final :</strong> un utilisateur placé uniquement dans <code>Administrators</code> a le pouvoir absolu sur l'OS du DC. Il peut donc manipuler directement le processus <code>LSASS</code> ou la base Active Directory au niveau fichier — et s'ajouter lui-même dans <code>Domain Admins</code> s'il le souhaite.</li>
+                </ul>
+                <p>
+                    <code>Administrators</code> est donc le conteneur final des droits système. <code>Domain Admins</code> n'est qu'un groupe global imbriqué dedans par défaut, pour faciliter la gestion à grande échelle.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. Une portée plus large, pas un privilège supérieur</h2>
+                <p>
+                    Il y a bien une asymétrie entre les deux groupes — mais elle porte sur la <strong>portée réseau</strong>, pas sur le <strong>niveau de sécurité</strong>. Les deux sont strictly Tier 0.
+                </p>
+                <ul>
+                    <li><strong><code>Domain Admins</code> (groupe global) :</strong> quand une machine rejoint le domaine, Active Directory injecte automatiquement <code>Domain Admins</code> dans le groupe <code>Administrateurs</code> local de cette machine. Cela lui donne un pouvoir d'administration transverse sur tout le parc — postes, serveurs, DC compris.</li>
+                    <li><strong><code>Administrators</code> (groupe Builtin / Domain Local) :</strong> ce groupe contrôle uniquement l'OS des contrôleurs de domaine et la base AD. Il n'est pas injecté automatiquement sur les postes clients ou les serveurs membres.</li>
+                </ul>
+
+                <div class="highlight-card">
+                    <p><strong>L'analogie qui fixe l'idée :</strong> imagine un grand hôtel (le réseau d'entreprise) avec des centaines de chambres (les serveurs et les postes).</p>
+                    <p>• <code>Administrators</code> = <strong>la serrure de la chambre.</strong> Chaque machine possède son propre groupe <code>Administrators</code> : c'est la serrure locale qui dit « toute personne dans ce groupe a le contrôle total de <em>cette</em> machine ».</p>
+                    <p>• <code>Domain Admins</code> = <strong>le pass-partout des employés.</strong> C'est le groupe global du réseau dans lequel on place les comptes de l'équipe IT.</p>
+                </div>
+                <p>
+                    Quand une nouvelle machine rejoint le domaine, Windows dit automatiquement à sa serrure locale (<code>Administrators</code>) : « accepte le pass-partout (<code>Domain Admins</code>) ». Résultat : l'équipe IT peut dépanner n'importe quelle machine du réseau instantanément, sans configurer chaque poste un par un.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. Pourquoi deux groupes distincts, alors ?</h2>
+                <p>
+                    Trois raisons structurelles justifient cette séparation entre <code>Domain Admins</code> (porteur d'identités) et <code>Administrators</code> (porteur de droits effectifs) :
+                </p>
+
+                <h3>a) La flexibilité multi-domaines (logique AGDLP)</h3>
+                <p>
+                    <code>Domain Admins</code> est un groupe Global (il rassemble des identités d'un domaine précis) ; <code>Administrators</code> est un groupe Domain Local (il détient les privilèges système effectifs). Dans une entreprise avec deux domaines (<code>france.techcorp.local</code> et <code>usa.techcorp.local</code>), on peut ajouter le <code>Domain Admins</code> de France dans le groupe <code>Administrators</code> des DC américains — accordant un accès croisé propre sans jamais mélanger la gestion des comptes des deux pays. C'est exactement le même principe que l'architecture AGDLP appliquée aux permissions de fichiers, mais transposé au contrôle des serveurs eux-mêmes.
+                </p>
+
+                <h3>b) L'automatisation du parc informatique</h3>
+                <p>
+                    Windows a besoin d'un conteneur mobile, distribuable sur tout le réseau. Sans <code>Domain Admins</code>, il faudrait configurer manuellement les droits d'administration sur chaque nouveau serveur ou poste client — un travail insoutenable à l'échelle d'un parc de plusieurs centaines de machines.
+                </p>
+
+                <h3>c) La cohérence avec le noyau Windows</h3>
+                <p>
+                    Toute machine Windows, du PC individuel au serveur, possède le groupe <code>Administrators</code> pour gérer ses droits internes (services, pilotes, registre). Le conserver sur le contrôleur de domaine permet au noyau Windows d'appliquer exactement les mêmes mécanismes de sécurité système (UAC, politiques de privilèges) que sur n'importe quel autre serveur — pendant que <code>Domain Admins</code> sert de couche d'abstraction propre à Active Directory.
+                </p>
+
+                <div class="highlight-card">
+                    <p><strong>En résumé, la logique est la suivante :</strong></p>
+                    <p><code>Domain Admins</code> sert à regrouper les utilisateurs (les identités de l'équipe IT). <code>Administrators</code> sert à porter les droits et accès effectifs sur le système d'exploitation.</p>
+                    <p><code>Compte Admin → Domain Admins (porteur d'utilisateurs) → Administrators (porteur de droits) → Accès système</code></p>
+                </div>
+
+                <p>
+                    C'est cette séparation stricte entre <em>rassemblement des comptes</em> et <em>attribution des droits</em> qui rend Active Directory aussi souple à gérer à grande échelle — la même logique, littéralement, que celle qui structure AGDLP pour les permissions sur fichiers.
+                </p>
+            </section>
+
+            <section>
+                <h2>6. Enterprise Admins et Schema Admins : changer d'échelle, passer à la forêt</h2>
+                <p>
+                    <code>Enterprise Admins</code> (EA) et <code>Schema Admins</code> (SA) ne sont ni des groupes Globaux ni des groupes Domain Local : ce sont des <strong>groupes Universels</strong> (<em>Universal Groups</em>), et ils n'existent qu'à un seul endroit — le <strong>domaine racine de la forêt</strong> AD. On quitte ici le niveau Domaine pour passer au niveau Forêt.
+                </p>
+
+                <h3>a) Enterprise Admins : la surcouche d'identités de la forêt</h3>
+                <p>C'est un conteneur d'utilisateurs, comme <code>Domain Admins</code>, mais conçu pour gérer plusieurs domaines à la fois.</p>
+                <ul>
+                    <li><strong>Comment il obtient ses droits :</strong> par défaut, Active Directory imbrique automatiquement <code>Enterprise Admins</code> dans le groupe <code>Administrators</code> de <strong>chaque domaine</strong> de la forêt.</li>
+                    <li><strong>Résultat :</strong> un membre d'<code>Enterprise Admins</code> possède automatiquement les droits d'administration locale sur tous les contrôleurs de domaine de toutes les filiales de l'entreprise. Il doit rester <strong>vide au quotidien</strong>, et n'être peuplé que pour des opérations d'infrastructure majeures (création d'un nouveau domaine, approbation de forêt).</li>
+                </ul>
+
+                <h3>b) Schema Admins : le privilège direct sur la base de données</h3>
+                <p>Ici, la mécanique diverge complètement : <code>Schema Admins</code> ne s'imbrique pas dans <code>Administrators</code> et ne sert pas à gérer des serveurs Windows.</p>
+                <ul>
+                    <li><strong>Comment il obtient ses droits :</strong> il possède des permissions d'écriture directes (ACL) sur la <strong>partition Schéma</strong> de la base Active Directory.</li>
+                    <li><strong>Son rôle :</strong> le schéma est le "plan de construction" d'AD — il définit ce qu'est un utilisateur, un ordinateur, quels attributs ils peuvent porter. <code>Schema Admins</code> est le seul groupe autorisé à modifier ce plan (par exemple lors de l'installation d'un serveur Exchange ou d'une mise à niveau majeure d'AD). Il doit rester <strong>vide en permanence</strong>, et n'être peuplé que temporairement, le temps d'une extension de schéma.</li>
+                </ul>
+
+                <p><strong>Résumé de la mécanique à trois échelles :</strong></p>
+                <ul>
+                    <li><code>Domain Admins</code> = conteneur d'identités pour <strong>1 domaine</strong>.</li>
+                    <li><code>Enterprise Admins</code> = conteneur d'identités injecté dans la serrure <code>Administrators</code> de <strong>tous les domaines</strong> de la forêt.</li>
+                    <li><code>Schema Admins</code> = porteur de droits <strong>direct</strong> sur la base de données (le plan d'AD lui-même).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>7. Les "Built-in Operators" : le piège de la fausse délégation</h2>
+                <p>
+                    Conçus à l'origine par Microsoft pour déléguer des tâches quotidiennes sans attribuer le rôle <code>Domain Admin</code>, ces trois groupes Domain Local (Builtin) offrent en réalité des chemins d'élévation de privilèges (<em>Privilege Escalation</em>) quasi-immédiats vers le contrôle total du domaine. C'est le piège le plus sous-estimé d'Active Directory : on pense attribuer un rôle technique restreint, alors qu'on offre en réalité un bouton "passer Administrateur du Domaine".
+                </p>
+
+                <h3>Account Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> créer, modifier et supprimer des comptes utilisateurs, ordinateurs et groupes du domaine.</li>
+                    <li><strong>Ce qu'il ne peut pas toucher directement :</strong> les comptes protégés par le mécanisme <em>AdminSDHolder</em> (<code>Domain Admins</code>, <code>Administrators</code>, etc.).</li>
+                    <li><strong>Le danger caché :</strong> même sans pouvoir toucher directement aux comptes protégés, un attaquant membre de ce groupe peut créer des objets ordinateurs malveillants, réinitialiser le mot de passe de comptes de service stratégiques, ou configurer une délégation Kerberos (<em>Resource-Based Constrained Delegation</em>) pour pivoter jusqu'au statut <code>Domain Admin</code>.</li>
+                </ul>
+
+                <h3>Backup Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> effectuer les sauvegardes et restaurations sur les contrôleurs de domaine.</li>
+                    <li><strong>Privilèges système clés :</strong> <code>SeBackupPrivilege</code> et <code>SeRestorePrivilege</code> — deux privilèges qui ordonnent au noyau Windows d'<strong>ignorer totalement les permissions NTFS</strong>.</li>
+                    <li><strong>Le danger caché :</strong> un membre peut copier directement le fichier <code>ntds.dit</code> (la base de données AD) et la ruche <code>SYSTEM</code> depuis le contrôleur de domaine, puis extraire hors ligne les hachages NTLM de tous les comptes de l'entreprise — y compris <code>krbtgt</code> et <code>Administrator</code>. C'est un vol direct de la base de mots de passe complète du domaine, en quelques secondes.</li>
+                </ul>
+
+                <h3>Server Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> gérer la configuration des contrôleurs de domaine — redémarrer le serveur, gérer les services, fermer des sessions.</li>
+                    <li><strong>Le danger caché :</strong> gérer les services sur un contrôleur de domaine équivaut à contrôler le domaine. Un attaquant peut reconfigurer le chemin d'exécutable d'un service système pour y injecter un script malveillant. Au redémarrage du service, le script s'exécute avec les droits suprêmes du DC (<code>NT AUTHORITY\SYSTEM</code>).</li>
+                </ul>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Groupe</th>
+                                <th>Type de groupe</th>
+                                <th>Droits système cibles</th>
+                                <th>Risque d'élévation de privilèges</th>
+                                <th>Recommandation ANSSI / Microsoft</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Account Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td>Gestion d'objets AD (hors admins)</td>
+                                <td>Élevé (attaques Kerberos)</td>
+                                <td>Laisser vide — préférer la délégation par OU</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Backup Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td><code>SeBackupPrivilege</code> sur DC</td>
+                                <td>Critique (vol de la base <code>ntds.dit</code>)</td>
+                                <td>Laisser vide — utiliser des comptes gMSA</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Server Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td>Gestion de services &amp; logon sur DC</td>
+                                <td>Critique (exécution de code en <code>SYSTEM</code>)</td>
+                                <td>Laisser vide — restreindre l'accès aux DC</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>8. Le point commun de tous les scénarios d'attaque : le vol de jeton en mémoire</h2>
+                <p>
+                    Au-delà des trois "Operators", le risque le plus systémique touche <code>Domain Admins</code> et <code>Enterprise Admins</code> eux-mêmes : le <strong>vol de jeton / Pass-the-Hash</strong>.
+                </p>
+                <p>
+                    Ces comptes possèdent les clés du royaume. Si un membre de ce groupe se connecte sur un poste de travail compromis — même un simple poste utilisateur, pas un serveur — son hachage de mot de passe reste en mémoire RAM, dans le processus <code>LSASS</code>. Un attaquant qui extrait ce hachage (avec un outil comme Mimikatz) devient administrateur sur tout le réseau, sans même connaître le mot de passe en clair. C'est pour cette raison précise que la bonne pratique interdit d'utiliser un compte <code>Domain Admin</code> pour se connecter sur une machine utilisateur — c'est le principe du <em>Tiering</em>.
+                </p>
+            </section>
+
+            <section>
+                <h2>9. La règle d'or</h2>
+                <p>
+                    En environnement de production, selon les recommandations conjointes de l'ANSSI et de Microsoft :
+                </p>
+                <ul>
+                    <li><strong>Tier 0 (<code>Enterprise Admins</code>, <code>Schema Admins</code>) :</strong> laissés vides à 100 % au quotidien, peuplés temporairement uniquement pour des opérations d'infrastructure majeures, puis vidés immédiatement après.</li>
+                    <li><strong><code>Domain Admins</code> / <code>Administrators</code> :</strong> effectif réduit au strict minimum (2 à 3 comptes nommés maximum), jamais utilisés pour se connecter sur une machine utilisateur.</li>
+                    <li><strong>Les trois "Built-in Operators" (<code>Account</code>, <code>Backup</code>, <code>Server Operators</code>) :</strong> usage proscrit. La gestion des accès doit s'effectuer exclusivement par <strong>délégation de contrôle granulaire</strong> sur des Unités d'Organisation (OU) ciblées — jamais par l'ajout à un groupe intégré dont les privilèges réels dépassent largement le besoin apparent.</li>
+                </ul>
+
+                <p>
+                    C'est cette discipline — vider les groupes les plus puissants et déléguer précisément, plutôt que d'ajouter des membres à des rôles préfabriqués trop larges — qui distingue une architecture Active Directory résiliente d'une architecture qui ne demande qu'à être compromise en un seul mouvement latéral.
+                </p>
+            </section>
+        </article>
+
+        <footer>
+            <div>Publié le 21 Août 2026</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
