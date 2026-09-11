@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Directory Sites and Services : construire la topologie physique de la réplication</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Navigation / Bouton Retour -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <article>
+            <!-- En-tête de l'article -->
+            <header>
+                <div class="meta-container">
+                    <span class="meta-date">Publié le 18 Mars 2026</span>
+                    <div class="tags-container">
+                        <span class="tag">Active Directory</span>
+                        <span class="tag">Sites & Services</span>
+                        <span class="tag">Réplication</span>
+                        <span class="tag">Réseau</span>
+                    </div>
+                </div>
+                <h1>Active Directory Sites and Services : construire la topologie physique de la réplication</h1>
+                <p style="margin-top: 1rem; color: var(--text-muted); font-size: 1.1rem;">
+                    Comment adapter Active Directory à la réalité physique de votre réseau, maîtriser la bande passante WAN et optimiser l'authentification des utilisateurs distants.
+                </p>
+            </header>
+
+            <!-- Image Hero -->
+            <figure class="article-image-container">
+                <img src="images/ad_sites_hub_and_spoke_topology.png" alt="Représentation visuelle de la topologie physique Active Directory Sites and Services">
+                <figcaption>Topologie inter-site Active Directory et liaisons de réplication WAN</figcaption>
+            </figure>
+
+            <!-- Introduction -->
+            <section>
+                <p>
+                    Jusqu'ici, cette série a traité Active Directory presque exclusivement du point de vue logique : les groupes, les permissions, les rôles FSMO, le schéma. Mais AD ne vit pas dans un monde purement logique — il vit sur un réseau réel, avec des liens WAN de capacités inégales, des sites géographiquement distants, et une bande passante qui n'est jamais infinie. <strong>Active Directory Sites and Services</strong> est la console qui permet de dire à Active Directory : <em>voici la forme réelle de mon réseau, et voici comment tu dois t'y adapter.</em>
+                </p>
+                <p>
+                    Sans cette couche, Active Directory ferait une hypothèse extrêmement coûteuse par défaut : que tous les contrôleurs de domaine sont sur le même réseau local, bien connectés entre eux. Dans une entreprise avec un seul site, cette hypothèse est vraie et sans conséquence. Dans une entreprise avec un siège et plusieurs agences reliées par des liens WAN plus lents et plus chers, cette hypothèse par défaut génère un trafic de réplication chaotique et inutilement coûteux — c'est précisément ce que ce composant existe pour corriger.
+                </p>
+            </section>
+
+            <!-- Sommaire -->
+            <section class="highlight-card">
+                <h3>Sommaire</h3>
+                <ul style="margin-bottom: 0;">
+                    <li><a href="#section-1">1. Pourquoi la réplication a besoin d'une carte du réseau</a></li>
+                    <li><a href="#section-2">2. Les sites : représenter les zones bien connectées du réseau</a></li>
+                    <li><a href="#section-3">3. Les sous-réseaux (subnets) : le lien entre une IP et un site</a></li>
+                    <li><a href="#section-4">4. Le KCC : qui construit réellement la topologie de réplication</a></li>
+                    <li><a href="#section-5">5. Les Site Links : autoriser et planifier la réplication</a></li>
+                    <li><a href="#section-6">6. Les serveurs Bridgehead : l'interface unique vers l'extérieur</a></li>
+                    <li><a href="#section-7">7. « Bridge all site links » : la transitivité par défaut</a></li>
+                    <li><a href="#section-8">8. Vérifier et forcer la réplication</a></li>
+                    <li><a href="#section-9">9. Liens avec les articles précédents</a></li>
+                </ul>
+            </section>
+
+            <!-- Section 1 -->
+            <section id="section-1">
+                <h2>1. Pourquoi la réplication a besoin d'une carte du réseau</h2>
+                <p>
+                    On a établi dans l'article sur les rôles FSMO qu'Active Directory réplique en mode multi-maître : n'importe quel DC peut accepter une écriture, puis la propager aux autres. Mais cette affirmation laisse une question ouverte, à laquelle Sites and Services répond directement : <strong>propager comment, vers qui, en premier, et à quel rythme ?</strong>
+                </p>
+                <p>
+                    Sans configuration explicite, tous les DC nouvellement promus dans une forêt atterrissent dans un site unique créé automatiquement à la création de la forêt : <code>Default-First-Site-Name</code>. Tant qu'aucun autre site n'est défini, ce site contient l'intégralité des contrôleurs de domaine, où qu'ils se trouvent physiquement — y compris s'ils sont répartis sur trois continents reliés par des liens WAN de quelques Mbps. Dans cette configuration par défaut, Active Directory considère que tous ces DC sont "bien connectés" entre eux, et applique donc la même stratégie de réplication agressive que s'ils étaient tous sur le même switch — ce qui, sur un lien WAN lent, peut saturer la bande passante disponible en continu.
+                </p>
+                <p>
+                    C'est exactement le scénario de démarrage illustré dans le lab utilisé pour cet article : quatre contrôleurs de domaine — deux à Lomé (siège), un à Kpalimé, un à Attapkamé — tous initialement regroupés dans le même site par défaut, malgré une réalité réseau faite de trois liaisons WAN distinctes. La première étape de toute configuration sérieuse de Sites and Services consiste donc à faire correspondre la topologie logique d'AD à la topologie physique réelle du réseau.
+                </p>
+            </section>
+
+            <!-- Section 2 -->
+            <section id="section-2">
+                <h2>2. Les sites : représenter les zones bien connectées du réseau</h2>
+                <p>
+                    Un <strong>site</strong> Active Directory représente un ensemble de sous-réseaux considérés comme <em>bien connectés</em> — typiquement une localisation physique reliée en interne par un réseau local rapide et fiable (LAN), par opposition aux liaisons WAN plus lentes qui séparent les sites entre eux.
+                </p>
+                <p>Dans le scénario de ce lab, la structure cible est directe :</p>
+
+<pre><code>Forêt : mylab.local
+│
+├── Site : Lome-HO     (siège, 2 DC : DC01, DC02)
+├── Site : Kpalime-BO      (agence, 1 DC : DC03)
+└── Site : Attakpame-BO  (agence, 1 DC : DC04)</code></pre>
+
+                <p>
+                    Créer un site ne fait, à ce stade, que déclarer son existence dans l'annuaire — il faut ensuite lui associer des sous-réseaux et y déplacer les contrôleurs de domaine physiquement présents à cet endroit. Ce déplacement d'un DC d'un site vers un autre ne modifie rien à son fonctionnement local ; il modifie uniquement la façon dont le KCC va planifier sa réplication avec le reste de la forêt.
+                </p>
+
+                <aside class="highlight-card">
+                    <p>
+                        <strong>Conseil de terrain :</strong> Il vaut mieux définir ses sites et ses sous-réseaux <strong>avant</strong> de promouvoir de nouveaux contrôleurs de domaine, plutôt qu'après. Une fois les sous-réseaux correctement déclarés, l'assistant de promotion d'un nouveau DC détecte automatiquement, à partir de son adresse IP, à quel site il doit être rattaché.
+                    </p>
+                </aside>
+            </section>
+
+            <!-- Section 3 -->
+            <section id="section-3">
+                <h2>3. Les sous-réseaux (subnets) : le lien entre une IP et un site</h2>
+                <p>
+                    Un site, à lui seul, ne veut rien dire pour le reste d'Active Directory tant qu'aucune plage IP ne lui est associée. C'est le rôle du <strong>sous-réseau (subnet)</strong> : déclarer qu'une plage d'adresses IP donnée appartient à tel site.
+                </p>
+
+<pre><code>172.18.72.0/24   →  Lome-HO
+192.168.72.0/24  →  Kpalime-BO
+10.72.0.0/24     →  Attakpame-BO</code></pre>
+
+                <p>Deux règles structurent ce mécanisme :</p>
+                <ul>
+                    <li><strong>Un sous-réseau ne peut être rattaché qu'à un seul site :</strong> L'appartenance est exclusive — pas de partage possible entre deux sites pour une même plage IP.</li>
+                    <li><strong>Un site peut, à l'inverse, contenir plusieurs sous-réseaux :</strong> Rien n'empêche un même site physique de couvrir plusieurs plages IP distinctes (VLAN de postes, VLAN de serveurs, etc.), tant qu'elles sont réellement bien connectées entre elles.</li>
+                </ul>
+                <p>
+                    Ce rattachement IP → site détermine aussi, côté client, à quel contrôleur de domaine un poste ou un serveur va préférentiellement s'adresser pour s'authentifier. Un poste dont l'adresse IP appartient au sous-réseau <code>192.168.72.0/24</code> sera automatiquement dirigé vers le DC de Kpalime plutôt que vers un DC de Lome à l'autre bout d'un lien WAN — c'est la <strong>site awareness</strong>, un mécanisme qui économise silencieusement du trafic WAN sur l'authentification quotidienne.
+                </p>
+            </section>
+
+            <!-- Section 4 -->
+            <section id="section-4">
+                <h2>4. Le KCC : qui construit réellement la topologie de réplication</h2>
+                <p>
+                    Un point souvent mal compris : <strong>on ne dessine jamais soi-même la topologie de réplication complète.</strong> On configure des sites, des sous-réseaux et des site links — puis un processus automatique appelé le <strong>KCC</strong> (<em>Knowledge Consistency Checker</em>), qui tourne sur chaque DC, calcule lui-même les connexions de réplication concrètes.
+                </p>
+                <p>
+                    Le KCC ne travaille pas de la même façon selon qu'on est à l'intérieur d'un site ou entre deux sites différents :
+                </p>
+
+                <h3>a) Réplication intra-site : rapide, non planifiée</h3>
+                <p>
+                    À l'intérieur d'un même site, le KCC construit une <strong>topologie en anneau</strong>. La réplication se déclenche par <strong>notification de changement</strong> plutôt que sur un horaire fixe : dès qu'un DC accepte une écriture, il informe ses partenaires de réplication après un court délai (quelques secondes), qui viennent alors récupérer la modification.
+                </p>
+
+                <h3>b) Réplication inter-site : planifiée, compressée, économe</h3>
+                <p>
+                    Entre deux sites différents, la bande passante peut être limitée. Le KCC (via le rôle <strong>ISTG</strong> — <em>Intersite Topology Generator</em>) ne réplique pas à chaque changement individuel. Il respecte à la place un <strong>planning</strong> défini sur le site link et compresse le trafic de réplication.
+                </p>
+            </section>
+
+            <!-- Section 5 -->
+            <section id="section-5">
+                <h2>5. Les Site Links : autoriser et planifier la réplication</h2>
+                <p>
+                    Un <strong>site link</strong> représente une liaison logique entre deux (ou plusieurs) sites, sur laquelle la réplication inter-site est autorisée à circuler. Sans site link entre deux sites, aucune réplication directe ne peut avoir lieu entre eux.
+                </p>
+                <p>
+                    À la création d'une forêt, un site link unique existe par défaut : <code>DEFAULTIPSITELINK</code>, qui relie automatiquement tous les sites tant qu'aucune structure plus fine n'a été définie.
+                </p>
+
+                <h3>a) Le coût (cost) : établir une priorité entre plusieurs chemins</h3>
+                <p>
+                    Chaque site link porte un coût numérique (100 par défaut). Lorsque plusieurs chemins existent entre deux sites, le KCC privilégie systématiquement le chemin dont la <strong>somme des coûts est la plus basse</strong>.
+                </p>
+
+<pre><code>Lome-HO ──── Kpalime-BO       (lien principal, coût = 60)
+Lome-HO ──── Attakpame-BO   (lien principal, coût = 60)
+Kpalime-BO ───── Attakpame-BO   (lien de secours, coût = 100)</code></pre>
+
+                <p>
+                    En abaissant délibérément le coût des deux liens directs depuis le siège (60, contre 100 par défaut), on indique au KCC d'utiliser en priorité les deux liens directs depuis Lome, et de ne garder le lien Kpalime-Attakpame que pour assurer la continuité en cas de panne.
+                </p>
+
+                <h3>b) L'intervalle et le planning de réplication</h3>
+                <p>
+                    Par défaut, la réplication inter-site s'exécute toutes les 180 minutes (réglable de 15 minutes au minimum à une plage horaire précise).
+                </p>
+                <p>
+                    Dans notre scénario, les deux liens WAN prioritaires (Lome-Kpalime et Lome-Attakpame) sont configurés pour interdire toute réplication du lundi au vendredi, de 7h à 18h (heures ouvrées), et pour répliquer toutes les 50 minutes en dehors de cette plage. Le lien de secours n'est pas retouché.
+                </p>
+            </section>
+
+            <!-- Section 6 -->
+            <section id="section-6">
+                <h2>6. Les serveurs Bridgehead : l'interface unique vers l'extérieur</h2>
+                <p>
+                    Quand un site contient plusieurs contrôleurs de domaine, Active Directory désigne un <strong>bridgehead server</strong> : le seul DC autorisé à porter le trafic de réplication inter-site pour ce site. Cela évite de multiplier inutilement le trafic WAN.
+                </p>
+                <p>
+                    Il est possible de désigner manuellement un <strong>preferred bridgehead server</strong>, comme dans notre lab où <code>DC01</code> est configuré comme bridgehead préféré pour le transport IP.
+                </p>
+
+<pre><code>DC01 (Lome, bridgehead)  ── réplique avec ──►  DC03 (Kpalime)
+DC01 (Lome, bridgehead)  ── réplique avec ──►  DC04 (Attakpame)
+DC01 (Lome)              ── réplique avec ──►  DC02 (Lome, intra-site)</code></pre>
+
+                <p>
+                    Le second DC de Lome (<code>DC02</code>) ne réplique jamais directement avec Kpalime ou Attakpame : il reçoit ces changements par réplication intra-site depuis <code>DC01</code>.
+                </p>
+            </section>
+
+            <!-- Section 7 -->
+            <section id="section-7">
+                <h2>7. « Bridge all site links » : la transitivité par défaut</h2>
+                <p>
+                    L'option <strong>"Bridge all site links"</strong> est activée par défaut sur le transport IP. Quand elle est active, le KCC considère que <strong>tous les site links sont transitivement reliés entre eux</strong>.
+                </p>
+                <p>
+                    Créer manuellement un objet <strong>site link bridge</strong> n'a aucun effet tant que cette option reste cochée. Ce n'est que dans les réseaux à topologie en étoile stricte (où deux agences ne doivent <em>jamais</em> répliquer entre elles) qu'il devient pertinent de la décocher et de configurer manuellement les ponts autorisés.
+                </p>
+            </section>
+
+            <!-- Section 8 -->
+            <section id="section-8">
+                <h2>8. Vérifier et forcer la réplication</h2>
+                <p>Voici les méthodes pour vérifier et accélérer le recalcul de la topologie :</p>
+                <ul>
+                    <li><strong>Dans la console :</strong> Clic droit sur l'objet <code>NTDS Settings</code> d'un DC &gt; <em>All Tasks &gt; Check Replication Topology</em>.</li>
+                    <li><strong>En ligne de commande :</strong>
+                        <ul>
+                            <li><code>repadmin /kcc</code> : déclenche le recalcul à distance.</li>
+                            <li><code>repadmin /replsummary</code> : affiche la synthèse de réplication de la forêt.</li>
+                            <li><code>repadmin /showrepl</code> : détaille les partenaires de réplication et les dernières synchronisations pour un DC précis.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Section 9 -->
+            <section id="section-9">
+                <h2>9. Liens avec les articles précédents</h2>
+                <p>Cette notion de topologie physique s'articule directement avec nos précédents sujets :</p>
+                <ul>
+                    <li><strong>Avec <a href="../fsmo-roles/index.html">Les rôles FSMO</a> :</strong> Les FSMO gèrent les règles logiques d'autorité, tandis que Sites and Services définit le chemin physique et la fréquence de propagation de ces modifications.</li>
+                    <li><strong>Avec <a href="../directory-services-ldap/index.html">Où vivent les identités</a> :</strong> Les objets Site, Subnet et Site Link sont stockés dans la <strong>partition Configuration</strong> de la forêt, répliquée sur l'ensemble des DC.</li>
+                    <li><strong>Avec <a href="../aging_and_scavenging/index.html">Aging and Scavenging DNS</a> :</strong> La gestion du temps et le refus du trafic inutile partagent le même objectif : préserver la bande passante et la cohérence de l'annuaire.</li>
+                </ul>
+            </section>
+
+            <!-- Conclusion -->
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    Active Directory Sites and Services configure la façon dont l'annuaire respecte la réalité physique du réseau sur lequel il tourne. Une topologie logique mal alignée sur le réseau réel ne casse pas Active Directory immédiatement, mais se traduit par un lien WAN saturé, une authentification lente en agence et du gaspillage de bande passante.
+                </p>
+            </section>
+        </article>
+
+        <!-- Footer / Cartes de suggestion -->
+        <footer>
+            <p>© 2026 Blog Infrastructure & Système</p>
+            <p>Conçu avec soin pour la performance</p>
+        </footer>
+    </div>
+
+</body>
+</html>

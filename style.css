@@ -1,0 +1,329 @@
+/* ==========================================================================
+   VARIABLES ET CONFIGURATION GLOBALE
+   ========================================================================== */
+:root {
+    --bg: #faf9f6;
+    --text: #1c1c1e;
+    --text-muted: #636366;
+    --accent: #1a56db;
+    --accent-hover: #1141ab;
+    --accent-light: #eff6ff;
+    --border: #e5e5ea;
+    --card-bg: #ffffff;
+    --table-header-bg: #f4f4f6;
+    
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.02);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ==========================================================================
+   RESET & REGLAGES DE BASE
+   ========================================================================== */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+    padding: 3rem 1.5rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ==========================================================================
+   NAVIGATION / BOUTON RETOUR
+   ========================================================================== */
+.back-nav {
+    margin-bottom: 3rem;
+}
+
+.back-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.back-nav a:hover {
+    color: var(--accent);
+    transform: translateX(-3px);
+}
+
+/* ==========================================================================
+   EN-TÊTE DE L'ARTICLE (HEADER)
+   ========================================================================== */
+header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2rem;
+}
+
+.meta-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.meta-date {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    background-color: var(--accent-light);
+    color: var(--accent);
+    padding: 0.2rem 0.55rem;
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+}
+
+h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+/* ==========================================================================
+   CONTENU PRINCIPAL (ARTICLE & SECTIONS)
+   ========================================================================== */
+article section {
+    margin-bottom: 2.5rem;
+}
+
+h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+    color: var(--text);
+}
+
+h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-top: 1.75rem;
+    margin-bottom: 0.75rem;
+    color: var(--text);
+}
+
+p {
+    margin-bottom: 1.25rem;
+    color: #27272a;
+    font-size: 1.025rem;
+}
+
+strong {
+    font-weight: 600;
+    color: var(--text);
+}
+
+/* Prestations d'éléments de code inline */
+code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background-color: var(--accent-light);
+    color: var(--accent);
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+    word-break: break-word;
+}
+
+/* Lists */
+ul, ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.25rem;
+}
+
+li {
+    margin-bottom: 0.75rem;
+    color: #27272a;
+    font-size: 1.025rem;
+}
+
+li::marker {
+    color: var(--text-muted);
+}
+
+/* Citation / Blockquote */
+blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   COMPOSANTS SPÉCIFIQUES
+   ========================================================================== */
+
+/* Cartes de mise en valeur (Highlight Card) */
+.highlight-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.highlight-card p {
+    margin-bottom: 0.75rem;
+}
+
+.highlight-card p:last-child {
+    margin-bottom: 0;
+}
+
+/* Tableaux dynamiques et réactifs */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-sm);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.925rem;
+}
+
+th, td {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+}
+
+th {
+    background-color: var(--table-header-bg);
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: rgba(239, 246, 255, 0.3); /* Effet survol discret */
+}
+
+/* Figures et images */
+.article-image-container {
+    margin: 2.5rem 0;
+    padding: 0;
+}
+
+.article-image-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+}
+
+.article-image-container figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.4;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+/* ==========================================================================
+   PIED DE PAGE (FOOTER)
+   ========================================================================== */
+footer {
+    margin-top: 4rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+@media (max-width: 640px) {
+    body {
+        padding: 2rem 1rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    .meta-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+}
