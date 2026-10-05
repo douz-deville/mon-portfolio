@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows LAPS : un mot de passe différent pour chaque ordinateur</title>
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <nav class="back-nav">
+            <a href="../">← RETOUR AUX ARTICLES</a>
+        </nav>
+
+        <article>
+            <header>
+                <div class="meta-container">
+                    <span class="meta-date">Publié le 22 Septembre 2026</span>
+                    <div class="tags-container">
+                        <span class="tag">Active Directory</span>
+                        <span class="tag">Windows LAPS</span>
+                        <span class="tag">Sécurité</span>
+                        <span class="tag">GPO</span>
+                    </div>
+                </div>
+                <h1>Windows LAPS : un mot de passe différent pour chaque ordinateur</h1>
+            </header>
+
+            <section>
+                <h2>1. Pourquoi garder un compte administrateur local</h2>
+                <p>D'abord, une question importante. Pourquoi garder un compte administrateur local sur chaque ordinateur ? Ce compte existe pour des cas particuliers.</p>
+                
+                <ul>
+                    <li><strong>Le réseau peut tomber en panne :</strong> Sans réseau, l'ordinateur ne peut pas parler au <strong>contrôleur de domaine</strong>. Le compte administrateur local, lui, fonctionne toujours. Il ne dépend pas du réseau.</li>
+                    <li><strong>Un ordinateur neuf n'est pas encore dans le domaine :</strong> Au début, il n'a aucun compte du domaine. Seul le compte administrateur local existe. C'est ce compte qui sert à faire les premiers réglages.</li>
+                    <li><strong>Le contrôleur de domaine peut tomber en panne :</strong> Si tous les contrôleurs de domaine sont en panne, personne ne peut se connecter avec un compte du domaine. Le compte local, lui, marche quand même.</li>
+                    <li><strong>Un pirate peut prendre le contrôle du domaine :</strong> Dans ce cas très grave, on ne peut plus faire confiance aux comptes du domaine. Le compte local sert de dernier recours.</li>
+                    <li><strong>Pour des petites tâches rapides :</strong> Un technicien peut réparer une machine avec le compte local, sans utiliser un compte <code>Domain Admin</code>. C'est plus sûr : si ce mot de passe est volé, il ne donne accès qu'à <strong>une seule machine</strong>.</li>
+                </ul>
+
+                <p>Donc, ce compte est utile. Mais il crée aussi un gros problème. On va le voir maintenant.</p>
+            </section>
+
+            <section>
+                <h2>2. Le problème : le même mot de passe partout</h2>
+                <p>Beaucoup d'entreprises font une erreur simple. Elles mettent <strong>le même mot de passe</strong> sur le compte administrateur local de <strong>toutes</strong> les machines.</p>
+                
+                <p>Voici pourquoi c'est très dangereux. Un pirate attaque une seule machine. Il vole le mot de passe local. Ce mot de passe est le même partout. Le pirate peut alors se connecter à <strong>toutes les autres machines</strong> avec ce mot de passe. Cette attaque a un nom : <strong>Pass-the-Hash</strong>. Elle est déjà expliquée dans l'article sur les groupes privilégiés d'Active Directory.</p>
+
+                <p>Il faut donc une solution. Cette solution doit faire deux choses :</p>
+                <ol>
+                    <li>Donner un mot de passe <strong>différent</strong> à chaque machine.</li>
+                    <li>Changer ce mot de passe <strong>automatiquement</strong>, de temps en temps.</li>
+                </ol>
+
+                <p>C'est exactement ce que fait <strong>Windows LAPS</strong>.</p>
+            </section>
+
+            <section>
+                <h2>3. C'est quoi Windows LAPS ?</h2>
+                <p><strong>Windows LAPS</strong> est un outil de Microsoft. Il est gratuit. Il a un seul but : donner un mot de passe unique au compte administrateur local de chaque machine.</p>
+                
+                <p>Voici comment il fonctionne, en mots simples :</p>
+                <ul>
+                    <li>Chaque ordinateur a un mot de passe <strong>différent</strong> pour son compte administrateur local.</li>
+                    <li>Ce mot de passe est <strong>fort</strong> (majuscules, minuscules, chiffres, caractères spéciaux).</li>
+                    <li>Ce mot de passe <strong>change automatiquement</strong>, tout seul, à intervalles réguliers.</li>
+                    <li>Ce mot de passe est <strong>stocké</strong> dans Active Directory (ou dans Azure Active Directory, selon les besoins).</li>
+                </ul>
+
+                <p>Windows LAPS ne s'installe pas sur les <strong>contrôleurs de domaine</strong>. Il s'installe sur les postes de travail et les serveurs normaux.</p>
+            </section>
+
+            <!-- ZONE IMAGE -->
+            <figure class="article-image-container">
+                <img src="images/windows_laps_before_after.png" alt="Schéma d'architecture Windows LAPS et Active Directory">
+                <figcaption>L'effet de Windows LAPS : d'un mot de passe partagé exploitable en Pass-the-Hash à un mot de passe unique par machine.</figcaption>
+            </figure>
+
+            <section>
+                <h2>4. Windows LAPS remplace LAPS Legacy</h2>
+                <p>Avant Windows LAPS, il existait un ancien outil : <strong>LAPS Legacy</strong> (aussi appelé Microsoft LAPS). Windows LAPS est le nouveau produit qui le remplace.</p>
+                
+                <p>Windows LAPS n'est pas juste une mise à jour de LAPS Legacy. C'est un <strong>produit complètement différent</strong>. Il a ses propres paramètres de GPO. Il a ses propres attributs dans le schéma Active Directory. Les deux outils peuvent même vivre en même temps sur le même réseau, sans problème.</p>
+
+                <p>Voici les nouveautés principales de Windows LAPS, comparées à LAPS Legacy :</p>
+                
+                <ul>
+                    <li><strong>a) Il est intégré à Windows :</strong> Avec LAPS Legacy, il fallait installer un petit programme (un "agent") sur chaque machine. Avec Windows LAPS, ce n'est plus nécessaire. L'agent est déjà dans le système Windows. Il suffit juste d'installer une mise à jour.</li>
+                    <li><strong>b) Le mot de passe est chiffré :</strong> Avec LAPS Legacy, le mot de passe était stocké <strong>en clair</strong> dans Active Directory — n'importe qui avec les droits de lecture pouvait le voir directement. Avec Windows LAPS, le mot de passe est <strong>chiffré</strong>. C'est une amélioration importante pour la sécurité.</li>
+                    <li><strong>c) On peut choisir où stocker le mot de passe :</strong> Avec LAPS Legacy, il n'y avait qu'un seul endroit : Active Directory. Avec Windows LAPS, on peut choisir : Active Directory, <strong>ou</strong> Azure Active Directory.</li>
+                    <li><strong>d) On garde un historique des mots de passe :</strong> Windows LAPS peut garder en mémoire les anciens mots de passe. Par exemple, il peut garder les 5 derniers mots de passe. C'est très utile en cas de problème pendant un changement de mot de passe.</li>
+                    <li><strong>e) Il peut aussi gérer le mot de passe DSRM :</strong> C'est le mot de passe de restauration des services d'annuaire, sur les contrôleurs de domaine. Windows LAPS peut aussi faire tourner ce mot de passe automatiquement. C'est un sujet un peu différent, pour un autre article.</li>
+                    <li><strong>f) Un nouvel onglet dans la console Active Directory :</strong> Cet onglet s'appelle "LAPS". On y voit le nom du compte géré, le mot de passe, et sa date d'expiration.</li>
+                    <li><strong>g) Un nouveau module PowerShell :</strong> Il est complètement séparé de celui de LAPS Legacy. Il a de nouvelles commandes.</li>
+                    <li><strong>h) Un nouveau fichier ADMX :</strong> C'est le fichier qui donne accès aux paramètres de GPO de Windows LAPS.</li>
+                    <li><strong>i) Un nouveau journal d'événements :</strong> Ce journal s'appelle "LAPS". On le trouve dans l'Observateur d'événements, sur chaque machine.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>5. Quels systèmes sont compatibles ?</h2>
+                <p>Windows LAPS ne marche pas sur toutes les versions de Windows. Voici la liste :</p>
+
+                <p><strong>Côté postes de travail :</strong></p>
+                <ul>
+                    <li>Windows 10 (versions Pro, Éducation, Entreprise)</li>
+                    <li>Windows 11 (versions 21H2, 22H2, en Pro, Éducation, Entreprise)</li>
+                </ul>
+
+                <p><strong>Côté serveurs :</strong></p>
+                <ul>
+                    <li>Windows Server 2019</li>
+                    <li>Windows Server 2022 (y compris en mode "Core", sans interface graphique)</li>
+                </ul>
+
+                <div class="highlight-card">
+                    <p><strong>Attention :</strong> Avoir la bonne version de Windows ne suffit pas. Il faut aussi installer une <strong>mise à jour minimum</strong> (mise à jour d'avril 2023). Sans cette mise à jour, Windows LAPS n'apparaît pas sur la machine, même s'il est déjà "intégré" au système.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>6. Les prérequis avant de commencer</h2>
+                <p>Avant d'installer Windows LAPS, il faut vérifier plusieurs choses :</p>
+                <ol>
+                    <li><strong>Les systèmes doivent être compatibles.</strong> Voir la liste juste au-dessus.</li>
+                    <li><strong>Toutes les machines doivent être à jour.</strong> Au minimum, la mise à jour d'avril 2023.</li>
+                    <li><strong>Tous les contrôleurs de domaine doivent être mis à jour en premier</strong>, avant de faire la mise à niveau du schéma Active Directory. C'est une étape très importante.</li>
+                    <li><strong>Active Directory doit être bien sauvegardé.</strong> On va modifier le schéma. C'est une opération sensible. Il faut donc toujours avoir une sauvegarde avant de commencer.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>7. Étape 1 : préparer Active Directory</h2>
+                <p>Cette étape se fait sur un contrôleur de domaine, avec un compte du groupe <code>Schema Admins</code> (rappel : ce groupe doit normalement rester vide en dehors de ce genre d'opération, comme expliqué dans l'article sur les groupes privilégiés).</p>
+
+                <p>D'abord, on vérifie que le module PowerShell de Windows LAPS est bien disponible :</p>
+                <pre><code>Import-Module LAPS
+Get-Command -Module LAPS</code></pre>
+
+                <p>Ensuite, on met à jour le schéma Active Directory. Cette commande ajoute les nouveaux attributs nécessaires à Windows LAPS :</p>
+                <pre><code>Update-LapsADSchema</code></pre>
+
+                <p>Après cette commande, de nouveaux attributs apparaissent dans Active Directory. On peut les voir dans l'éditeur d'attributs d'un objet ordinateur (il faut d'abord activer l'affichage des "fonctionnalités avancées" dans la console) :</p>
+                <ul>
+                    <li>Le mot de passe chiffré du compte administrateur local de la machine.</li>
+                    <li>L'historique des mots de passe précédents.</li>
+                    <li>La date de la prochaine expiration du mot de passe.</li>
+                    <li>Deux attributs liés au mot de passe DSRM (pour les contrôleurs de domaine uniquement).</li>
+                </ul>
+
+                <p>Un nouvel onglet "LAPS" apparaît aussi dans les propriétés de chaque ordinateur, dans la console Active Directory Users and Computers.</p>
+            </section>
+
+            <section>
+                <h2>8. Étape 2 : donner le droit aux ordinateurs d'écrire leur mot de passe</h2>
+                <p>Chaque ordinateur doit avoir le droit d'écrire son propre mot de passe dans Active Directory. Par défaut, ce droit n'existe pas. Il faut le donner, pour une OU précise (une unité d'organisation qui contient les ordinateurs concernés) :</p>
+                
+                <pre><code>Set-LapsADComputerSelfPermission -Identity "OU=PC,DC=xyz,DC=com"</code></pre>
+
+                <p><strong>Conseil pratique :</strong> pour éviter les erreurs de frappe, il vaut mieux copier le "Distinguished Name" exact de l'OU depuis ses propriétés (onglet "Éditeur d'attributs", attribut <code>distinguishedName</code>), plutôt que de le taper à la main.</p>
+            </section>
+
+            <section>
+                <h2>9. Étape 3 : configurer Windows LAPS par GPO</h2>
+                <p>D'abord, il faut installer les modèles d'administration de Windows LAPS. Ces modèles sont deux fichiers :</p>
+                <ul>
+                    <li><code>LAPS.admx</code> (à mettre dans le magasin central des GPO, dans <code>PolicyDefinitions</code>)</li>
+                    <li><code>LAPS.adml</code> (à mettre dans le sous-dossier de langue, par exemple <code>fr-FR</code>)</li>
+                </ul>
+
+                <p>Une fois ces fichiers en place, une nouvelle section apparaît dans l'édition des GPO, sous : <em>Configuration ordinateur > Modèles d'administration > Système > LAPS</em>.</p>
+
+                <p>Voici les paramètres principaux à configurer :</p>
+                <ul>
+                    <li><strong>a) Configurer le répertoire de sauvegarde du mot de passe :</strong> On l'active. On choisit où stocker le mot de passe : Active Directory (ou Azure Active Directory).</li>
+                    <li><strong>b) Paramètres du mot de passe :</strong> On l'active. On choisit une politique forte : majuscules, minuscules, chiffres, caractères spéciaux. On peut choisir une longueur de 16 caractères. On choisit aussi la fréquence de renouvellement automatique, par exemple tous les 30 jours.</li>
+                    <li><strong>c) Configurer la taille de l'historique des mots de passe chiffrés :</strong> On l'active. On choisit une valeur entre 0 et 12. La valeur 0 veut dire "pas d'historique". La valeur 1 veut dire "on garde seulement le mot de passe précédent". C'est utile en cas de problème pendant un changement de mot de passe.</li>
+                    <li><strong>d) Activer le chiffrement du mot de passe :</strong> Ce paramètre est actif par défaut, même sans configuration explicite. Mais il vaut mieux l'activer soi-même, pour être sûr.</li>
+                    <li><strong>e) Nom du compte administrateur à gérer :</strong> Si le compte s'appelle "Administrateur" (le nom par défaut), il n'y a rien à faire. Si le compte a un nom personnalisé (par exemple "ADM-PC"), il faut écrire ce nom ici.</li>
+                </ul>
+
+                <p>Une fois la GPO configurée, il faut la lier à l'OU qui contient les ordinateurs. Il faut aussi penser à retirer le lien avec l'ancienne GPO de LAPS Legacy, si elle existe, pour que Windows LAPS prenne bien le relais.</p>
+            </section>
+
+            <section>
+                <h2>10. Étape 4 : voir Windows LAPS en action</h2>
+                <p>Une fois la GPO appliquée sur les machines (avec <code>gpupdate /force</code>, puis un redémarrage), Windows LAPS commence à fonctionner tout seul.</p>
+
+                <p>On peut vérifier plusieurs choses côté Active Directory :</p>
+                <ul>
+                    <li>Dans l'onglet "LAPS" d'un ordinateur, on voit le nom du compte géré et son mot de passe chiffré. On peut cliquer pour l'afficher en clair (si on a les droits nécessaires).</li>
+                    <li>Avec PowerShell, on peut aussi récupérer le mot de passe directement :</li>
+                </ul>
+
+                <pre><code>Get-LapsADPassword -Identity "NOM-DU-PC" -AsPlainText</code></pre>
+
+                <p>Côté machine cliente, un journal spécial existe. Il s'appelle "LAPS". On le trouve dans l'Observateur d'événements, dans <em>Journaux des applications et des services > Microsoft > Windows > LAPS > Operational</em>. Ce journal montre chaque changement de mot de passe fait par Windows LAPS.</p>
+
+                <p>On peut aussi forcer un changement de mot de passe immédiat, sans attendre la date normale d'expiration, avec cette commande PowerShell sur la machine cliente :</p>
+                
+                <pre><code>Invoke-LapsPolicyProcessing</code></pre>
+            </section>
+
+            <section>
+                <h2>11. Étape 5 : qui a le droit de lire et de déchiffrer les mots de passe ?</h2>
+                <p>C'est une étape très importante pour la sécurité. Il faut bien comprendre une distinction : <strong>lire</strong> un mot de passe n'est pas la même chose que <strong>déchiffrer</strong> un mot de passe.</p>
+
+                <p>Par défaut, seuls les membres du groupe <code>Domain Admins</code> peuvent lire <strong>et</strong> déchiffrer les mots de passe gérés par Windows LAPS.</p>
+
+                <p>Si on veut donner ce droit à un autre groupe (par exemple, une équipe support qui n'est pas <code>Domain Admin</code>), il faut faire deux choses :</p>
+
+                <p><strong>a) Donner le droit de réinitialiser le mot de passe</strong> (première étape, avec PowerShell) :</p>
+                <pre><code>Set-LapsADResetPasswordPermission -Identity "OU=PC,DC=xyz,DC=com" -AllowedPrincipals "MONDOMAINE\GDL-LAPS-PWD-READ"</code></pre>
+
+                <p><strong>b) Donner le droit de déchiffrer le mot de passe</strong> (deuxième étape, obligatoire, par GPO) : Sans cette deuxième étape, le groupe ne pourra toujours rien lire. Il faut aller dans le paramètre GPO "Configurer les déchiffreurs de mot de passe autorisés", l'activer, et écrire le nom du groupe (avec le préfixe du domaine) ou son SID.</p>
+
+                <div class="highlight-card">
+                    <p><strong>Attention :</strong> Ce paramètre de GPO ne remplace pas les autorisations existantes, il les <strong>définit entièrement</strong>. Si on met seulement le nouveau groupe, et qu'on oublie <code>Domain Admins</code>, alors même les administrateurs du domaine ne pourront plus déchiffrer les mots de passe. La solution : créer un groupe "chapeau", qui contient à la fois <code>Domain Admins</code> et les autres groupes autorisés, et mettre seulement ce groupe "chapeau" dans le paramètre GPO.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>12. Suivre le déploiement dans le temps</h2>
+                <p>Sur un grand parc de machines, il est difficile de savoir, machine par machine, si Windows LAPS fonctionne bien. Certaines machines ont peut-être encore LAPS Legacy. D'autres n'ont peut-être aucun des deux.</p>
+
+                <p>Un script PowerShell existe pour ça (créé par Loïc Verdier, disponible sur Github). Ce script génère un rapport, sous forme de fichier HTML. Ce rapport montre, pour chaque machine :</p>
+                <ul>
+                    <li>Le nom de la machine</li>
+                    <li>Le système d'exploitation</li>
+                    <li>Si Windows LAPS est actif ou non</li>
+                    <li>Si LAPS Legacy est actif ou non</li>
+                </ul>
+
+                <p>Ce rapport permet de repérer rapidement les machines oubliées — par exemple, une machine qui n'est pas dans la bonne OU, et qui n'a donc reçu ni la GPO, ni les autorisations nécessaires.</p>
+            </section>
+
+            <section>
+                <h2>13. Le lien avec les groupes privilégiés</h2>
+                <p>Windows LAPS n'est pas un sujet isolé. Il répond directement à un risque déjà détaillé dans l'article sur les groupes privilégiés d'Active Directory : le vol d'un hachage de mot de passe en mémoire (<code>LSASS</code>), suivi d'une attaque <strong>Pass-the-Hash</strong>.</p>
+
+                <p>Sans Windows LAPS, un même mot de passe administrateur local, copié sur toutes les machines, transforme la compromission d'un seul poste en compromission potentielle de <strong>tout le parc</strong>. Avec Windows LAPS, chaque mot de passe est unique et change régulièrement : voler le mot de passe d'une machine ne donne accès qu'à cette seule machine, et seulement pour un temps limité, jusqu'au prochain renouvellement automatique.</p>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>Windows LAPS répond à un problème simple, mais très répandu : le même mot de passe administrateur local, partagé sur toutes les machines d'un parc. Ce problème parait petit. Mais il donne à un attaquant un moyen très rapide de se déplacer d'une machine à l'autre.</p>
+
+                <p>Avec Windows LAPS, chaque machine a son propre mot de passe. Ce mot de passe change tout seul. Il est stocké de façon chiffrée. Et surtout, on peut contrôler précisément qui a le droit de le lire et de le déchiffrer. C'est une protection simple à mettre en place, pour un gain de sécurité important.</p>
+            </section>
+        </article>
+
+        <footer>
+            <p>© 2026 Blog Infrastructure & Système</p>
+            <p>Conçu pour la performance</p>
+        </footer>
+
+    </div>
+
+</body>
+</html>

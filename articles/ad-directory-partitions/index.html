@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Les partitions Active Directory (Naming Contexts)</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --accent: #0ea5e9;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --code-bg: #0f172a;
+      --code-text: #f8fafc;
+      --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: var(--text);
+      background-color: var(--bg);
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      padding: 3rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      color: #0f172a;
+      line-height: 1.3;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    .intro {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      color: var(--primary-dark);
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      margin-bottom: 1.25rem;
+    }
+
+    strong {
+      color: #0f172a;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    /* Style des Tableaux */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background-color: #f1f5f9;
+    }
+
+    /* Style des blocs de code & schémas textuels */
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: "Fira Code", Monaco, Consolas, "Courier New", monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 1.5rem 0;
+    }
+
+    code {
+      font-family: Monaco, Consolas, "Courier New", monospace;
+      background-color: #f1f5f9;
+      color: var(--primary-dark);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+
+    /* ZONE IMAGE/INFOGRAPHIE CSS CUSTOM */
+    .image-container {
+      margin: 2.5rem 0;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-radius: var(--radius);
+      padding: 2rem;
+      color: white;
+      box-shadow: var(--shadow);
+      border: 1px solid #334155;
+    }
+
+    .image-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .image-header h4 {
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .image-header p {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0;
+    }
+
+    .partitions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .partition-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .partition-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .partition-card .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .tag-domain { background-color: #3b82f6; color: white; }
+    .tag-forest { background-color: #10b981; color: white; }
+
+    .partition-card h5 {
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      font-family: monospace;
+      color: #38bdf8;
+    }
+
+    .partition-card p {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .image-caption {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-top: 1.25rem;
+      font-style: italic;
+    }
+
+    /* Listes */
+    ul {
+      margin-left: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 0;
+      }
+      .container {
+        padding: 1.5rem;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      h1 {
+        font-size: 1.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Les partitions Active Directory (Naming Contexts)</h1>
+      <p class="intro">Ce que réplique réellement un contrôleur de domaine.</p>
+    </header>
+
+    <p>Un contrôleur de domaine ne réplique pas "Active Directory" comme un bloc unique et indivisible. Il réplique une poignée de sections distinctes de l'annuaire, appelées <strong>partitions</strong> ou <strong>Naming Contexts (NC)</strong> — chacune avec son propre contenu, sa propre portée de réplication, et parfois même son propre rôle FSMO responsable de sa cohérence. C'est ce qu'on voit apparaître, sans plus d'explication la première fois, dans la sortie d'une commande comme <code>repadmin /showrepl</code> : cinq lignes, cinq partitions, chacune répliquée indépendamment des autres.</p>
+
+    <p>Comprendre cette architecture répond en réalité à trois questions qui se posent presque toujours ensemble et se mélangent facilement : <em>qu'est-ce qu'une partition, par opposition à une OU ou un conteneur ? Pourquoi deux partitions DNS distinctes ? Et est-ce qu'Active Directory peut écrire strictement n'importe où, ou seulement dans ces cinq endroits ?</em></p>
+
+    <!-- ZONE D'IMAGE / INFOGRAPHIE SYSTEME -->
+    <div class="image-container">
+      <div class="image-header">
+        <h4>Schéma d'Architecture</h4>
+        <p>Les 5 Naming Contexts (NC) d'Active Directory</p>
+      </div>
+      
+      <div class="partitions-grid">
+        <div class="partition-card">
+          <span class="tag tag-domain">Portée Domaine</span>
+          <h5>DC=domain,DC=com</h5>
+          <p>Utilisateurs, groupes, ordinateurs, OU et conteneurs d'un domaine précis.</p>
+        </div>
+
+        <div class="partition-card">
+          <span class="tag tag-forest">Portée Forêt</span>
+          <h5>CN=Configuration</h5>
+          <p>Topologie physique, sites AD, sous-réseaux et contrôleurs de domaine.</p>
+        </div>
+
+        <div class="partition-card">
+          <span class="tag tag-forest">Portée Forêt</span>
+          <h5>CN=Schema</h5>
+          <p>Définitions universelles de toutes les classes d'objets et attributs.</p>
+        </div>
+
+        <div class="partition-card">
+          <span class="tag tag-domain">Portée Domaine</span>
+          <h5>DC=DomainDnsZones</h5>
+          <p>Enregistrements et zones DNS locaux au domaine.</p>
+        </div>
+
+        <div class="partition-card">
+          <span class="tag tag-forest">Portée Forêt</span>
+          <h5>DC=ForestDnsZones</h5>
+          <p>Zones et enregistrements DNS globaux partagés dans toute la forêt.</p>
+        </div>
+      </div>
+      <div class="image-caption">Représentation synthétique des partitions répliquées au sein du fichier NTDS.dit</div>
+    </div>
+
+    <h2>1. Le premier piège : confondre partition et OU</h2>
+    <p>Avant de parler des cinq partitions, il faut désamorcer une confusion presque universelle chez qui découvre Active Directory : <strong>une partition n'est pas une unité d'organisation (OU), et une OU n'est pas un simple conteneur.</strong> Ce sont trois niveaux d'imbrication complètement différents.</p>
+
+    <h3><code>CN=Users</code> n'est pas une OU</h3>
+    <p>Dans la console <em>Active Directory Users and Computers</em>, on voit typiquement apparaître, à la racine du domaine :</p>
+    <pre>DC=xyz,DC=com
+│
+├── CN=Users
+├── CN=Computers
+├── OU=Employés
+├── OU=Serveurs
+└── ...</pre>
+
+    <p><code>CN=Users</code> et <code>OU=Employés</code> ressemblent à des dossiers identiques dans l'arborescence graphique — c'est exactement ce qui entretient la confusion. Mais leur préfixe n'est pas cosmétique : il indique le <strong>type d'objet AD</strong> sous-jacent.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Préfixe</th>
+          <th>Signification</th>
+          <th>Type d'objet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>DC=</code></td>
+          <td><em>Domain Component</em></td>
+          <td>Un composant du nom de domaine (<code>xyz</code>, <code>com</code>)</td>
+        </tr>
+        <tr>
+          <td><code>CN=</code></td>
+          <td><em>Common Name</em></td>
+          <td>Un objet ou un conteneur générique</td>
+        </tr>
+        <tr>
+          <td><code>OU=</code></td>
+          <td><em>Organizational Unit</em></td>
+          <td>Une unité d'organisation</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><code>CN=Users</code> est un <strong>conteneur</strong> — un objet de la classe <code>container</code>, créé automatiquement par AD DS à l'installation, qui existe surtout pour des raisons de compatibilité historique avec les anciens outils d'administration. <code>OU=Employés</code>, en revanche, est un objet de la classe <code>organizationalUnit</code>.</p>
+
+    <p>La différence n'est pas qu'une question de nommage : elle a une conséquence fonctionnelle directe, et c'est la seule chose à retenir pour ne plus jamais confondre les deux. <strong>Une stratégie de groupe (GPO) ne peut être liée qu'à une OU, un domaine ou un site — jamais à un simple conteneur.</strong> C'est pour cette raison précise que les administrateurs déplacent systématiquement leurs comptes utilisateurs vers des OU personnalisées plutôt que de les laisser dans le conteneur <code>CN=Users</code> par défaut : un objet resté dans <code>CN=Users</code> est structurellement impossible à cibler avec une GPO, quelle qu'elle soit.</p>
+
+    <h3>Une hiérarchie à quatre niveaux, pas deux</h3>
+    <p>Le modèle mental correct empile quatre couches distinctes, de la plus large à la plus fine :</p>
+    <pre>FORÊT
+│
+├── PARTITIONS (Naming Contexts)
+│     │
+│     ├── Schema
+│     ├── Configuration
+│     ├── Domaine (DC=xyz,DC=com)
+│     │      │
+│     │      ├── Conteneurs  (CN=Users, CN=Computers...)
+│     │      ├── OU          (OU=Employés, OU=Serveurs...)
+│     │      └── Objets      (utilisateurs, groupes, ordinateurs...)
+│     │
+│     ├── DomainDnsZones
+│     └── ForestDnsZones
+│
+└── CONTRÔLEURS DE DOMAINE (DC1, DC2...)</pre>
+
+    <p>Une partition est une division de la <strong>base de données</strong> ; un conteneur ou une OU est une division <strong>à l'intérieur</strong> d'une partition ; un objet (utilisateur, ordinateur, groupe) est ce que contiennent ces conteneurs et OU. Ce sont trois échelles différentes, jamais interchangeables.</p>
+
+    <h2>2. Les cinq partitions : vue d'ensemble</h2>
+    <p>Sur une installation AD DS standard avec DNS intégré, cinq Naming Contexts existent et se répliquent indépendamment les uns des autres :</p>
+
+    <pre>Active Directory
+│
+├── 1. DC=xyz,DC=com                              → Partition du domaine
+├── 2. CN=Configuration,DC=xyz,DC=com              → Configuration de la forêt
+├── 3. CN=Schema,CN=Configuration,DC=xyz,DC=com    → Schéma AD
+├── 4. DC=DomainDnsZones,DC=xyz,DC=com             → DNS du domaine
+└── 5. DC=ForestDnsZones,DC=xyz,DC=com             → DNS de la forêt</pre>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Partition</th>
+          <th>Portée de réplication</th>
+          <th>Contenu principal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Domaine (<code>xyz.com</code>)</td>
+          <td>Domaine</td>
+          <td>Utilisateurs, groupes, ordinateurs, OU, conteneurs</td>
+        </tr>
+        <tr>
+          <td>Configuration</td>
+          <td>Forêt entière</td>
+          <td>Sites, sous-réseaux, site links, DC, topologie de réplication</td>
+        </tr>
+        <tr>
+          <td>Schema</td>
+          <td>Forêt entière</td>
+          <td>Définition des classes d'objets et de leurs attributs</td>
+        </tr>
+        <tr>
+          <td>DomainDnsZones</td>
+          <td>Domaine</td>
+          <td>Zones et enregistrements DNS du domaine</td>
+        </tr>
+        <tr>
+          <td>ForestDnsZones</td>
+          <td>Forêt entière</td>
+          <td>Zones et enregistrements DNS partagés par toute la forêt</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>Chaque ligne se réplique <strong>indépendamment</strong> des autres — un point qui a une conséquence pratique directe et souvent déroutante au premier abord : rien n'empêche que la réplication de <code>Schema</code> échoue temporairement pendant que <code>xyz.com</code>, <code>DomainDnsZones</code> et <code>ForestDnsZones</code> continuent de fonctionner parfaitement entre les mêmes deux DC. Un <code>repadmin /showrepl</code> peut ainsi afficher quatre lignes vertes et une ligne en échec — ce n'est pas une incohérence du diagnostic, c'est la preuve que la granularité de réplication fonctionne exactement comme prévu.</p>
+
+    <h2>3. La partition Domaine : ce qui existe dans mon domaine</h2>
+    <p>C'est la partition la plus intuitive, celle qui contient tout ce qu'on manipule au quotidien :</p>
+    <pre>DC=xyz,DC=com
+│
+├── CN=Users            (conteneur)
+├── CN=Computers        (conteneur)
+├── OU=Employés         (OU)
+│      ├── Alice
+│      └── Bob
+└── OU=Serveurs         (OU)
+       ├── SRV01
+       └── SRV02</pre>
+    <p>Chaque création d'utilisateur, de groupe, d'ordinateur ou d'OU écrit dans cette partition. Elle n'est répliquée qu'entre les DC du <strong>même domaine</strong> — un DC d'un domaine enfant, dans une forêt multi-domaines, n'a pas besoin d'une copie complète de cette partition pour un domaine auquel il n'appartient pas.</p>
+
+    <h2>4. La partition Configuration : comment mon environnement AD est organisé</h2>
+    <p>Cette partition ne contient aucun utilisateur, aucun groupe — elle contient la description de l'infrastructure AD elle-même : où sont les sites, quels DC existent, quels site links les relient, comment la réplication doit circuler.</p>
+    <pre>CN=Configuration,DC=xyz,DC=com
+│
+├── CN=Sites
+│      ├── CN=Lomé
+│      │     └── CN=Servers → DC1, DC2
+│      ├── CN=Kpalimé
+│      └── CN=Attakpamé
+│
+├── CN=Partitions          (liste des domaines de la forêt)
+└── CN=Services            (configuration de services AD)</pre>
+
+    <p>C'est très exactement là qu'on retrouve, sous une forme structurée, tout ce qui a été détaillé dans l'article sur <strong>Active Directory Sites and Services</strong> : les sites, les sous-réseaux, les site links avec leurs coûts et leurs plannings, la désignation des bridgehead servers. Configurer un site link dans la console <em>Sites and Services</em> revient, concrètement, à écrire un nouvel objet dans cette partition — et comme elle est répliquée vers <strong>tous les DC de la forêt</strong>, y compris ceux de domaines différents du vôtre, un changement de topologie fait à un seul endroit finit par être visible partout, quel que soit le domaine.</p>
+
+    <h2>5. La partition Schema : ce qu'un objet AD peut être</h2>
+    <p>Le schéma ne contient aucun objet réel — ni utilisateur, ni ordinateur. Il définit la <strong>structure</strong> que tout objet AD doit respecter :</p>
+    <pre>Schema
+│
+├── Classe : user
+│     ├── attribut : sAMAccountName
+│     ├── attribut : userPrincipalName
+│     └── ...
+│
+├── Classe : computer
+│     ├── attribut : operatingSystem
+│     └── ...</pre>
+
+    <p>La distinction avec la partition Domaine tient en une phrase : <strong>le Schema définit ce qu'est un "user" ; la partition Domaine contient réellement l'utilisateur "Alice".</strong> Un attribut qui n'existe pas dans le schéma ne peut tout simplement pas être renseigné sur un objet, quel que soit le domaine concerné.</p>
+
+    <p>C'est précisément parce que cette partition est répliquée vers <strong>tous les DC de toute la forêt</strong>, sans exception, qu'une modification incohérente du schéma serait catastrophique — et c'est la raison structurelle, déjà développée dans l'article sur les rôles FSMO, pour laquelle le <strong>Schema Master</strong> est un rôle unique à l'échelle de la forêt entière : une seule autorité peut écrire dans cette partition à la fois, précisément parce qu'elle n'admet aucune réconciliation de conflit satisfaisante en cas d'écriture concurrente.</p>
+
+    <h2>6. DomainDnsZones et ForestDnsZones : deux partitions, pas une hiérarchie</h2>
+    <p>C'est la source de confusion la plus fréquente, et elle mérite d'être tranchée sans ambiguïté : <strong><code>ForestDnsZones</code> ne contient pas une copie de <code>DomainDnsZones</code>, et l'une n'est pas "au-dessus" de l'autre.</strong> Ce sont deux partitions strictly indépendantes, placées côte à côte, qui ne diffèrent que par leur <strong>portée de réplication</strong>.</p>
+
+    <pre>            DNS intégré à AD  
+                  │  
+         ┌────────┴────────┐  
+         ↓                 ↓  
+  DomainDnsZones     ForestDnsZones  
+         │                 │  
+répliqué au niveau   répliqué au niveau  
+   du domaine            de la forêt  </pre>
+
+    <p><strong>DomainDnsZones</strong> héberge les zones et enregistrements DNS dont la pertinence s'arrête à un seul domaine — typiquement, la zone principale de ce domaine, répliquée uniquement entre les DC qui en hébergent une copie DNS.</p>
+
+    <p><strong>ForestDnsZones</strong> héberge les zones et enregistrements dont la portée doit couvrir <strong>toute la forêt</strong>, y compris des domaines différents du vôtre. Dans une forêt à domaine unique, cette distinction paraît presque décorative — les deux partitions coexistent sans que leur différence de portée ne se manifeste jamais concrètement. Elle devient en revanche visible et utile dans une forêt multi-domaines :</p>
+
+    <pre>Forêt XYZ
+│
+├── xyz.com
+├── paris.xyz.com
+└── london.xyz.com</pre>
+
+    <p>Un enregistrement DNS qui doit être résolu depuis n'importe quel domaine de cette forêt — par exemple, certains enregistrements de service liés à la structure même de la forêt — a besoin d'être répliqué au niveau <code>ForestDnsZones</code>. Un enregistrement propre au fonctionnement interne d'un seul domaine n'a, à l'inverse, aucune raison d'encombrer la réplication de tous les autres domaines de la forêt : il reste dans <code>DomainDnsZones</code>.</p>
+
+    <p><strong>Aucune des deux configurations générales du domaine</strong> (utilisateurs, groupes, OU, GPO) ne transite par ces deux partitions DNS — la confusion vient souvent du mot "domaine" présent dans le nom <code>DomainDnsZones</code>, qui laisse croire à tort qu'elle contiendrait la configuration du domaine en général. Elle ne contient que des données DNS, rien d'autre.</p>
+
+    <h2>7. Où est-ce que tout ça vit, physiquement ?</h2>
+    <p>Sur chaque contrôleur de domaine, l'ensemble des partitions qu'il héberge est stocké dans un unique fichier de base de données : <code>%SystemRoot%\NTDS\ntds.dit</code> (le moteur sous-jacent est l'ESE — <em>Extensible Storage Engine</em>, le même type de moteur qu'utilisait historiquement Exchange).</p>
+
+    <pre>             ntds.dit  
+                │  
+   ┌────────────┼────────────┬────────────┬────────────┐  
+   ↓            ↓            ↓            ↓            ↓  
+Domaine    Configuration   Schema   DomainDnsZones ForestDnsZones  </pre>
+
+    <p>Il est important de ne pas se représenter ceci comme cinq fichiers séparés : les cinq Naming Contexts sont des divisions <strong>logiques</strong> à l'intérieur d'une seule et même base physique. Un DC ne stocke jamais nécessairement les cinq en entier, cela dit — il ne conserve que les partitions pertinentes pour son rôle : tout DC héberge obligatoirement Schema, Configuration et la partition de son propre domaine ; en revanche, il ne conserve une copie de la partition Domaine d'un autre domaine de la forêt que s'il en est également un Global Catalog.</p>
+
+    <h2>8. Est-ce qu'Active Directory écrit ailleurs que dans ces cinq partitions ?</h2>
+    <p>C'est la question la plus intéressante, parce que la réponse honnête est <strong>"pas tout à fait non"</strong> — il existe deux nuances réelles à ce qu'on pourrait croire être une liste fermée et exhaustive.</p>
+
+    <h3>a) Les partitions d'application (Application Directory Partitions)</h3>
+    <p>Techniquement, seules <strong>trois</strong> des cinq partitions vues plus haut sont obligatoires et créées automatiquement à l'installation de tout DC : Schema, Configuration, et la partition du Domaine. <code>DomainDnsZones</code> et <code>ForestDnsZones</code>, elles, ne sont pas des Naming Contexts "de base" au sens strict — ce sont des <strong>partitions d'application</strong> (<em>Application Directory Partitions</em>), créées spécifiquement par l'installation du rôle DNS intégré à AD.</p>
+
+    <p>Une partition d'application est un mécanisme générique : n'importe quel service compatible peut, en théorie, créer sa propre partition d'application avec sa propre portée de réplication personnalisée (limitée à un sous-ensemble choisi de DC, pas nécessairement tout un domaine ou toute une forêt). DNS est simplement, de très loin, l'usage le plus répandu de ce mécanisme — mais ce n'est pas le seul cas d'usage possible en théorie, et une infrastructure plus complexe peut tout à fait héberger des partitions d'application supplémentaires, propres à des produits tiers.</p>
+
+    <h3>b) SYSVOL : de la réplication AD, mais pas dans <code>ntds.dit</code></h3>
+    <p>Voici la nuance la plus souvent oubliée. Les stratégies de groupe (GPO) et les scripts d'ouverture de session ne sont <strong>pas</strong> stockés dans <code>ntds.dit</code>. Seule leur référence — l'objet <code>groupPolicyContainer</code>, contenant essentiellement un identifiant et des métadonnées — vit dans la partition Domaine. Le contenu réel des GPO (les fichiers de stratégie eux-mêmes) est stocké sur le système de fichiers, dans le dossier partagé <strong>SYSVOL</strong> (<code>%SystemRoot%\SYSVOL\sysvol\&lt;domaine&gt;\Policies\</code>), et répliqué entre les DC par un mécanisme entièrement différent : <strong>DFSR</strong> (<em>Distributed File System Replication</em>) sur les versions modernes de Windows Server, héritier de l'ancien FRS (<em>File Replication Service</em>).</p>
+
+    <pre>GPO
+│
+├── Métadonnées (groupPolicyContainer)
+│      → stocké dans ntds.dit, partition Domaine
+│      → répliqué par la réplication AD standard
+│
+└── Contenu réel (fichiers .pol, scripts, modèles ADM)
+       → stocké dans SYSVOL (système de fichiers)
+       → répliqué par DFSR, PAS par la réplication AD</pre>
+
+    <p>C'est la raison structurelle pour laquelle il est possible d'observer, en environnement réel, un DC parfaitement synchronisé du point de vue de <code>repadmin</code> (les cinq Naming Contexts répliquent sans erreur) alors que ses GPO restent visiblement désynchronisées ou incomplètes : ce sont deux mécanismes de réplication indépendants, l'un pour l'annuaire, l'autre pour le système de fichiers, qui peuvent parfaitement diverger l'un de l'autre sans que l'un n'alerte sur l'état de l'autre.</p>
+
+    <p><strong>Pour répondre directement à la question initiale :</strong> non, il n'existe pas de sixième Naming Context caché où siégeraient les objets AD eux-mêmes — les cinq (ou trois obligatoires + deux applicatives DNS) couvrent bien l'intégralité de la base d'annuaire. Mais Active Directory, au sens large de "l'écosystème de services qui font tourner un domaine", écrit également en dehors de cette base — au minimum dans SYSVOL, et potentiellement dans d'autres partitions d'application si l'infrastructure en héberge.</p>
+
+    <h2>9. Pourquoi <code>repadmin</code> affiche justement ces cinq lignes</h2>
+    <p>Une commande comme <code>repadmin /showrepl</code> ou <code>repadmin /syncall</code> énumère, pour un DC donné, la liste des Naming Contexts qu'il doit synchroniser avec chacun de ses partenaires de réplication — ni plus, ni moins que ce que ce DC héberge réellement. Sur un DC standard avec DNS intégré à AD, cela donne typiquement les cinq lignes vues en introduction, chacune avec son propre statut de synchronisation, son propre horodatage de dernière réussite, et sa propre liste de partenaires de réplication — exactement la même logique de diagnostic (<code>repadmin /showrepl</code>, <code>repadmin /kcc</code>) déjà détaillée dans l'article sur Sites and Services, mais appliquée ici au contenu de chaque partition plutôt qu'à la topologie réseau qui achemine leur réplication.</p>
+
+    <h2>10. Liens avec les articles précédents de cette série</h2>
+    <p>Trois rapprochements ont un rapport direct avec ce sujet.</p>
+    <p><strong>Avec <code>ad-sites-and-services</code> :</strong> la partition Configuration détaillée en section 4 <em>est</em> littéralement l'endroit où vivent les sites, sous-réseaux et site links déjà expliqués dans cet article — configurer une topologie de réplication dans la console revient concrètement à écrire dans cette partition précise.</p>
+
+    <p><strong>Avec <code>fsmo-roles</code> :</strong> deux liens directs, pas un seul. Le Schema Master tire sa nécessité d'être unique du fait que la partition Schema (section 5) ne tolère aucune écriture concurrente réconciliable. Le Domain Naming Master, lui, est directement responsable de l'ajout ou de la suppression de domaines et de partitions d'application dans la forêt — ce qui inclut, très concrètement, la création des partitions <code>DomainDnsZones</code> et <code>ForestDnsZones</code> détaillées en section 8.</p>
+
+    <p><strong>Avec <code>directory-services-ldap</code> :</strong> cet article posait les fondations du nommage LDAP (distinguished names, RDN) sur lesquelles repose entièrement la distinction <code>CN=</code> vs <code>OU=</code> développée en section 1 — sans cette base, la différence entre un conteneur et une unité d'organisation reste arbitraire plutôt que structurelle.</p>
+
+    <h2>Conclusion</h2>
+    <p>Les cinq partitions d'Active Directory ne sont pas un détail d'implémentation réservé aux administrateurs qui creusent la réplication en profondeur — elles définissent la frontière exacte de ce qui se réplique ensemble, à quelle échelle, et sous la responsabilité de quelle autorité. Confondre partition et OU masque une distinction fonctionnelle réelle (le ciblage GPO) ; confondre <code>DomainDnsZones</code> et <code>ForestDnsZones</code> masque une différence de portée qui ne devient visible qu'en environnement multi-domaines ; et croire que ces cinq partitions épuisent tout ce qu'Active Directory écrit occulte SYSVOL, le seul composant capable de désynchroniser silencieusement vos GPO pendant que <code>repadmin</code> affiche un état parfaitement sain sur les cinq Naming Contexts.</p>
+  </div>
+
+</body>
+</html>

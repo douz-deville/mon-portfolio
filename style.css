@@ -327,3 +327,27 @@ footer {
         align-items: flex-start;
     }
 }
+
+/* ==========================================================================
+   BLOCS DE CODE ET SCHÉMAS ASCII
+   ========================================================================== */
+pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 1.75rem 0;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress HA Multi-AZ — Vue Synthétique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6; --text: #1c1c1e; --text-muted: #636366;
+            --accent: #1a56db; --accent-light: #eff6ff; --border: #e5e5ea; --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.65; padding: 3rem 1.5rem; }
+        .container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .back-nav { margin-bottom: 3rem; }
+        .back-nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-family: var(--font-mono); }
+        .back-nav a:hover { color: var(--accent); }
+        header { margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+        .meta-tag {
+            font-family: var(--font-mono); font-size: 0.75rem; background-color: var(--accent-light);
+            color: var(--accent); padding: 0.2rem 0.55rem; border-radius: 4px; font-weight: 500;
+            display: inline-block; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        h1 { font-size: 2.25rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+        h2 { font-size: 1.4rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        p { margin-bottom: 1.25rem; color: #27272a; font-size: 1.025rem; }
+        strong { font-weight: 600; color: var(--text); }
+        ul { margin-bottom: 1.5rem; padding-left: 1.25rem; }
+        li { margin-bottom: 0.75rem; color: #27272a; font-size: 1.025rem; }
+        .highlight-card {
+            background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent);
+            border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0;
+        }
+        .highlight-card p:last-child { margin-bottom: 0; }
+        .table-container { width: 100%; overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
+        th, td { padding: 0.85rem 1.1rem; border-bottom: 1px solid var(--border); }
+        th { background-color: #f4f4f6; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        .check-list li::before { content: "✅ "; }
+        footer { margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); }
+        @media (max-width: 640px) { h1 { font-size: 1.85rem; } footer { flex-direction: column; gap: 0.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav"><a href="index.html">← RETOUR AU PROJET</a></nav>
+
+        <header>
+            <span class="meta-tag">Cloud / DevOps — Haute disponibilité</span>
+            <h1>Garantir la continuité d'un site web face à la panne</h1>
+        </header>
+
+        <article>
+            <section>
+                <p>J'ai conçu, déployé et testé en conditions de panne réelle une infrastructure web hautement disponible sur AWS, hébergeant un site WordPress. Ce projet reproduit, à l'échelle d'un environnement cloud réel, l'architecture que l'on retrouve derrière la quasi-totalité des services en ligne qui ne peuvent pas se permettre d'interruption : répartition de charge entre plusieurs zones géographiques, base de données répliquée en continu, et remise en service automatique en cas de défaillance matérielle — sans intervention humaine.</p>
+            </section>
+
+            <section>
+                <h2>1. Le problème que ce projet résout</h2>
+                <p>Une infrastructure hébergée sur un serveur unique a un point commun avec tous les systèmes fragiles : elle fonctionne parfaitement, jusqu'au jour où ce serveur unique tombe en panne. Pour une organisation, une telle panne ne se traduit pas seulement par un inconfort technique — elle se traduit directement par de l'indisponibilité commerciale, une perte de confiance client, et dans certains secteurs, des pénalités contractuelles liées à des engagements de disponibilité (SLA).</p>
+                <p>La question à laquelle ce projet répond est directe :</p>
+                <div class="highlight-card">
+                    <p><strong>Comment concevoir une infrastructure qui continue de servir ses utilisateurs même lorsqu'un serveur, voire une zone géographique entière de la région cloud, devient indisponible ?</strong></p>
+                </div>
+                <p>C'est exactement le principe qu'appliquent les plateformes capables de maintenir un taux de disponibilité proche de 99,9 % — pas en espérant qu'aucune panne ne survienne, mais en concevant l'infrastructure pour qu'une panne individuelle n'affecte jamais le service rendu à l'utilisateur final.</p>
+            </section>
+
+            <section>
+                <h2>2. Ce que j'ai construit</h2>
+                <p>J'ai déployé une infrastructure répartie sur deux zones de disponibilité distinctes (deux centres de données physiquement séparés au sein de la même région AWS), structurée autour de trois responsabilités cloisonnées :</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Composant</th><th>Rôle</th><th>Pourquoi c'est important</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Répartiteur de charge (ALB)</strong></td><td>Seul point d'entrée public, distribue le trafic entre les serveurs disponibles</td><td>Aucun serveur individuel n'est directement exposé ni indispensable</td></tr>
+                            <tr><td><strong>Serveurs applicatifs auto-réparables</strong></td><td>Hébergent WordPress, répartis sur deux zones, remplacés automatiquement s'ils tombent</td><td>Une panne matérielle se répare seule, sans intervention humaine</td></tr>
+                            <tr><td><strong>Base de données répliquée (RDS Multi-AZ)</strong></td><td>Une copie active et une copie de secours synchronisée en temps réel, sur deux zones</td><td>Les données survivent à la perte d'une zone entière</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>L'ensemble repose sur une segmentation réseau stricte : les serveurs applicatifs et la base de données vivent dans des sous-réseaux privés, invisibles depuis Internet — seul le répartiteur de charge est exposé publiquement, exactement le même principe de point d'entrée unique déjà appliqué dans mon lab Zero Trust, transposé ici à une infrastructure cloud plutôt qu'à une architecture d'authentification.</p>
+            </section>
+
+            <section>
+                <h2>3. Pourquoi cette approche compte pour une organisation</h2>
+                <p><strong>a) La disponibilité se traduit directement en chiffre d'affaires.</strong> Pour toute activité en ligne, chaque minute d'indisponibilité a un coût mesurable — ventes manquées, support client saturé, image de marque écornée. Une architecture qui élimine les points de défaillance uniques réduit ce risque à sa source, plutôt que de compter sur la chance.</p>
+                <p><strong>b) La réparation automatique réduit la charge opérationnelle.</strong> Sans cette architecture, une panne nocturne exige un réveil d'astreinte, une intervention manuelle, et un délai de rétablissement qui se compte en dizaines de minutes au mieux. Avec l'auto-réparation mise en place ici, le système détecte la perte d'une instance et la remplace de lui-même, sans qu'aucun humain n'ait besoin d'intervenir pour un incident de ce type.</p>
+                <p><strong>c) La croissance du trafic n'exige pas une refonte.</strong> La capacité de calcul s'ajuste automatiquement à la demande (de 2 à 4 serveurs actifs selon la charge), ce qui évite à la fois le sur-provisionnement coûteux en période calme et la saturation en période de forte affluence.</p>
+                <p><strong>d) La donnée est protégée indépendamment de l'application.</strong> La base de données étant répliquée sur une zone distincte, la perte d'une zone entière n'entraîne pas de perte de données — un impératif pour toute activité qui ne peut pas se permettre de perdre une commande, un compte client ou une transaction.</p>
+            </section>
+
+            <section>
+                <h2>4. Compétences démontrées</h2>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Domaine</th><th>Ce que le projet illustre</th></tr></thead>
+                        <tbody>
+                            <tr><td>Architecture cloud</td><td>Conception d'une infrastructure multi-zone sans point de défaillance unique, répartition réseau public/privé</td></tr>
+                            <tr><td>Haute disponibilité & résilience</td><td>Load balancing, auto-scaling, réplication de base de données, validés par un test de panne réel plutôt que théorique</td></tr>
+                            <tr><td>Sécurité réseau cloud</td><td>Segmentation en sous-réseaux privés, filtrage par groupes de sécurité appliquant le principe du moindre privilège</td></tr>
+                            <tr><td>Résolution de problèmes en autonomie</td><td>Diagnostic et correction de quatre incidents réels rencontrés en cours de déploiement, sans solution préétablie</td></tr>
+                            <tr><td>Rigueur de validation</td><td>Protocole de test de panne documenté ("Build & Break"), avec résultats mesurés plutôt que supposés</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>5. Validation du projet</h2>
+                <p>Plutôt que de supposer que l'infrastructure tiendrait en cas de panne, j'ai provoqué une panne réelle pour le vérifier : suppression manuelle et volontaire d'un serveur actif, pendant que le site restait en production.</p>
+                <ul class="check-list">
+                    <li>Le site est resté continuellement accessible pendant l'incident, sans erreur visible pour l'utilisateur final.</li>
+                    <li>Le système a détecté l'écart de capacité en quelques secondes.</li>
+                    <li>Un serveur de remplacement a été relancé automatiquement et intégré au service en moins de deux minutes.</li>
+                </ul>
+                <p>C'est cette preuve empirique — et non une simple affirmation sur le papier — qui distingue une architecture réellement résiliente d'une architecture seulement supposée l'être.</p>
+            </section>
+
+            <section>
+                <h2>6. Prochaines étapes envisagées</h2>
+                <ul>
+                    <li>Chiffrement de bout en bout (HTTPS) avec un certificat géré automatiquement, devant le répartiteur de charge.</li>
+                    <li>Mise en cache et distribution de contenu via un CDN pour réduire la latence et la charge sur les serveurs d'origine.</li>
+                    <li>Ajout d'un pare-feu applicatif (WAF) devant le répartiteur de charge pour filtrer les requêtes malveillantes.</li>
+                    <li>Industrialisation complète du déploiement par Infrastructure as Code (Terraform ou CloudFormation), pour rendre cette architecture reproductible en quelques minutes plutôt qu'en configuration manuelle.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>Ce projet ne se limite pas à faire tourner un site WordPress sur AWS — il démontre une capacité à concevoir une infrastructure pour l'échec plutôt que pour le cas idéal, et à prouver sa résilience par un test réel plutôt que par une promesse. C'est exactement la différence entre une architecture qui a l'air robuste sur un schéma, et une architecture dont la robustesse a été mesurée.</p>
+            </section>
+        </article>
+
+        <footer>
+            <div>Bootcamp AWS CloudOps Essentials — Semaine 1</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>

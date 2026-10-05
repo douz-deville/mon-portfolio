@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress HA Multi-AZ — Guide Technique Complet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f6; --text: #1c1c1e; --text-muted: #636366;
+            --accent: #1a56db; --accent-light: #eff6ff; --border: #e5e5ea; --card-bg: #ffffff;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.65; padding: 3rem 1.5rem; }
+        .container { max-width: 800px; margin: 0 auto; width: 100%; }
+        .back-nav { margin-bottom: 3rem; }
+        .back-nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-family: var(--font-mono); }
+        .back-nav a:hover { color: var(--accent); }
+        header { margin-bottom: 2.5rem; border-bottom: 1px solid var(--border); padding-bottom: 2rem; }
+        .meta-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+        .meta-date { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); }
+        .tags-container { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .tag { font-family: var(--font-mono); font-size: 0.75rem; background-color: var(--accent-light); color: var(--accent); padding: 0.2rem 0.55rem; border-radius: 4px; font-weight: 500; }
+        h1 { font-size: 2.25rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 1.5rem; }
+        h2 { font-size: 1.4rem; font-weight: 600; margin-top: 2.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+        h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1.75rem; margin-bottom: 1rem; color: var(--accent); }
+        p { margin-bottom: 1.25rem; color: #27272a; font-size: 1.025rem; }
+        strong { font-weight: 600; color: var(--text); }
+        ul, ol { margin-bottom: 1.5rem; padding-left: 1.25rem; }
+        li { margin-bottom: 0.6rem; color: #27272a; font-size: 1.025rem; }
+        code { font-family: var(--font-mono); font-size: 0.9em; background-color: var(--accent-light); color: var(--accent); padding: 0.15rem 0.35rem; border-radius: 4px; }
+        pre { background-color: #1e1e24; color: #f8f8f2; font-family: var(--font-mono); padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5; margin: 1.5rem 0; border: 1px solid var(--border); }
+        pre code { background-color: transparent; color: inherit; padding: 0; }
+        .highlight-card { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+        .highlight-card p:last-child { margin-bottom: 0; }
+        .incident-card { background-color: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid #d97706; border-radius: 6px; padding: 1.25rem 1.5rem; margin: 1.5rem 0; }
+        .incident-card p:last-child { margin-bottom: 0; }
+        .table-container { width: 100%; overflow-x: auto; margin: 1.5rem 0; border: 1px solid var(--border); border-radius: 8px; background: var(--card-bg); }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.92rem; }
+        th, td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+        th { background-color: #f4f4f6; font-weight: 600; }
+        tr:last-child td { border-bottom: none; }
+        footer { margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 2rem; display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); }
+        @media (max-width: 640px) { h1 { font-size: 1.85rem; } footer { flex-direction: column; gap: 0.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="back-nav"><a href="index.html">← RETOUR AU PROJET</a></nav>
+
+        <header>
+            <div class="meta-container">
+                <span class="meta-date">Bootcamp AWS CloudOps Essentials — Semaine 1</span>
+                <div class="tags-container">
+                    <span class="tag">AWS</span>
+                    <span class="tag">Haute disponibilité</span>
+                    <span class="tag">RDS Multi-AZ</span>
+                    <span class="tag">Auto Scaling</span>
+                </div>
+            </div>
+            <h1>WordPress Multi-AZ Hautement Disponible sur AWS</h1>
+        </header>
+
+        <article>
+            <section>
+                <p>Ce guide détaille l'intégralité du déploiement réalisé lors de la Semaine 1 du Bootcamp AWS CloudOps Essentials : la conception de l'architecture, l'installation, la configuration réseau, le découplage des données, l'industrialisation par image système et Auto Scaling, et les procédures de validation par test de panne (<em>Build & Break</em>).</p>
+            </section>
+
+            <section>
+                <h2>1. Architecture globale et matrice réseau</h2>
+                <p>L'objectif de cette infrastructure est de garantir un fonctionnement sans interruption de service (<em>Zero-Downtime</em>), un découplage strict entre la couche applicative <em>stateless</em> et la couche de données <em>stateful</em>, ainsi qu'un haut niveau de sécurité réseau grâce au masquage des serveurs applicatifs dans des sous-réseaux privés.</p>
+
+<pre><code>                                [ Clients Internet ]
+                                         │
+                                         ▼ (HTTP:80)
+                       ┌───────────────────────────────────┐
+                       │ Application Load Balancer (ALB)   │
+                       │   Pub-Subnet-AZ1 &amp; Pub-Subnet-AZ2 │
+                       └─────────────────┬─────────────────┘
+                                         │
+                   ┌─────────────────────┴─────────────────────┐
+                   ▼ (Port 80)                                 ▼ (Port 80)
+      ┌─────────────────────────┐                 ┌─────────────────────────┐
+      │  EC2 Instance (Web)     │                 │  EC2 Instance (Web)     │
+      │  Priv-Subnet-AZ1        │                 │  Priv-Subnet-AZ2        │
+      │  (Auto Scaling Group)   │                 │  (Auto Scaling Group)   │
+      └────────────┬────────────┘                 └────────────┬────────────┘
+                   │                                           │
+                   └─────────────────────┬─────────────────────┘
+                                         ▼ (MySQL:3306)
+                       ┌───────────────────────────────────┐
+                       │   Amazon RDS MySQL (Multi-AZ)     │
+                       │  Primary (AZ1) ── Standby (AZ2)   │
+                       └───────────────────────────────────┘</code></pre>
+
+                <h3>Plan d'adressage IP (VPC 10.0.0.0/16)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Ressource</th><th>Zone (AZ)</th><th>Type</th><th>CIDR</th><th>Destination de routage</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>Pub-Subnet-AZ1</code></td><td>eu-north-1a</td><td>Public</td><td><code>10.0.1.0/24</code></td><td>Internet Gateway</td></tr>
+                            <tr><td><code>Priv-Subnet-AZ1</code></td><td>eu-north-1a</td><td>Privé</td><td><code>10.0.2.0/24</code></td><td>NAT Gateway</td></tr>
+                            <tr><td><code>Pub-Subnet-AZ2</code></td><td>eu-north-1b</td><td>Public</td><td><code>10.0.3.0/24</code></td><td>Internet Gateway</td></tr>
+                            <tr><td><code>Priv-Subnet-AZ2</code></td><td>eu-north-1b</td><td>Privé</td><td><code>10.0.4.0/24</code></td><td>NAT Gateway</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>2. Matrice de sécurité (Security Groups)</h2>
+                <p>Pour respecter le principe du moindre privilège, j'ai filtré le trafic inter-composants à l'aide de références croisées entre Security Groups, plutôt que d'autoriser des plages IP larges.</p>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Security Group</th><th>Règle entrante</th><th>Port / Protocole</th><th>Source autorisée</th><th>Usage</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>WordPress-Web-SG</code></td><td>HTTP</td><td>80 / TCP</td><td>SG de l'ALB</td><td>Trafic web entrant</td></tr>
+                            <tr><td><code>WordPress-Web-SG</code></td><td>SSH</td><td>22 / TCP</td><td>Mon IP / EC2 Instance Connect</td><td>Administration à distance</td></tr>
+                            <tr><td><code>WordPress-DB-SG</code></td><td>MySQL/Aurora</td><td>3306 / TCP</td><td><code>WordPress-Web-SG</code></td><td>Accès BDD réservé aux serveurs web</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>3. Déploiement pas à pas</h2>
+
+                <h3>Phase 1 — Infrastructure réseau & VPC</h3>
+                <p>J'ai commencé par poser le socle réseau avant de déployer le moindre serveur.</p>
+                <ol>
+                    <li><strong>Création du VPC</strong> : dans <em>VPC &gt; Your VPCs &gt; Create VPC</em>, j'ai nommé le VPC <code>WordPress-VPC</code> avec un bloc IPv4 <code>10.0.0.0/16</code>.</li>
+                    <li><strong>Création des sous-réseaux</strong> : j'ai créé <code>Pub-Subnet-AZ1</code> (<code>10.0.1.0/24</code>) et <code>Priv-Subnet-AZ1</code> (<code>10.0.2.0/24</code>) dans <code>eu-north-1a</code>, puis <code>Pub-Subnet-AZ2</code> (<code>10.0.3.0/24</code>) et <code>Priv-Subnet-AZ2</code> (<code>10.0.4.0/24</code>) dans <code>eu-north-1b</code>.</li>
+                    <li><strong>Routage Internet</strong> : j'ai créé une Internet Gateway (<code>WordPress-IGW</code>), je l'ai attachée au VPC, puis j'ai créé une table de routage publique avec une route <code>0.0.0.0/0</code> vers cette passerelle, associée aux deux sous-réseaux publics.</li>
+                    <li><strong>DB Subnet Group</strong> : dans <em>RDS &gt; Subnet groups</em>, j'ai créé <code>wordpress-db-subnet-group</code> en sélectionnant explicitement les deux zones <code>eu-north-1a</code> et <code>eu-north-1b</code>, avec les sous-réseaux privés <code>10.0.2.0/24</code> et <code>10.0.4.0/24</code>.</li>
+                </ol>
+
+                <h3>Phase 2 — Base de données RDS MySQL Multi-AZ</h3>
+                <ol>
+                    <li><strong>Security Group BDD</strong> : j'ai créé <code>WordPress-DB-SG</code>, rattaché à <code>WordPress-VPC</code>.</li>
+                    <li><strong>Création de la base</strong> : moteur MySQL 8.0+, instance <code>db.t3.micro</code>, option <strong>Multi-AZ DB instance</strong> activée, identifiant <code>wordpress-db</code>, utilisateur <code>admin</code>. J'ai placé la base dans <code>WordPress-VPC</code> via <code>wordpress-db-subnet-group</code>, accès public désactivé, Security Group <code>WordPress-DB-SG</code>, et une base initiale nommée <code>wordpress</code>.</li>
+                    <li><strong>Récupération de l'endpoint</strong> : une fois le statut passé à <em>Available</em>, j'ai copié l'endpoint de connexion (de la forme <code>wordpress-db.c1e48mc2w244.eu-north-1.rds.amazonaws.com</code>) pour l'utiliser lors de l'installation de WordPress.</li>
+                </ol>
+
+                <h3>Phase 3 — Serveur web initial & configuration WordPress</h3>
+                <p>J'ai lancé une première instance EC2 (<code>WordPress-Web-Server</code>, AMI Amazon Linux 2023, type <code>t3.micro</code>) dans <code>Pub-Subnet-AZ1</code> avec IP publique activée, rattachée au Security Group <code>WordPress-Web-SG</code>. Je m'y suis connecté via EC2 Instance Connect pour installer la pile LAMP et déployer WordPress :</p>
+
+<pre><code># Update système et installation des paquets applicatifs
+sudo dnf update -y
+sudo dnf install -y httpd php php-mysqli mariadb105
+
+# Activation du service web
+sudo systemctl start httpd
+sudo systemctl enable httpd
+
+# Téléchargement et déploiement de WordPress
+cd /var/www/html
+sudo wget https://wordpress.org/latest.tar.gz
+sudo tar -xzf latest.tar.gz
+sudo cp -r wordpress/* .
+sudo rm -rf wordpress latest.tar.gz
+
+# Attribution des droits sur le dossier web
+sudo chown -R apache:apache /var/www/html
+sudo chmod -R 755 /var/www/html</code></pre>
+
+                <p>J'ai ensuite ouvert le flux réseau manquant entre les deux couches : dans <code>WordPress-DB-SG</code>, j'ai ajouté une règle entrante <code>MYSQL/Aurora (3306)</code> avec pour source le Security Group <code>WordPress-Web-SG</code> — sans cette règle, le pare-feu virtuel bloque tout accès du serveur web vers la base.</p>
+                <p>J'ai terminé l'installation via l'assistant web de WordPress (<code>http://&lt;IP_PUBLIQUE_EC2&gt;</code>), en renseignant le nom de base <code>wordpress</code>, l'utilisateur <code>admin</code>, l'endpoint RDS comme hôte de base de données, et le préfixe de table <code>wp_</code>, avant de créer le compte administrateur du site.</p>
+
+                <h3>Phase 4 — Haute disponibilité (AMI, ALB & Auto Scaling)</h3>
+                <ol>
+                    <li><strong>Création de l'AMI</strong> : à partir de <code>WordPress-Web-Server</code> déjà configuré, j'ai créé une image <code>WordPress-AMI-v1</code>, qui sert ensuite de modèle reproductible pour toute nouvelle instance.</li>
+                    <li><strong>Target Group</strong> : j'ai créé <code>WordPress-TG</code> (type Instances, protocole HTTP:80, health check sur <code>/</code>).</li>
+                    <li><strong>Application Load Balancer</strong> : j'ai créé <code>WordPress-ALB</code> en mode <em>Internet-facing</em>, réparti sur les deux sous-réseaux publics, avec un listener HTTP:80 redirigeant vers <code>WordPress-TG</code>.</li>
+                    <li><strong>Launch Template</strong> : j'ai créé <code>WordPress-LT</code> à partir de l'AMI <code>WordPress-AMI-v1</code>, type <code>t3.micro</code>, Security Group <code>WordPress-Web-SG</code>.</li>
+                    <li><strong>Auto Scaling Group</strong> : j'ai déployé <code>WordPress-ASG</code> à partir de ce Launch Template, réparti sur les deux sous-réseaux <strong>privés</strong>, rattaché au Target Group <code>WordPress-TG</code>, avec une capacité désirée de 2 instances (min 2, max 4).</li>
+                    <li><strong>Bascule du DNS du site</strong> : dans l'administration WordPress, j'ai remplacé l'ancienne IP publique par le nom DNS de l'ALB (<code>WordPress-ALB-xxx.eu-north-1.elb.amazonaws.com</code>), afin que le site référence désormais le point d'entrée résilient plutôt qu'un serveur unique.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>4. Procédure de validation « Build & Break »</h2>
+                <p>Plutôt que de me contenter d'une architecture qui semble correcte sur le papier, j'ai voulu vérifier concrètement sa capacité à tolérer une perte matérielle soudaine.</p>
+
+<pre><code>[ Action User ] : Suppression manuelle d'une instance EC2 active dans EC2 Console
+       │
+       ▼
+[ ALB Health Check ] : Échec de la sonde HTTP sur l'instance détruite
+       │
+       ▼
+[ ALB Routing ] : Redirection à 100% du trafic vers l'instance restante (0s coupure)
+       │
+       ▼
+[ ASG Metrics ] : Détection de l'écart de capacité (1 instance active / 2 désirées)
+       │
+       ▼
+[ ASG Auto-Healing ] : Lancement automatique d'une nouvelle instance depuis WordPress-LT</code></pre>
+
+                <h3>Résultats observés</h3>
+                <ul>
+                    <li><strong>Suppression</strong> : j'ai forcé la terminaison de l'instance <code>i-0123456789101112a</code>.</li>
+                    <li><strong>Disponibilité web</strong> : le site est resté continuellement accessible via l'URL de l'ALB, sans générer d'erreur HTTP 502/503.</li>
+                    <li><strong>Réparation automatique</strong> : l'Auto Scaling Group a généré un événement <code>Launching a new EC2 instance</code> et rétabli la cible de 2 instances en moins de 120 secondes.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>5. Journal d'incidents et résolutions</h2>
+                <p>Quatre blocages réels ont jalonné ce déploiement. Je les détaille tels que rencontrés, avec le diagnostic et la correction appliquée.</p>
+
+                <div class="incident-card">
+                    <p><strong>Incident 1 — Incompatibilité de couverture AZ du DB Subnet Group</strong></p>
+                    <p><strong>Symptôme :</strong> <em>« The DB subnet group doesn't meet Availability Zone coverage requirement. Add subnets to cover at least 2 AZs. »</em></p>
+                    <p><strong>Cause :</strong> les sous-réseaux sélectionnés appartenaient tous à la même zone de disponibilité (<code>eu-north-1a</code>).</p>
+                    <p><strong>Correction :</strong> j'ai recréé le second sous-réseau privé spécifiquement sur <code>eu-north-1b</code>, puis sélectionné explicitement deux zones distinctes dans la configuration du Subnet Group.</p>
+                </div>
+
+                <div class="incident-card">
+                    <p><strong>Incident 2 — Absence de capacité IP dans la zone eu-north-1c</strong></p>
+                    <p><strong>Symptôme :</strong> <em>« You can't create a db.t4g.micro instance because there are no subnets with available IP addresses in eu-north-1c. »</em></p>
+                    <p><strong>Cause :</strong> RDS tentait de provisionner une réplique dans une troisième zone (<code>eu-north-1c</code>) non configurée dans mon VPC.</p>
+                    <p><strong>Correction :</strong> j'ai retiré <code>eu-north-1c</code> du DB Subnet Group pour contraindre le périmètre de haute disponibilité aux seules zones <code>eu-north-1a</code> et <code>eu-north-1b</code> réellement configurées.</p>
+                </div>
+
+                <div class="incident-card">
+                    <p><strong>Incident 3 — Erreur « Gateway Timeout » (HTTP 504) lors de l'installation WordPress</strong></p>
+                    <p><strong>Symptôme :</strong> l'assistant WordPress s'exécutait dans le vide puis échouait par dépassement de délai d'attente.</p>
+                    <p><strong>Cause :</strong> le Security Group <code>WordPress-DB-SG</code> ne possédait aucune règle entrante — le pare-feu virtuel bloquait tout le trafic sur le port 3306.</p>
+                    <p><strong>Correction :</strong> j'ai ajouté la règle entrante <code>MYSQL/Aurora (3306)</code> avec pour source le Security Group <code>WordPress-Web-SG</code>.</p>
+                </div>
+
+                <div class="incident-card">
+                    <p><strong>Incident 4 — Erreur « 503 Service Temporarily Unavailable » sur l'ALB</strong></p>
+                    <p><strong>Symptôme :</strong> l'accès au site via le DNS de l'ALB renvoyait une erreur 503.</p>
+                    <p><strong>Cause :</strong> le Target Group de l'ALB n'avait aucune cible enregistrée, les instances étant encore en cours d'initialisation par l'Auto Scaling Group.</p>
+                    <p><strong>Correction :</strong> j'ai vérifié l'association explicite du Target Group <code>WordPress-TG</code> dans la configuration de l'Auto Scaling Group, puis attendu le délai de grâce du health check avant que les instances ne soient déclarées saines.</p>
+                </div>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>Cette infrastructure valide, de bout en bout, les trois piliers d'une architecture hautement disponible : l'absence de point d'entrée unique côté réseau (ALB réparti sur deux zones), l'absence de point de calcul unique côté application (Auto Scaling Group auto-réparable), et l'absence de point de persistance unique côté données (RDS Multi-AZ répliqué). Le test de panne « Build & Break » n'était pas une formalité : c'est la preuve que cette résilience fonctionne réellement, pas seulement sur le schéma d'architecture.</p>
+            </section>
+        </article>
+
+        <footer>
+            <div>Bootcamp AWS CloudOps Essentials — Semaine 1</div>
+            <div>Portfolio Sécurité & Architecture</div>
+        </footer>
+    </div>
+</body>
+</html>
