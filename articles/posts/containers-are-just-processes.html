@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les conteneurs ne sont que des processus — Container Security Partie 1 — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">CONTAINER SECURITY — PARTIE 1</span>
+                <span class="meta-date">Publié le 15 Octobre 2026</span>
+            </div>
+            <h1>Les conteneurs ne sont que des processus</h1>
+            <p class="pitch">
+                Comprendre la réalité technique d'un conteneur Linux pour mieux appréhender ses mécanismes d'isolement et ses vecteurs d'attaque.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">Container Security</span>
+                <span class="tag">Docker</span>
+                <span class="tag">Linux</span>
+                <span class="tag">Sécurité</span>
+            </div>
+        </header>
+
+        <!-- Figure / Image d'illustration (Profondeur Niveau 2) -->
+        <figure class="article-image-container" style="margin: 2.5rem 0; text-align: center;">
+            <img src="../../images/container-vs-vm-architecture.png" alt="Schéma comparatif de l'architecture d'une Machine Virtuelle et d'un Conteneur Linux" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted); font-style: italic;">Comparaison de l'architecture : Noyau invité et hyperviseur (VM) vs Noyau unique partagé (Conteneurs)</figcaption>
+        </figure>
+
+        <article>
+            <section>
+                <p>
+                    Dans cette série, je veux comprendre comment les conteneurs fonctionnent vraiment, et surtout comment ils utilisent des fonctions de Linux pour s'isoler les uns des autres. Pourquoi ? Parce qu'on ne peut pas bien protéger ce qu'on ne comprend pas. Si je sais comment un conteneur est construit, je sais aussi où il peut casser.
+                </p>
+
+                <p>Ce premier article ne traite qu'une seule idée. Elle est simple à dire, mais elle change toute la façon de penser la sécurité des conteneurs :</p>
+
+                <div class="highlight-card">
+                    <p style="margin-bottom: 0;"><strong>Un conteneur est un processus Linux normal, lancé avec quelques restrictions autour de lui.</strong></p>
+                </div>
+            </section>
+
+            <section>
+                <h2>1. Pourquoi cette idée est si importante</h2>
+                <p>
+                    Beaucoup de gens imaginent un conteneur comme une petite machine virtuelle : un mini-ordinateur avec son propre système, enfermé dans une boîte. Ce n'est pas vrai. Et cette mauvaise image mène à de mauvaises décisions de sécurité.
+                </p>
+
+                <p>
+                    Si je crois qu'un conteneur est une boîte étanche, je vais lui faire confiance trop vite. Si je comprends que c'est un processus de l'hôte avec des limites ajoutées par le noyau, je vais me poser les bonnes questions :
+                </p>
+
+                <ul>
+                    <li>Quelles limites exactement ? Qui les a posées ? Peuvent-elles être retirées ?</li>
+                    <li>Qui, sur l'hôte, peut voir ce qui se passe dans le conteneur ?</li>
+                    <li>Que se passe-t-il si le noyau lui-même a une faille ?</li>
+                </ul>
+
+                <p>Tout le reste de la série répond à ces questions, une par une.</p>
+            </section>
+
+            <section>
+                <h2>2. Ce qu'un conteneur n'est pas : une machine virtuelle</h2>
+                <p>Voici les deux modèles côte à côte.</p>
+
+<pre><code>        MACHINE VIRTUELLE                           CONTENEURS
+
+┌──────────────┐ ┌──────────────┐        ┌──────────────┐ ┌──────────────┐
+│    App A     │ │    App B     │        │    App A     │ │    App B     │
+│ Bibliothèques│ │ Bibliothèques│        │ Bibliothèques│ │ Bibliothèques│
+│ Noyau invité │ │ Noyau invité │        └──────┬───────┘ └──────┬───────┘
+└──────┬───────┘ └──────┬───────┘               │                │
+       │                │                ┌──────┴────────────────┴──────┐
+┌──────┴────────────────┴──────┐         │   Noyau Linux de l'hôte      │
+│          Hyperviseur         │         │   (UN SEUL, partagé)         │
+└──────────────┬───────────────┘         └──────────────┬───────────────┘
+               │                                        │
+          Matériel (CPU, RAM)                      Matériel (CPU, RAM)</code></pre>
+
+                <p>La différence la plus importante est en bas : <strong>une machine virtuelle a son propre noyau, un conteneur utilise le noyau de l'hôte.</strong></p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élément</th>
+                                <th>Machine virtuelle</th>
+                                <th>Conteneur</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Noyau</strong></td>
+                                <td>Un noyau par VM (le noyau « invité »)</td>
+                                <td>Un seul noyau, celui de l'hôte, partagé</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ce qui isole</strong></td>
+                                <td>L'hyperviseur et le matériel (virtualisation)</td>
+                                <td>Des fonctions du noyau Linux</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Démarrage</strong></td>
+                                <td>Démarre tout un système (secondes à minutes)</td>
+                                <td>Lance un processus (très rapide)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Poids</strong></td>
+                                <td>Une image complète de système (plusieurs Go)</td>
+                                <td>Seulement l'application et ses fichiers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Système possible</strong></td>
+                                <td>Windows, Linux, etc.</td>
+                                <td>Même noyau que l'hôte (Linux pour conteneurs Linux)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Si le noyau a une faille</strong></td>
+                                <td>La faille touche seulement cette VM</td>
+                                <td>La faille touche l'hôte <strong>et</strong> tous les conteneurs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Le dernier point est celui qui compte le plus pour la sécurité.</p>
+            </section>
+
+            <section>
+                <h2>3. Rappel : qu'est-ce qu'un processus Linux ?</h2>
+                <p>Quand on lance un programme sur Linux, le noyau crée un <strong>processus</strong>. C'est un objet que le noyau suit avec beaucoup d'informations :</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Information</th>
+                                <th>À quoi ça sert</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>PID</strong></td>
+                                <td>Le numéro unique du processus</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Parent (PPID)</strong></td>
+                                <td>Le processus qui l'a lancé</td>
+                            </tr>
+                            <tr>
+                                <td><strong>UID / GID</strong></td>
+                                <td>L'utilisateur et le groupe au nom desquels il tourne</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mémoire</strong></td>
+                                <td>Son espace mémoire privé</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fichiers ouverts</strong></td>
+                                <td>La liste de ses descripteurs de fichiers</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Répertoire racine</strong></td>
+                                <td>Ce qu'il voit comme <code>/</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Namespaces</strong></td>
+                                <td>Ce qu'il voit du système (processus, réseau, points de montage…)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cgroup</strong></td>
+                                <td>Combien de CPU et de mémoire il peut utiliser</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Capabilities</strong></td>
+                                <td>Les droits spéciaux qu'il possède</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Filtre seccomp</strong></td>
+                                <td>Les appels système qu'il a le droit de faire</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Étiquette de sécurité</strong></td>
+                                <td>Son profil AppArmor ou SELinux</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Retenons cette liste : les namespaces, cgroups, capabilities, seccomp et l'étiquette de sécurité sont <strong>exactement</strong> ce qu'un moteur de conteneurs règle pour fabriquer un conteneur.</p>
+
+                <h3>Le système de fichiers <code>/proc</code></h3>
+                <p>Le noyau expose toutes ces informations dans un dossier spécial : <code>/proc</code>. Pour chaque processus, un sous-dossier <code>/proc/&lt;PID&gt;/</code> contient des fichiers qui décrivent ce processus :</p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Chemin</th>
+                                <th>Contenu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/root</code></td>
+                                <td>Le répertoire racine du processus (ce qu'il voit comme <code>/</code>)</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/cwd</code></td>
+                                <td>Son répertoire courant</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/exe</code></td>
+                                <td>Le programme qu'il exécute</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/environ</code></td>
+                                <td>Ses variables d'environnement</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/cgroup</code></td>
+                                <td>Son groupe de contrôle de ressources</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/ns/</code></td>
+                                <td>Les namespaces auxquels il appartient</td>
+                            </tr>
+                            <tr>
+                                <td><code>/proc/&lt;PID&gt;/fd/</code></td>
+                                <td>Ses fichiers ouverts</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>4. La démonstration pas à pas</h2>
+                
+                <div class="highlight-card">
+                    <p style="margin-bottom: 0;"><strong>Avant de commencer :</strong> Il faut un hôte <strong>Linux</strong>. Sur Windows ou macOS, Docker Desktop fait tourner les conteneurs dans une VM cachée et les commandes ne verraient pas directement les processus.</p>
+                </div>
+
+                <h3>Étape 1 : chercher nginx sur l'hôte</h3>
+                <pre><code>ps -fC nginx</code></pre>
+                <p>Résultat : <strong>rien</strong>. Aucun serveur nginx ne tourne sur cette machine.</p>
+
+                <h3>Étape 2 : lancer un conteneur nginx</h3>
+                <pre><code>docker run -d --name webserver nginx</code></pre>
+
+                <h3>Étape 3 : regarder la liste des processus de l'hôte</h3>
+                <pre><code>ps -fC nginx</code></pre>
+                <p>Résultat :</p>
+
+<pre><code>UID         PID    PPID  C STIME TTY          TIME CMD
+root       46727  46705  0 10:42 ?        00:00:00 nginx: master process nginx -g daemon off;
+101        46783  46727  0 10:42 ?        00:00:00 nginx: worker process
+101        46784  46727  0 10:42 ?        00:00:00 nginx: worker process</code></pre>
+
+                <p><strong>L'hôte voit des processus nginx normaux.</strong> Pour lui, c'est comme si nginx était installé en local. Le processus principal a le PID <code>46727</code>.</p>
+
+                <h3>Étape 4 : créer un fichier à l'intérieur du conteneur</h3>
+                <pre><code>docker exec webserver touch /mynewfile</code></pre>
+
+                <h3>Étape 5 : retrouver ce fichier depuis l'hôte, sans Docker</h3>
+                <pre><code>sudo ls /proc/46727/root</code></pre>
+
+<pre><code>bin  boot  dev  docker-entrypoint.d  docker-entrypoint.sh  etc  home  lib  lib64
+media  mnt  mynewfile  opt  proc  root  run  sbin  srv  sys  tmp  usr  var</code></pre>
+
+                <p>On voit le fichier <code>mynewfile</code> accessible directement depuis l'hôte avec les outils standards.</p>
+            </section>
+
+            <section>
+                <h2>5. Pour aller plus loin : cinq expériences à faire</h2>
+                
+                <p><strong>a) Trouver le PID automatiquement</strong></p>
+                <pre><code>docker inspect -f '{{.State.Pid}}' webserver</code></pre>
+
+                <p><strong>b) Voir la liste des processus du conteneur</strong></p>
+                <pre><code>docker top webserver</code></pre>
+
+                <p><strong>c) Regarder les namespaces du processus</strong></p>
+                <pre><code>sudo ls -l /proc/46727/ns</code></pre>
+
+                <p><strong>d) Regarder le cgroup</strong></p>
+                <pre><code>cat /proc/46727/cgroup</code></pre>
+
+                <p><strong>e) Retrouver le fichier sur le disque de l'hôte</strong></p>
+                <pre><code>sudo find /var/lib/docker/overlay2 -name mynewfile 2&gt;/dev/null</code></pre>
+            </section>
+
+            <section>
+                <h2>6. Deux numéros pour un même processus</h2>
+                <p>
+                    Dans le conteneur, nginx croit être le processus numéro <strong>1</strong>. Sur l'hôte, il porte le numéro <strong>46727</strong>. Le noyau lui attribue un numéro dans chaque espace de numéros (<em>PID namespace</em>).
+                </p>
+            </section>
+
+            <section>
+                <h2>7. Qui fabrique le conteneur, alors ?</h2>
+                <p>Le noyau Linux n'a pas d'objet appelé « conteneur ». C'est une <strong>convention</strong> : un moteur de conteneurs règle plusieurs fonctions du noyau sur un processus ordinaire.</p>
+
+<pre><code>docker (client)
+      │
+      ▼
+dockerd (le démon Docker)
+      │
+      ▼
+containerd (gère le cycle de vie)
+      │
+      ▼
+containerd-shim (reste en vie à côté du conteneur)
+      │
+      ▼
+runc (règle le noyau, lance le processus et s'arrête)
+      │
+      ▼
+le processus nginx  ←  c'est lui, le « conteneur »</code></pre>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fonction du noyau</th>
+                                <th>Rôle</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Namespaces</strong></td>
+                                <td>Isole la vue (processus, réseau, fichiers montés…)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cgroups</strong></td>
+                                <td>Limite la consommation (CPU, mémoire…)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Capabilities</strong></td>
+                                <td>Limite les privilèges spécifiques</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Seccomp</strong></td>
+                                <td>Filtre les appels système autorisés</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AppArmor / SELinux</strong></td>
+                                <td>Applique les règles d'accès obligatoires</td>
+                            </tr>
+                            <tr>
+                                <td><strong>OverlayFS</strong></td>
+                                <td>Gère le système de fichiers en couches</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>8. Ce que cela change pour la sécurité</h2>
+
+                <h3>a) Le noyau est partagé : surface d'attaque commune</h3>
+                <p>Si le noyau Linux a une faille (ex: <em>Dirty COW</em> CVE-2016-5195 ou CVE-2019-5736 sur <code>runc</code>), un conteneur peut potentiellement compromettre l'hôte entier.</p>
+
+                <h3>b) L'hôte voit tout</h3>
+                <p>Un administrateur <code>root</code> sur l'hôte peut lire la mémoire et les variables d'environnement de n'importe quel conteneur :</p>
+                <pre><code>sudo cat /proc/46727/environ | tr '\0' '\n'</code></pre>
+
+                <h3>c) Qui parle à Docker est root de fait</h3>
+                <p>Accéder au démon Docker ou au groupe <code>docker</code> équivaut à un accès <code>root</code> sur l'hôte.</p>
+
+                <h3>d) Le mode --privileged</h3>
+                <p>Ce mode désactive la majorité des protections du noyau et doit être évité.</p>
+            </section>
+
+            <section>
+                <h2>9. Idées fausses fréquentes</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Idée fausse</th>
+                                <th>Réalité</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>« Un conteneur est une petite VM »</td>
+                                <td>C'est un processus isolé de l'hôte.</td>
+                            </tr>
+                            <tr>
+                                <td>« Il y a un noyau par conteneur »</td>
+                                <td>Le noyau est unique et partagé avec l'hôte.</td>
+                            </tr>
+                            <tr>
+                                <td>« Ce qui est dedans est caché de l'hôte »</td>
+                                <td><code>root</code> sur l'hôte lit tout via <code>/proc</code>.</td>
+                            </tr>
+                            <tr>
+                                <td>« <code>root</code> du conteneur est inoffensif »</td>
+                                <td>Sans user namespaces, l'UID 0 du conteneur est l'UID 0 de l'hôte.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    Un conteneur n'est pas une boîte magique : c'est un processus Linux ordinaire configuré pour voir moins de choses et consommer des ressources contrôlées. Dans le prochain article, nous aborderons la première brique d'isolement : les <strong>namespaces</strong>.
+                </p>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

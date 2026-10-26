@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress HA Multi-AZ — Vue Synthétique — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR AU LAB</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../articles/index.html">ARTICLES</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Vue Synthétique -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">CLOUD / DEVOPS — HAUTE DISPONIBILITÉ</span>
+                <span class="meta-date">PROJET 4</span>
+            </div>
+            <h1>Garantir la continuité d'un site web face à la panne</h1>
+            <p class="pitch">
+                Présentation synthétique d'une architecture Cloud AWS résiliente : répartition de charge multi-AZ, auto-scaling et base de données répliquée sans point de défaillance unique.
+            </p>
+        </header>
+
+        <article>
+            <section>
+                <p>
+                    J'ai conçu, déployé et testé en conditions de panne réelle une infrastructure web hautement disponible sur AWS, hébergeant un site WordPress. Ce projet reproduit, à l'échelle d'un environnement cloud réel, l'architecture que l'on retrouve derrière la quasi-totalité des services en ligne qui ne peuvent pas se permettre d'interruption : répartition de charge entre plusieurs zones géographiques, base de données répliquée en continu, et remise en service automatique en cas de défaillance matérielle — sans intervention humaine.
+                </p>
+            </section>
+
+            <section>
+                <h2>1. Le problème que ce projet résout</h2>
+                <p>
+                    Une infrastructure hébergée sur un serveur unique a un point commun avec tous les systèmes fragiles : elle fonctionne parfaitement, jusqu'au jour où ce serveur unique tombe en panne. Pour une organisation, une telle panne ne se traduit pas seulement par un inconfort technique — elle se traduit directement par de l'indisponibilité commerciale, une perte de confiance client, et dans certains secteurs, des pénalités contractuelles liées à des engagements de disponibilité (SLA).
+                </p>
+                <p>La question à laquelle ce projet répond est directe :</p>
+                
+                <div class="highlight-card" style="margin: 1.5rem 0;">
+                    <p style="margin: 0; font-weight: 500; font-size: 1rem; color: var(--text);">
+                        <strong>Comment concevoir une infrastructure qui continue de servir ses utilisateurs même lorsqu'un serveur, voire une zone géographique entière de la région cloud, devient indisponible ?</strong>
+                    </p>
+                </div>
+                
+                <p>
+                    C'est exactement le principe qu'appliquent les plateformes capables de maintenir un taux de disponibilité proche de 99,9 % — pas en espérant qu'aucune panne ne survienne, mais en concevant l'infrastructure pour qu'une panne individuelle n'affecte jamais le service rendu à l'utilisateur final.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. Ce que j'ai construit</h2>
+                <p>
+                    J'ai déployé une infrastructure répartie sur deux zones de disponibilité distinctes (deux centres de données physiquement séparés au sein de la même région AWS), structurée autour de trois responsabilités cloisonnées :
+                </p>
+
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.75rem;">Composant</th>
+                                <th style="padding: 0.75rem;">Rôle</th>
+                                <th style="padding: 0.75rem;">Pourquoi c'est important</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Répartiteur de charge (ALB)</strong></td>
+                                <td style="padding: 0.75rem;">Seul point d'entrée public, distribue le trafic entre les serveurs disponibles.</td>
+                                <td style="padding: 0.75rem;">Aucun serveur individuel n'est directement exposé ni indispensable.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Serveurs applicatifs auto-réparables</strong></td>
+                                <td style="padding: 0.75rem;">Hébergent WordPress, répartis sur deux zones, remplacés automatiquement s'ils tombent.</td>
+                                <td style="padding: 0.75rem;">Une panne matérielle se répare seule, sans intervention humaine.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Base de données répliquée (RDS Multi-AZ)</strong></td>
+                                <td style="padding: 0.75rem;">Une copie active et une copie de secours synchronisée en temps réel, sur deux zones.</td>
+                                <td style="padding: 0.75rem;">Les données survivent à la perte d'une zone entière.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    L'ensemble repose sur une segmentation réseau stricte : les serveurs applicatifs et la base de données vivent dans des sous-réseaux privés, invisibles depuis Internet — seul le répartiteur de charge est exposé publiquement.
+                </p>
+            </section>
+
+            <section>
+                <h2>3. Pourquoi cette approche compte pour une organisation</h2>
+                <p>
+                    <strong>a) La disponibilité se traduit directement en chiffre d'affaires.</strong> Pour toute activité en ligne, chaque minute d'indisponibilité a un coût mesurable — ventes manquées, support client saturé, image de marque écornée. Une architecture qui élimine les points de défaillance uniques réduit ce risque à sa source.
+                </p>
+                <p>
+                    <strong>b) La réparation automatique réduit la charge opérationnelle.</strong> Sans cette architecture, une panne nocturne exige un réveil d'astreinte et un délai de rétablissement important. Avec l'auto-réparation mise en place, le système détecte la perte d'une instance et la remplace de lui-même.
+                </p>
+                <p>
+                    <strong>c) La croissance du trafic n'exige pas une refonte.</strong> La capacité de calcul s'ajuste automatiquement à la demande (de 2 à 4 serveurs actifs selon la charge), ce qui évite le sur-provisionnement coûteux en période calme et la saturation lors des pics d'affluence.
+                </p>
+                <p>
+                    <strong>d) La donnée est protégée indépendamment de l'application.</strong> La base de données étant répliquée sur une zone distincte, la perte d'une zone entière n'entraîne pas de perte de données.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. Compétences démontrées</h2>
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.75rem;">Domaine</th>
+                                <th style="padding: 0.75rem;">Ce que le projet illustre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Architecture cloud</strong></td>
+                                <td style="padding: 0.75rem;">Conception d'une infrastructure multi-zone sans point de défaillance unique, découpage réseau public/privé.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Haute disponibilité &amp; résilience</strong></td>
+                                <td style="padding: 0.75rem;">Load balancing, auto-scaling, réplication de base de données, validés par un test de panne réel.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Sécurité réseau cloud</strong></td>
+                                <td style="padding: 0.75rem;">Segmentation en sous-réseaux privés, filtrage par groupes de sécurité (Security Groups) avec le principe du moindre privilège.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Résolution d'incidents</strong></td>
+                                <td style="padding: 0.75rem;">Diagnostic et correction de quatre incidents réels rencontrés en cours de déploiement.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Rigueur de validation</strong></td>
+                                <td style="padding: 0.75rem;">Protocole de test de panne documenté (« Build &amp; Break »), avec résultats mesurés.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>5. Validation du projet (Test de panne)</h2>
+                <p>
+                    Plutôt que de supposer que l'infrastructure tiendrait en cas de panne, j'ai provoqué une panne réelle pour le vérifier : suppression manuelle et volontaire d'un serveur actif pendant que le site était sollicité.
+                </p>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0;">
+                    <div style="padding: 0.85rem 1.1rem; background: var(--card-bg, rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: var(--radius-md);">
+                        <span style="color: #10b981; font-weight: bold; margin-right: 0.5rem;">✓</span>
+                        <span>Le site est resté continuellement accessible pendant l'incident, sans erreur visible pour l'utilisateur final.</span>
+                    </div>
+                    <div style="padding: 0.85rem 1.1rem; background: var(--card-bg, rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: var(--radius-md);">
+                        <span style="color: #10b981; font-weight: bold; margin-right: 0.5rem;">✓</span>
+                        <span>Le système a détecté l'écart de capacité en quelques secondes.</span>
+                    </div>
+                    <div style="padding: 0.85rem 1.1rem; background: var(--card-bg, rgba(255,255,255,0.02)); border: 1px solid var(--border); border-radius: var(--radius-md);">
+                        <span style="color: #10b981; font-weight: bold; margin-right: 0.5rem;">✓</span>
+                        <span>Un serveur de remplacement a été relancé automatiquement et intégré au service en moins de deux minutes.</span>
+                    </div>
+                </div>
+
+                <p>
+                    C'est cette preuve empirique — et non une simple affirmation sur le papier — qui distingue une architecture réellement résiliente d'une architecture seulement supposée l'être.
+                </p>
+            </section>
+
+            <section>
+                <h2>6. Prochaines étapes envisagées</h2>
+                <ul>
+                    <li>Chiffrement de bout en bout (HTTPS) avec un certificat TLS/SSL géré automatiquement devant le répartiteur de charge.</li>
+                    <li>Mise en cache et distribution de contenu via un CDN (Amazon CloudFront) pour réduire la latence.</li>
+                    <li>Ajout d'un pare-feu applicatif (AWS WAF) devant le répartiteur de charge pour filtrer les requêtes malveillantes.</li>
+                    <li>Industrialisation complète du déploiement par Infrastructure as Code (Terraform) pour rendre cette architecture reproductible en quelques secondes.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    Ce projet démontre une capacité à concevoir une infrastructure pour l'échec plutôt que pour le cas idéal, et à prouver sa résilience par un test réel. C'est exactement la différence entre une architecture qui a l'air robuste sur un schéma, et une architecture dont la robustesse a été mesurée et éprouvée.
+                </p>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Bootcamp AWS CloudOps Essentials — Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

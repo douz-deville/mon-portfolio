@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cycle de vie d'un token JWT — signature, validation et confiance dans le temps — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; PROTOCOLES DE SÉCURITÉ</span>
+                <span class="meta-date">Publié le 1 Août 2026</span>
+            </div>
+            <h1>Cycle de vie d'un token JWT — signature, validation et confiance dans le temps</h1>
+            <p class="pitch">
+                Comprendre la mécanique interne de vérification des jetons JSON Web Tokens, du JWKS à la rotation des clés et à la gestion de l'expiration.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">JWT</span>
+                <span class="tag">OAuth2</span>
+                <span class="tag">Zero Trust</span>
+            </div>
+        </header>
+
+        <!-- Figure / Image d'illustration (Profondeur Niveau 2) -->
+        <figure class="article-image-container" style="margin: 2.5rem 0; text-align: center;">
+            <img src="../../images/connexion_idp_tokens.png" alt="Cycle de vie d'un token JWT, validation JWKS et rotation des clés" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted); font-style: italic;">Séquence de validation locale d'un JWT à l'aide de l'endpoint JWKS de l'Identity Provider</figcaption>
+        </figure>
+
+        <article>
+            <section>
+                <h2>Le contexte, en une phrase</h2>
+                <p>
+                    Dans une architecture d'identité déléguée — décrite plus en détail dans <a href="../idp-zero-trust/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a> — une application ne vérifie plus un mot de passe, elle vérifie un token émis par un Identity Provider. Cette approche résout le problème de la confiance entre systèmes, mais elle en ouvre un autre, tout aussi important : comment cette confiance se maintient-elle après l'authentification initiale, pendant toute la durée où le token reste utilisable ?
+                </p>
+            </section>
+
+            <section>
+                <h2>D'où vient la clé publique, concrètement</h2>
+                <p>
+                    Dire qu'une application "vérifie la signature avec la clé publique de l'IdP" élude une question pratique : comment l'application obtient-elle cette clé, et comment sait-elle laquelle utiliser si l'IdP en possède plusieurs ?
+                </p>
+                <p>
+                    La réponse tient dans un endpoint standardisé, le <strong>JWKS</strong> (JSON Web Key Set), généralement exposé par l'IdP à une URL prévisible comme <code>/realms/&lt;realm&gt;/protocol/openid-connect/certs</code> chez Keycloak, ou plus généralement découvrable via le document de configuration OpenID Connect (<code>/.well-known/openid-configuration</code>). Ce document JSON liste l'ensemble des clés publiques actuellement valides, chacune associée à un identifiant unique, le <code>kid</code> (key ID).
+                </p>
+                <p>
+                    C'est ce <code>kid</code> qui fait le lien entre un token précis et la bonne clé : l'en-tête du JWT contient lui-même un champ <code>kid</code>, qui indique quelle clé du JWKS utiliser pour vérifier sa signature. L'application n'a donc pas besoin de connaître à l'avance une clé fixe — elle interroge le JWKS (ou consulte un cache local qu'elle rafraîchit périodiquement), retrouve la clé correspondant au <code>kid</code> du token reçu, et vérifie la signature avec.
+                </p>
+                <p>
+                    Cette indirection a une raison d'être précise : la <strong>rotation des clés</strong>. Un IdP change régulièrement sa paire de clés de signature, pour limiter la fenêtre d'exposition si une clé privée venait à être compromise. Pendant une période de transition, le JWKS expose simultanément l'ancienne et la nouvelle clé publique, le temps que tous les tokens signés avec l'ancienne clé expirent naturellement. Sans le mécanisme <code>kid</code> + JWKS, chaque rotation de clé casserait la vérification de tous les tokens en circulation au moment du changement.
+                </p>
+            </section>
+
+            <section>
+                <h2>Vérifier un jeton : deux contrôles, pas un seul</h2>
+                <p>
+                    Une fois la bonne clé publique récupérée, vérifier un JWT reste malgré tout une opération en deux temps distincts, pas une vérification unique.
+                </p>
+                <p>
+                    <strong>D'abord, la vérification de signature</strong>, avec la clé retrouvée via le <code>kid</code>. C'est un calcul cryptographique binaire : la signature est valide, ou elle ne l'est pas. Ce contrôle garantit que le token vient bien de l'Identity Provider et qu'il n'a pas été modifié depuis son émission.
+                </p>
+                <p>
+                    <strong>Ensuite, seulement si la signature est valide, la validation des claims.</strong> Cette étape regarde le contenu du payload :
+                </p>
+                <ul>
+                    <li><code>exp</code> (expiration) — le token n'est plus accepté après cette date,</li>
+                    <li><code>nbf</code> (not before) — le token n'est pas encore valide avant cette date, utile pour des jetons pré-émis à activer plus tard,</li>
+                    <li><code>iat</code> (issued at) — sert notamment à détecter des tokens anormalement anciens ou à appliquer une tolérance de dérive d'horloge (clock skew) entre serveurs,</li>
+                    <li><code>aud</code> (audience) — l'application ou l'API à laquelle le token est destiné,</li>
+                    <li><code>iss</code> (issuer) — l'IdP qui a émis le token, à recouper avec celui attendu.</li>
+                </ul>
+                <p>
+                    <strong>Pourquoi cette distinction compte :</strong> un token peut avoir une signature parfaitement authentique — donc légitimement émis par l'IdP, non modifié — tout en étant expiré, ou destiné à une autre application. Un token dont l'audience n'est pas vérifiée peut être accepté par une application à laquelle il n'était pas destiné, alors même que sa signature est irréprochable. C'est une faille réelle et fréquente, indépendante de la robustesse cryptographique de la signature elle-même. Une application doit implémenter les deux contrôles, explicitement, l'un et l'autre.
+                </p>
+                <p>
+                    Et surtout : toute cette vérification — récupération de la clé via le <code>kid</code>, signature, claims — se fait localement, sans appeler l'Identity Provider à chaque requête. C'est ce qui rend ces architectures performantes et scalables.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le compromis que ce modèle introduit</h2>
+                <p>
+                    Cette absence d'appel systématique à l'IdP a un revers. Si l'application fait confiance à un token uniquement sur la base d'une vérification locale, que se passe-t-il si ce token est compromis avant son expiration ?
+                </p>
+                <p>
+                    Contrairement à une session serveur classique, où révoquer l'accès signifie simplement supprimer une entrée côté serveur, un JWT ne dépend d'aucun état côté serveur — sa validité repose uniquement sur sa signature et ses claims. On ne peut pas, à proprement parler, "supprimer" un jeton déjà émis : il reste cryptographiquement valide jusqu'à son expiration, quoi qu'il arrive.
+                </p>
+                <p>
+                    C'est ce compromis précis qui structure le reste de l'architecture — durée de vie des tokens, mécanisme de renouvellement, et éventuellement révocation.
+                </p>
+            </section>
+
+            <section>
+                <h2>Durée de vie courte et renouvellement</h2>
+                <p>
+                    La parade la plus courante à ce problème n'est pas d'empêcher la compromission, mais d'en limiter la fenêtre d'exploitation : l'Access Token a une durée de vie volontairement courte, typiquement de l'ordre de quelques minutes. Un token compromis n'est donc exploitable que pendant cette fenêtre réduite, pas indéfiniment.
+                </p>
+                <p>
+                    Le problème évident d'une durée de vie aussi courte est qu'elle obligerait l'utilisateur à se réauthentifier en permanence. C'est là qu'intervient le <strong>Refresh Token</strong> : un jeton séparé, à durée de vie beaucoup plus longue, dont le seul rôle est d'obtenir un nouvel Access Token auprès de l'IdP sans redemander les identifiants de l'utilisateur.
+                </p>
+                <p>
+                    Ce second jeton déplace le problème plutôt que de le résoudre entièrement : si un Access Token compromis n'est exploitable que quelques minutes, un Refresh Token compromis, lui, permettrait d'obtenir indéfiniment de nouveaux Access Tokens. Deux mécanismes limitent ce risque :
+                </p>
+                <ul>
+                    <li>le Refresh Token est stocké et transmis dans des conditions plus strictes que l'Access Token (jamais exposé côté client dans un contexte web classique, par exemple),</li>
+                    <li>la <strong>rotation des Refresh Tokens</strong> : à chaque utilisation, l'IdP invalide l'ancien Refresh Token et en émet un nouveau. Si un Refresh Token déjà utilisé est présenté une seconde fois, c'est un signal fort de vol — l'IdP peut alors révoquer immédiatement toute la chaîne de tokens associée à cette session.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Révoquer avant l'expiration, quand c'est nécessaire</h2>
+                <p>
+                    Pour les cas où attendre l'expiration naturelle d'un Access Token n'est pas acceptable — une session utilisateur compromise détectée en temps réel, un employé dont l'accès doit être coupé immédiatement — certaines architectures réintroduisent un point de contact avec l'IdP : un <strong>endpoint d'introspection</strong> (RFC 7662), que l'application interroge pour confirmer qu'un token est toujours valide, ou un <strong>endpoint de révocation</strong> (RFC 7009), que l'IdP utilise pour invalider un token avant son terme.
+                </p>
+                <p>
+                    Le coût de cette option est direct : elle réintroduit, au moins partiellement, l'aller-retour réseau vers l'IdP que la vérification locale par signature permettait justement d'éviter. Il n'existe pas de solution qui cumule performance maximale et révocation immédiate sans contrepartie — chaque architecture choisit un point d'équilibre entre les deux, généralement en réservant l'introspection aux opérations les plus sensibles plutôt qu'à chaque requête.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Dans mon lab personnel, l'API Flask récupère les clés publiques de Keycloak via son endpoint JWKS et valide la signature ainsi que les claims d'un JWT à chaque requête entrante — sans jamais accorder de confiance implicite au fait que la requête provienne du réseau interne.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Voir la mise en œuvre pratique de cette validation de tokens et de la gestion du JWKS dans mon laboratoire.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

@@ -4,320 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Christian Agbogan | Architecture & Sécurité des Systèmes d'Information</title>
-    <style>
-        :root {
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --border: #e2e8f0;
-            --text-title: #0f172a;
-            --text-body: #334155;
-            --text-light: #64748b;
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-body);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            padding: 4rem 1.5rem;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        /* En-tête : focus sur la posture */
-        header {
-            margin-bottom: 4rem;
-        }
-
-        h1 {
-            font-size: 2.2rem;
-            color: var(--text-title);
-            font-weight: 700;
-            letter-spacing: -0.02em;
-        }
-
-        .subtitle {
-            color: var(--primary);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .pitch {
-            font-size: 1.15rem;
-            color: var(--text-body);
-            margin: 2rem 0;
-            line-height: 1.7;
-            font-weight: 400;
-        }
-
-        .meta-info {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            display: flex;
-            justify-content: space-between; /* Pousse les éléments aux extrémités de la ligne */
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            padding: 1.2rem 0;
-            margin-top: 2rem;
-        }
-
-        .meta-info a {
-            color: var(--text-body);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.15s;
-        }
-
-        .meta-info a:hover {
-            color: var(--primary);
-        }
-
-        .meta-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-body);
-            text-decoration: none;
-            transition: color 0.15s ease;
-        }
-
-        a.meta-item:hover {
-            color: var(--primary);
-        }
-
-        .meta-item svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-            flex-shrink: 0;
-        }
-
-        /* Philosophie de conception */
-        h2 {
-            font-size: 1.25rem;
-            color: var(--text-title);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 1.5rem;
-        }
-
-        section {
-            margin-bottom: 4rem;
-        }
-
-        .philosophy-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 640px) {
-            .philosophy-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .philosophy-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
-        }
-
-        .philosophy-card h3 {
-            font-size: 1.05rem;
-            color: var(--text-title);
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .philosophy-card p {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* Études de cas (Projets) */
-        .case-studies {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .case-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .case-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .case-tag {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--primary);
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .case-title {
-            font-size: 1.3rem;
-            color: var(--text-title);
-            font-weight: 600;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 1rem;
-        }
-
-        .case-desc {
-            font-size: 0.95rem;
-            color: var(--text-body);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .case-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .tech-stack {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            font-family: monospace;
-        }
-
-        .btn-link {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .btn-link:hover {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
-
-        footer {
-            margin-top: 6rem;
-            border-top: 1px solid var(--border);
-            padding-top: 2rem;
-            text-align: center;
-            color: var(--text-light);
-            font-size: 0.85rem;
-        }
-
-
-        /* Style pour la section de présentation rapide */
-        .about-teaser-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.01);
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .about-teaser-card p {
-            font-size: 1.05rem;
-            color: var(--text-body);
-            line-height: 1.7;
-            margin: 0;
-        }
-
-        .about-teaser-card .btn-link {
-            align-self: flex-start;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .view-all-card {
-            background: transparent;
-            border: 1px dashed var(--border);
-            border-radius: 8px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.15s, background 0.15s;
-        }
-
-        .view-all-card:hover {
-            border-color: var(--primary);
-            background: var(--bg-card);
-        }
-
-        .view-all-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: color 0.15s;
-        }
-
-        .view-all-card:hover .view-all-link {
-            color: var(--primary);
-        }
-
-        .view-all-link svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
-            transition: transform 0.15s;
-        }
-
-        .view-all-card:hover .view-all-link svg {
-            transform: translateX(3px);
-        }
-
-        
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
         
-        <!-- En-tête : Présentation de ta démarche -->
+        <!-- En-tête : Présentation de la démarche -->
         <header>
-            <h1>AGBOGAN Kossi Christian Daniel Esuté</h1>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <h1>AGBOGAN Kossi Christian Daniel Esuté</h1>
+                <!-- Bouton Theme Switcher -->
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+            
             <div class="subtitle">Sécurité des Systèmes d'Information & Infrastructure</div>
 
             <p class="pitch">
@@ -327,7 +29,7 @@
             <div class="meta-info">
                 <!-- Localisation -->
                 <span class="meta-item">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5-2.5z"/></svg>
                     Dakar, Sénégal
                 </span>
 
@@ -343,8 +45,8 @@
                     GitHub
                 </a>
 
-                <!-- Contact / Mail -->
-                <a href="mailto:kossi-christian.agbogan@ism.edu.sn" class="meta-item">
+                <!-- Contact / Mail avec Copie Automatique via JS -->
+                <a href="#" data-email="kossi-christian.agbogan@ism.edu.sn" class="meta-item">
                     <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                     Me contacter
                 </a>
@@ -363,13 +65,13 @@
             </div>
         </section>
 
-        <!-- Philosophie de conception (Remplace la liste brute de compétences) -->
+        <!-- Principes de conception -->
         <section>
             <h2>Principes de Conception</h2>
             <div class="philosophy-grid">
                 
                 <div class="philosophy-card">
-                    <h3>Gouvernance & Alignement</h3>
+                    <h3>Gouvernance &amp; Alignement</h3>
                     <p>Traduire l'analyse de risque opérationnelle en politiques de sécurité concrètes. Chaque décision technique s'appuie sur une modélisation préalable de la menace.</p>
                 </div>
 
@@ -391,26 +93,35 @@
             </div>
         </section>
 
-        <!-- Section Labs (anciennement "Études de cas") -->
+        <!-- Section Labs -->
         <section>
             <h2>Labs</h2>
+            
+            <!-- Barre de filtres dynamiques JS pour les Labs -->
+            <div class="filter-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="active-directory">Active Directory</button>
+                <button class="filter-btn" data-filter="iam-zero-trust">IAM / Zero Trust</button>
+                <button class="filter-btn" data-filter="cloud-aws">AWS / Cloud</button>
+            </div>
+
             <div class="case-studies">
 
-                <div class="case-card">
-                    <span class="case-tag">Architecture Réseau & Identité</span>
-                    <a href="labs/projet-1-initium/index.html" class="case-title">Projet INITIUM : Refonte et durcissement d'une infrastructure hospitalière</a>
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Architecture Réseau &amp; Identité</span>
+                    <a href="labs/posts/projet-1-initium/overview.html" class="case-title">Projet INITIUM : Refonte et durcissement d'une infrastructure hospitalière</a>
                     <p class="case-desc">
                         À la suite d'un audit révélant des vulnérabilités critiques, ce projet détaille la restructuration globale d'un système d'information de santé. L'intervention se concentre sur l'étanchéité réseau par segmentation dynamique et sur l'implémentation d'une politique d'identité rigoureuse pour isoler les équipements médicaux sensibles.
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">pfSense / Active Directory / VLAN / GPO</span>
-                        <a href="labs/projet-1-initium/index.html" class="btn-link">Consulter l'architecture →</a>
+                        <a href="labs/posts/projet-1-initium/overview.html" class="btn-link">Consulter l'architecture →</a>
                     </div>
                 </div>
 
-                <div class="case-card">
+                <div class="case-card" data-category="iam-zero-trust">
                     <span class="case-tag">Gestion des Accès (IAM)</span>
-                    <span class="case-title" style="color: var(--text-title);">Fédération d'identité souveraine et authentification unifiée</span>
+                    <span class="case-title">Fédération d'identité souveraine et authentification unifiée</span>
                     <p class="case-desc">
                         Conception d'une infrastructure d'identité centralisée et sécurisée hors cloud. Ce travail technique explore l'interconnexion de protocoles d'annuaire d'entreprise avec des solutions de fédération SSO pour garantir un contrôle d'accès granulaire et chiffré sur l'ensemble des applicatifs.
                     </p>
@@ -420,15 +131,27 @@
                     </div>
                 </div>
 
-                <div class="case-card">
-                    <span class="case-tag">Zero Trust & Sécurité Applicative</span>
-                    <a href="labs/LAB-ZT-IAM-01/index.html" class="case-title">LAB-ZT-IAM-01 : Architecture Zero Trust appliquée à une API protégée</a>
+                <div class="case-card" data-category="iam-zero-trust">
+                    <span class="case-tag">Zero Trust &amp; Sécurité Applicative</span>
+                    <a href="labs/posts/LAB-ZT-IAM-01/overview.html" class="case-title">LAB-ZT-IAM-01 : Architecture Zero Trust appliquée à une API protégée</a>
                     <p class="case-desc">
                         Ce laboratoire personnel reproduit, à l'échelle d'une infrastructure à trois niveaux, le modèle Zero Trust adopté par les organisations les plus exposées au numérique. Le projet couvre la mise en place d'un point d'entrée réseau unique, la centralisation de la gestion des identités, et la validation cryptographique systématique de chaque requête au niveau applicatif — sans jamais accorder de confiance implicite au réseau interne.
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">Keycloak / Nginx / Flask / KVM-libvirt / JWT-OIDC</span>
-                        <a href="labs/LAB-ZT-IAM-01/index.html" class="btn-link">Consulter l'architecture →</a>
+                        <a href="labs/posts/LAB-ZT-IAM-01/overview.html" class="btn-link">Consulter l'architecture →</a>
+                    </div>
+                </div>
+
+                <div class="case-card" data-category="cloud-aws">
+                    <span class="case-tag">Cloud &amp; Haute Disponibilité</span>
+                    <a href="labs/posts/projet-4-wordpress-ha-aws/overview.html" class="case-title">Projet WordPress HA : une infrastructure AWS multi-zone qui se répare seule</a>
+                    <p class="case-desc">
+                        Déploiement d'une infrastructure WordPress répartie sur deux zones de disponibilité : répartiteur de charge, serveurs applicatifs auto-réparables et base de données répliquée en continu. La résilience n'est pas supposée mais prouvée, par un test de panne réel consistant à supprimer volontairement un serveur en production.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">AWS / EC2 / RDS Multi-AZ / ALB / Auto Scaling</span>
+                        <a href="labs/posts/projet-4-wordpress-ha-aws/overview.html" class="btn-link">Consulter l'architecture →</a>
                     </div>
                 </div>
 
@@ -442,32 +165,66 @@
             </div>
         </section>
 
-        <!-- Nouvelle section Articles -->
+        <!-- Section Articles -->
         <section>
             <h2>Articles</h2>
+
+            <!-- Barre de filtres dynamiques JS pour les Articles -->
+            <div class="filter-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="active-directory">Active Directory</button>
+                <button class="filter-btn" data-filter="container-security">Container Security</button>
+                <button class="filter-btn" data-filter="fondamentaux">Fondamentaux</button>
+                <button class="filter-btn" data-filter="iam-zero-trust">IAM / Zero Trust</button>
+            </div>
+
             <div class="case-studies">
 
-                <div class="case-card">
+                <div class="case-card" data-category="iam-zero-trust">
                     <span class="case-tag">IAM · Zero Trust · Keycloak</span>
-                    <a href="articles/idp-zero-trust/index.html" class="case-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a>
+                    <a href="articles/posts/idp-zero-trust.html" class="case-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a>
                     <p class="case-desc">
                         Comment un Identity Provider comme Keycloak devient le point central de confiance numérique, et pourquoi la vraie question n'est pas « qui es-tu » mais « comment le prouves-tu, et comment je continue à vérifier ».
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">Réflexion technique</span>
-                        <a href="articles/idp-zero-trust/index.html" class="btn-link">Lire l'article →</a>
+                        <a href="articles/posts/idp-zero-trust.html" class="btn-link">Lire l'article →</a>
                     </div>
                 </div>
 
-                <div class="case-card">
+                <div class="case-card" data-category="iam-zero-trust">
                     <span class="case-tag">JWT · OAuth2 · Zero Trust</span>
-                    <a href="articles/jwt-token-lifecycle/index.html" class="case-title">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</a>
+                    <a href="articles/posts/jwt-token-lifecycle.html" class="case-title">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</a>
                     <p class="case-desc">
-                                            Vérifier la signature d'un token ne suffit pas à le valider entièrement. Entre durée de vie courte, renouvellement et révocation, comment une architecture par jetons gère-t-elle la confiance après l'authentification initiale ?
+                        Vérifier la signature d'un token ne suffit pas à le valider entièrement. Entre durée de vie courte, renouvellement et révocation, comment une architecture par jetons gère-t-elle la confiance après l'authentification initiale ?
                     </p>
                     <div class="case-meta">
                         <span class="tech-stack">Réflexion technique</span>
-                        <a href="articles/jwt-token-lifecycle/index.html" class="btn-link">Lire l'article →</a>
+                        <a href="articles/posts/jwt-token-lifecycle.html" class="btn-link">Lire l'article →</a>
+                    </div>
+                </div>
+
+                <div class="case-card" data-category="container-security">
+                    <span class="case-tag">Container Security · Linux</span>
+                    <a href="articles/posts/containers-are-just-processes.html" class="case-title">Les conteneurs ne sont que des processus</a>
+                    <p class="case-desc">
+                        Comprendre la réalité technique d'un conteneur Linux : un processus ordinaire de l'hôte isolé par des namespaces, cgroups et capabilities.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">Container Security — Partie 1</span>
+                        <a href="articles/posts/containers-are-just-processes.html" class="btn-link">Lire l'article →</a>
+                    </div>
+                </div>
+
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · Sécurité</span>
+                    <a href="articles/posts/windows-laps.html" class="case-title">Windows LAPS : un mot de passe différent pour chaque ordinateur</a>
+                    <p class="case-desc">
+                        Mise en place et architecture de Windows LAPS pour éliminer la réutilisation des mots de passe administrateur local et contrecarrer les attaques Pass-the-Hash.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">Active Directory &amp; GPO</span>
+                        <a href="articles/posts/windows-laps.html" class="btn-link">Lire l'article →</a>
                     </div>
                 </div>
 
@@ -488,5 +245,7 @@
 
     </div>
 
+    <!-- Script JS unique (script.js à la racine) -->
+    <script src="script.js" defer></script>
 </body>
 </html>

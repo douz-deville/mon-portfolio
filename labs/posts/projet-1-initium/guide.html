@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INITIUM — Guide Technique Pas-à-Pas — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR AU LAB</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../articles/index.html">ARTICLES</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête du Rapport -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">RAPPORT D'INGÉNIERIE &amp; GUIDE TECHNIQUE</span>
+                <span class="meta-date">Mis à jour le 16 Juillet 2026</span>
+            </div>
+            <h1>INITIUM – Durcissement du Socle Réseau &amp; Identité (Phase 1)</h1>
+            <p class="pitch">Guide d'implémentation complet pas-à-pas : segmentation réseau VLAN, pare-feu pfSense, annuaire Active Directory et politiques de sécurité.</p>
+            
+            <div class="document-details" style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.5rem; padding: 1rem; background: var(--card-bg, rgba(255,255,255,0.03)); border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.9rem;">
+                <div class="detail-item"><strong>Auteur :</strong> AGBOGAN Kossi Christian Daniel Esuté</div>
+                <div class="detail-item"><strong>Organisation :</strong> CHR HEALTH-CENTER (ESIV)</div>
+                <div class="detail-item"><strong>Version :</strong> 1.1</div>
+            </div>
+        </header>
+
+        <article>
+            <section>
+                <h2>1. Contexte, Menaces &amp; Objectifs</h2>
+                <p>À la suite d’un audit de sécurité, le Centre Hospitalier Régional HEALTH-CENTER a révélé des vulnérabilités structurelles majeures : absence de segmentation (réseau "plat"), présence de systèmes d'exploitation obsolètes non isolés, défaut de contrôle des accès administratifs et absence de traçabilité.</p>
+                <p>Le projet INITIUM pose les fondations d'un socle réseau et d'identité étanche et résilient. L'objectif est d'appliquer le principe du moindre privilège au niveau des flux et de l'annuaire avant l'intégration ultérieure d'outils de détection avancés.</p>
+
+                <h3>1.1 Projet 1 : "INITIUM – Durcissement du Socle Réseau &amp; Identité"</h3>
+                <p>Cette première phase pose les fondations indispensables de la nouvelle infrastructure. Aucun outil de supervision ou de détection avancée n'est déployé à ce stade : on se concentre sur l'étanchéité et le contrôle des accès.</p>
+
+                <h3>1.2 Objectifs et Compétences Techniques</h3>
+                <ul>
+                    <li><strong>Sécurité Périmétrique et Routage Contrôlé :</strong> Segmenter un réseau plat par le déploiement d'un pare-feu open source (pfSense) et la configuration de réseaux virtuels (VLANs) étanches.</li>
+                    <li><strong>Application du Principe du Moindre Privilège :</strong> Concevoir, documenter et appliquer une matrice de flux inter-VLAN stricte (blocage par défaut, autorisation exclusive de l'existant légitime).</li>
+                    <li><strong>Centralisation et Durcissement de la Gestion des Identités (IAM) :</strong> Déployer un annuaire d'entreprise (Active Directory) sain, structuré par rôles métiers, et y appliquer des stratégies de sécurité restrictives via GPO (Group Policy Objects).</li>
+                    <li><strong>Prise en compte des contraintes sectorielles (Santé) :</strong> Isoler concrètement le segment Biomédical sensible contenant des protocoles non chiffrés (DICOM/HL7), une problématique propre aux architectures hospitalières.</li>
+                </ul>
+
+                <pre class="ascii-art" style="margin: 2rem 0; overflow-x: auto; background: var(--card-bg, rgba(255,255,255,0.02)); padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.2;">
+                  ┌──────────────────────────────────────────────┐
+                  │                INTERNET (WAN)                │
+                  └───────────────────────┬──────────────────────┘
+                                          │ (vtnet0 - DHCP)
+                                          ▼
+                                   [ pfSense-FW ] (IP Admin: WAN / HTTPS 443)
+                                          │ (vtnet1 - Trunk)
+                                          ▼
+                                  [ Hosp-SW-01 ] (vIOS-L2)
+                                          │
+        ┌────────────────────┬────────────┴────────┬────────────────────┐
+        │ (Gi0/2 - Access)   │ (Access)            │ (Access)           │ (Gi0/1 - Access)
+        ▼                    ▼                     ▼                    ▼
+   VLAN 30              VLAN 10               VLAN 50              VLAN 60
+ [ Hosp-CL-01 ]       [ MEDIC Void ]       [ Hosp-BIO-01 ]      [ Hosp-AD-01 ]
+ (ADMIN Subnet)       (MEDIC Subnet)       (BIOMED Subnet)      (SERVERS Subnet)
+                </pre>
+            </section>
+
+            <section>
+                <h2>2. Conception Logique (Cible Réseau)</h2>
+                
+                <h3>2.1 Ajustement du Plan d'Adressage</h3>
+                <p>Pour la Phase 1, un plan d'adressage uniforme en /24 a été retenu pour l'ensemble des segments afin de valider fonctionnellement le routage et les mécanismes d'annuaire. L'implémentation de sous-réseaux plus restreints (/28, /27, /26) est reportée à la partie 2 du projet.</p>
+                
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.5rem;">VLAN</th>
+                                <th style="padding: 0.5rem;">Nom du Segment</th>
+                                <th style="padding: 0.5rem;">Bloc IP (CIDR)</th>
+                                <th style="padding: 0.5rem;">Plage d'Adresses</th>
+                                <th style="padding: 0.5rem;">Passerelle (pfSense)</th>
+                                <th style="padding: 0.5rem;">Usage final cible</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>10</strong></td>
+                                <td style="padding: 0.5rem;">MEDIC</td>
+                                <td style="padding: 0.5rem;">10.0.10.0/24</td>
+                                <td style="padding: 0.5rem;">10.0.10.1 - 10.0.10.253</td>
+                                <td style="padding: 0.5rem;">10.0.10.254</td>
+                                <td style="padding: 0.5rem;">Équipements de soin / Clinique (Vide en Phase 1)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>30</strong></td>
+                                <td style="padding: 0.5rem;">ADMIN</td>
+                                <td style="padding: 0.5rem;">10.0.30.0/24</td>
+                                <td style="padding: 0.5rem;">10.0.30.1 - 10.0.30.253</td>
+                                <td style="padding: 0.5rem;">10.0.30.254</td>
+                                <td style="padding: 0.5rem;">Postes administratifs et d'administration</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>50</strong></td>
+                                <td style="padding: 0.5rem;">BIOMED</td>
+                                <td style="padding: 0.5rem;">10.0.50.0/24</td>
+                                <td style="padding: 0.5rem;">10.0.50.1 - 10.0.50.253</td>
+                                <td style="padding: 0.5rem;">10.0.50.254</td>
+                                <td style="padding: 0.5rem;">Dispositifs médicaux critiques (PACS/IRM)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>60</strong></td>
+                                <td style="padding: 0.5rem;">SERVERS</td>
+                                <td style="padding: 0.5rem;">10.0.60.0/24</td>
+                                <td style="padding: 0.5rem;">10.0.60.1 - 10.0.60.253</td>
+                                <td style="padding: 0.5rem;">10.0.60.254</td>
+                                <td style="padding: 0.5rem;">Contrôleurs de domaine, DNS, futurs serveurs SecOps</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>2.2 Périmètre Technique du Projet 1 (Sur EVE-NG)</h3>
+                <p>Pour valider techniquement ce socle sans surcharger les ressources physiques, le laboratoire se limitera aux briques suivantes :</p>
+                
+                <h4>Sécurité Périmétrique :</h4>
+                <ul>
+                    <li>1x Instance pfSense unique (la Haute Disponibilité CARP sera traitée au Projet 2).</li>
+                    <li>4x VLANs ciblés au lieu du modèle global.</li>
+                </ul>
+
+                <h4>Gestion de l'Identité &amp; Systèmes :</h4>
+                <ul>
+                    <li><strong>1x Contrôleur de Domaine (Windows Server 2022) :</strong> Rôle AD DS pour le domaine <code>health-center.com</code>. Création des Unités Organisationnelles (OU) médicales et administratives.</li>
+                    <li><strong>GPO de durcissement initial :</strong> Stratégie de mots de passe forte, verrouillage automatique de session, blocage des périphériques de stockage amovibles (USB).</li>
+                    <li><strong>1x Poste Client (Windows 10/11) :</strong> Placé dans le VLAN ADMIN, intégré au domaine, servant de témoin pour valider la descente des GPO et le routage.</li>
+                    <li><strong>1x Équipement Biomédical Virtuel (Linux léger) :</strong> Placé dans le VLAN 50 pour valider l'étanchéité du réseau biomédical.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>3. Étape 1 : Création du point d'accès externe (Cloud0)</h2>
+                <p>Avant de poser la moindre machine, nous devons créer la porte d'entrée qui relie le laboratoire au monde extérieur. Dans EVE-NG, cela se matérialise par un réseau de type "Nuage".</p>
+
+                <ol>
+                    <li>Faisons un clic droit sur le quadrillage blanc d'EVE-NG ➜ Sélectionnons <strong>Network</strong>.</li>
+                    <li>Dans la fenêtre de configuration qui s'ouvre :
+                        <ul>
+                            <li><strong>Name/Prefix :</strong> Effaçons le texte par défaut et tapons <code>WAN_Internet</code>.</li>
+                            <li><strong>Type :</strong> Choisir impérativement <code>Management(Cloud0)</code> dans le menu déroulant.</li>
+                        </ul>
+                    </li>
+                    <li>Clique sur <strong>Save</strong>.</li>
+                </ol>
+
+                <p><strong>Pourquoi fait-on cela ?</strong><br>
+                Ce nuage <code>Management(Cloud0)</code> est directement relié à la première carte réseau (eth0) de EVE-NG, celle que nous avons configurée en mode NAT dans Virt-Manager. C'est ce nœud qui va accomplir deux rôles critiques : donner un accès Internet au pare-feu pour ses futures mises à jour, et permettre d'ouvrir l'interface graphique du pfSense depuis le navigateur du PC hôte.</p>
+            </section>
+
+            <section>
+                <h2>4. Étape 2 : Déploiement du nœud pfSense et câblage</h2>
+                <p>Maintenant que la porte de sortie existe, nous installons le pare-feu périmétrique.</p>
+
+                <ol>
+                    <li><strong>Ajout du Node :</strong> Faire un clic droit sur le quadrillage ➜ <strong>Node</strong> ➜ Sélectionner <strong>pfSense</strong>. Laisser les paramètres par défaut (2 interfaces, RAM à 1024 ou 2048 MB) mais passer de 'telnet' à 'vnc' et cliquer sur <strong>Save</strong>.</li>
+                    <li><strong>Câblage de la patte Internet :</strong> Survoler le pfSense pour attraper l'icône de prise orange, puis glisser le câble vers le nuage <code>WAN_Internet</code>. Dans la fenêtre qui s'ouvre, choisir impérativement l'interface <strong>em0</strong> du côté pfSense, et <strong>Cloud0</strong> du côté du nuage. Valider.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>5. Étape 3 : Initialisation dans la console pfSense</h2>
+                <p>Allumer le pfSense en faisant un double-clic dessus et ouvrir sa console textuelle. Laisser le système charger jusqu'à ce qu'il pose les questions d'attribution des cartes.</p>
+                <p>Voici la configuration exacte à saisir :</p>
+
+                <ul>
+                    <li><strong>Should VLANs be set up now [y|n]?</strong> Répondre <strong>n</strong> (Non). Nous allons créer les VLANs proprement depuis l'interface web, ce sera beaucoup plus simple et visuel pour la suite.</li>
+                    <li><strong>Enter the WAN interface name :</strong> Taper <strong>vtnet0</strong> et valider. (L'interface em0 devient ainsi officiellement la patte externe connectée à Internet).</li>
+                    <li><strong>Enter the LAN interface name :</strong> Appuyer directement sur Entrée sans rien écrire. (C'est normal : nous n'affectons pas de LAN classique puisque nous allons découper l'interface em1 en plusieurs VLANs logiques par la suite).</li>
+                    <li><strong>Do you want to proceed [y|n]?</strong> Taper <strong>y</strong> (Oui) et valider.</li>
+                    <li><strong>Would you like to remove the LAN IP address and unload the interface now [y|n]?</strong> Taper <strong>y</strong> (Oui) et valider.</li>
+                </ul>
+                <p>Le pfSense va terminer son initialisation et afficher son menu principal. Sur la ligne de l'interface WAN (wan), il va indiquer l'adresse IP qu'il a récupérée (dans notre cas : <code>192.168.122.146/24</code>).</p>
+            </section>
+
+            <section>
+                <h2>6. Étape 4 : Premier accès à l'interface graphique (WebGUI)</h2>
+                <p>Une fois l'adresse IP WAN attribuée par l'hyperviseur, l'administration du pare-feu s'effectue depuis le navigateur web du poste hôte.</p>
+
+                <ol>
+                    <li>Ouvrir un navigateur web sur le PC physique.</li>
+                    <li>Saisir l'adresse IP obtenue par le pfSense dans la barre d'adresse (ex: <code>https://192.168.122.146</code>).</li>
+                    <li>Ignorer l'avertissement de sécurité lié au certificat SSL auto-signé en cliquant sur Paramètres avancés puis sur Continuer vers le site.</li>
+                    <li>Saisir les identifiants de connexion initiaux par défaut :
+                        <ul>
+                            <li>Username : <code>admin</code></li>
+                            <li>Password : <code>pfsense</code></li>
+                        </ul>
+                    </li>
+                    <li>Cliquer sur <strong>Sign In</strong>.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>7. Étape 5 : Configuration initiale via l'assistant (Wizard)</h2>
+                <p>Au premier accès, un assistant de configuration s'ouvre automatiquement pour structurer les paramètres système fondamentaux de l'infrastructure hospitalière.</p>
+
+                <h3>7.1 Identification et DNS du Système</h3>
+                <ul>
+                    <li><strong>Hostname :</strong> Taper <code>pfsense-fw</code> (Nom réseau du pare-feu).</li>
+                    <li><strong>Domain :</strong> Taper <code>health-center.lan</code> (Domaine de l'organisation, en évitant le TLD .local pour prévenir les conflits de protocoles mDNS/Apple).</li>
+                    <li><strong>Primary DNS Server :</strong> Saisir <code>10.0.60.10</code> (Adresse IP planifiée pour le futur contrôleur de domaine Active Directory du VLAN 60, indispensable pour la résolution interne).</li>
+                    <li><strong>Secondary DNS Server :</strong> Saisir <code>1.1.1.1</code> (Serveur DNS public pour maintenir la résolution externe en cas de maintenance du serveur interne).</li>
+                    <li><strong>Override DNS :</strong> Décocher la case pour interdire au DHCP d'EVE-NG d'écraser ces paramètres statiques.</li>
+                    <li>Cliquer sur <strong>Next</strong>.</li>
+                </ul>
+
+                <h3>7.2 Synchronisation Horaire (NTP)</h3>
+                <ul>
+                    <li><strong>Time server hostname :</strong> Laisser <code>pool.ntp.org</code> (Garantit une synchronisation parfaite des horloges, condition critique pour la corrélation des logs et les équipements biomédicaux).</li>
+                    <li><strong>Timezone :</strong> Sélectionner <code>Europe/Paris</code> (ou le fuseau adapté).</li>
+                    <li>Cliquer sur <strong>Next</strong>.</li>
+                </ul>
+
+                <h3>7.3 Configuration de l'interface WAN</h3>
+                <ul>
+                    <li><strong>Configuration Type :</strong> Laisser sur <code>DHCP</code>.</li>
+                    <li>Laisser tous les blocs de configurations statiques ou spécifiques (PPPoE, PPTP) vides.</li>
+                    <li><strong>RFC1918 &amp; Bogon Networks :</strong> Décocher impérativement les deux cases <em>Block RFC1918 Private Networks</em> et <em>Block bogon networks</em>.
+                        <p><strong>Pourquoi fait-on cela ?</strong> Si ces options restent cochées, le pare-feu bloquera tout trafic provenant de plages d'adresses privées. L'adresse du poste physique et le réseau NAT de Virt-Manager étant en zone privée (RFC1918), cocher ces cases couperait immédiatement l'accès à l'interface graphique du lab.</p>
+                    </li>
+                    <li>Cliquer sur <strong>Next</strong>.</li>
+                </ul>
+
+                <h3>7.4 Sécurisation du compte d'administration</h3>
+                <ul>
+                    <li><strong>New admin Password :</strong> Saisir <code>Hosp-Initium2026!</code>.</li>
+                    <li><strong>Confirm admin Password :</strong> Saisir <code>Hosp-Initium2026!</code>.</li>
+                    <li>Cliquer sur <strong>Next</strong> puis sur <strong>Reload</strong> pour appliquer la configuration.</li>
+                </ul>
+                <p>Une fois le rechargement terminé, le pfSense affiche son tableau de bord complet (Dashboard).</p>
+            </section>
+
+            <section>
+                <h2>8. Étape 6 : Raccordement du pfSense au switch virtuel Trunk</h2>
+                <p>Pour que le pare-feu puisse router le trafic des différents services de l'hôpital, sa seconde interface doit être connectée au commutateur virtuel en mode Trunk (agrégation de liens).</p>
+
+                <ol>
+                    <li><strong>Arrêt propre de la VM :</strong> Dans la console Termius du pfSense, saisir l'option <strong>0</strong> (Shutdown system) et valider par <strong>y</strong>. Attendre que le nœud devienne gris (éteint) sur le schéma EVE-NG.</li>
+                    <li><strong>Ajout du nuage interne :</strong> Faire un clic droit sur le quadrillage d'EVE-NG ➜ <strong>Network</strong> :
+                        <ul>
+                            <li><strong>Name/Prefix :</strong> <code>Trunk_Hosp</code></li>
+                            <li><strong>Type :</strong> Choisir <code>Management(Cloud1)</code> (qui correspond au switch virtuel / pont réseau créé dans Virt-Manager dédié au trafic interne).</li>
+                        </ul>
+                    </li>
+                    <li>Cliquer sur <strong>Save</strong>.</li>
+                    <li><strong>Câblage de l'interconnexion :</strong> Glisser le câble depuis l'icône orange du pfSense vers le nuage <code>Trunk_Hosp</code>. Sélectionner impérativement l'interface <strong>em1</strong> (ou <strong>vtnet1</strong>) du côté pfSense. Valider.</li>
+                    <li><strong>Relance du système :</strong> Faire un clic droit sur le pfSense ➜ <strong>Start</strong>.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>9. Étape 7 : Création des interfaces virtuelles (VLANs) dans pfSense</h2>
+                <p>Une fois le pare-feu redémarré, l'accès à l'interface WebGUI (<code>https://192.168.122.146</code>) permet d'injecter la logique de découpage réseau.</p>
+
+                <h3>9.1 Accéder au gestionnaire de VLANs</h3>
+                <p>Naviguer dans le menu supérieur vers <strong>Interfaces &gt; Assignments</strong>, puis cliquer sur l'onglet <strong>VLANs</strong> tout à droite. Cliquer sur le bouton vert <strong>+ Add</strong>.</p>
+
+                <h3>9.2 Taguer l'interface parente</h3>
+                <ul>
+                    <li><strong>Parent Interface :</strong> Sélectionner impérativement <code>em1</code> (ou <code>vtnet1</code>).</li>
+                    <li><strong>VLAN Tag :</strong> Saisir le numéro du VLAN (ex: <code>10</code>).</li>
+                    <li><strong>Description :</strong> Saisir le nom du service (ex: <code>VLAN10_MEDIC</code>).</li>
+                    <li>Cliquer sur <strong>Save</strong>.</li>
+                </ul>
+
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.5rem;">VLAN Tag</th>
+                                <th style="padding: 0.5rem;">VLAN Priority</th>
+                                <th style="padding: 0.5rem;">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;">10</td>
+                                <td style="padding: 0.5rem;">0 (Best Effort)</td>
+                                <td style="padding: 0.5rem;">VLAN10_MEDIC</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;">30</td>
+                                <td style="padding: 0.5rem;">0 (Best Effort)</td>
+                                <td style="padding: 0.5rem;">VLAN30_ADMIN</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;">50</td>
+                                <td style="padding: 0.5rem;">0 (Best Effort)</td>
+                                <td style="padding: 0.5rem;">VLAN50_BIOMED</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;">60</td>
+                                <td style="padding: 0.5rem;">0 (Best Effort)</td>
+                                <td style="padding: 0.5rem;">VLAN60_SERVERS</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>9.3 Assigner le VLAN créé</h3>
+                <p>Revenir sur l'onglet <strong>Interface Assignments</strong>. Dans le menu déroulant <strong>Available network ports</strong>, sélectionner le VLAN fraîchement créé (ex: <code>VLAN 10 on em1...</code>) et cliquer sur <strong>+ Add</strong>.</p>
+
+                <h3>9.4 Configurer l'adressage IP</h3>
+                <p>Cliquer sur le nom de la nouvelle interface apparue (souvent nommée <code>OPT1</code>).</p>
+                <ul>
+                    <li>Cocher <strong>Enable Interface</strong>.</li>
+                    <li><strong>Description :</strong> Renommer l'interface de manière explicite (ex: <code>MEDIC</code>).</li>
+                    <li><strong>IPv4 Configuration Type :</strong> Sélectionner <code>Static IPv4</code>.</li>
+                    <li>En bas dans <strong>Static IPv4 Configuration</strong> : Saisir la passerelle correspondante (ex: <code>10.0.10.254</code>) avec un masque en <strong>/24</strong>.</li>
+                    <li>Cliquer sur <strong>Save</strong> puis sur <strong>Apply Changes</strong> en haut.</li>
+                </ul>
+
+                <p>Voici le plan d'adressage strict à appliquer pour les 4 interfaces du laboratoire :</p>
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.5rem;">Nom de l'interface</th>
+                                <th style="padding: 0.5rem;">Identifiant VLAN</th>
+                                <th style="padding: 0.5rem;">Adresse IP Statique (Passerelle)</th>
+                                <th style="padding: 0.5rem;">Sous-réseau</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>MEDIC</strong></td>
+                                <td style="padding: 0.5rem;">10</td>
+                                <td style="padding: 0.5rem;">10.0.10.254</td>
+                                <td style="padding: 0.5rem;">/24 (255.255.255.0)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>ADMIN</strong></td>
+                                <td style="padding: 0.5rem;">30</td>
+                                <td style="padding: 0.5rem;">10.0.30.254</td>
+                                <td style="padding: 0.5rem;">/24 (255.255.255.0)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>BIOMED</strong></td>
+                                <td style="padding: 0.5rem;">50</td>
+                                <td style="padding: 0.5rem;">10.0.50.254</td>
+                                <td style="padding: 0.5rem;">/24 (255.255.255.0)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.5rem;"><strong>SERVERS</strong></td>
+                                <td style="padding: 0.5rem;">60</td>
+                                <td style="padding: 0.5rem;">10.0.60.254</td>
+                                <td style="padding: 0.5rem;">/24 (255.255.255.0)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>9.5 Résolution du blocage de l'accès WebGUI (IP WAN)</h3>
+                <p>Après la validation de l'assistant initial, le pare-feu active par sécurité ses mécanismes de protection restrictifs. Dans un environnement de laboratoire virtuel où l'administration s'effectue par la patte externe (WAN), ces protections provoquent un blocage immédiat de l'interface graphique.</p>
+
+                <p><strong>Déblocage d'urgence via le Terminal :</strong></p>
+                <ol>
+                    <li>Ouvrir la session Terminal du pfSense.</li>
+                    <li>Dans le menu principal textuel, saisir l'option <strong>8</strong> pour ouvrir le Shell.</li>
+                    <li>Saisir la commande suivante pour couper temporairement le moteur de filtrage du pare-feu :
+                        <pre><code>pfctl -d</code></pre>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>10. Étape 8 : Configuration des serveurs DHCP par VLAN</h2>
+                <p>Dans pfSense, le service DHCP s'active de manière indépendante pour chaque interface réseau locale. Pour notre laboratoire, nous allons l'activer sur les zones clients (MEDIC, ADMIN, BIOMED).</p>
+
+                <div class="highlight-card">
+                    <strong>Règle de conception importante :</strong> Nous n'activerons pas le DHCP sur le VLAN 60 (SERVERS). Dans une infrastructure critique, tous les serveurs (Active Directory, serveurs de bases de données, etc.) doivent impérativement posséder une adresse IP statique configurée à la main pour garantir la stabilité des services.
+                </div>
+
+                <p>Pour les VLANs 10, 30 et 50, naviguer dans le menu supérieur vers <strong>Services &gt; DHCP Server</strong> et appliquer la configuration suivante :</p>
+
+                <h3>10.1 Zone Médicale (Interface MEDIC - VLAN 10)</h3>
+                <ul>
+                    <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on MEDIC interface</em>.</li>
+                    <li><strong>Range (Plage d'adresses) :</strong> From: <code>10.0.10.10</code> | To: <code>10.0.10.100</code></li>
+                    <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code> (L'adresse du futur serveur Active Directory/DNS de l'hôpital).</li>
+                    <li>Cliquer sur <strong>Save</strong> en bas de la page.</li>
+                </ul>
+
+                <h3>10.2 Zone Administrative (Interface ADMIN - VLAN 30)</h3>
+                <ul>
+                    <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on ADMIN interface</em>.</li>
+                    <li><strong>Range :</strong> From: <code>10.0.30.10</code> | To: <code>10.0.30.100</code></li>
+                    <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code>.</li>
+                    <li>Cliquer sur <strong>Save</strong> en bas de la page.</li>
+                </ul>
+
+                <h3>10.3 Zone Biomédicale (Interface BIOMED - VLAN 50)</h3>
+                <ul>
+                    <li><strong>DHCP Server :</strong> Cocher la case <em>Enable DHCP server on BIOMED interface</em>.</li>
+                    <li><strong>Range :</strong> From: <code>10.0.50.10</code> | To: <code>10.0.50.100</code></li>
+                    <li><strong>DNS Servers :</strong> Saisir <code>10.0.60.10</code>.</li>
+                    <li>Cliquer sur <strong>Save</strong> en bas de la page.</li>
+                </ul>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Rapport d'Ingénierie INITIUM Phase 1 • CHR HEALTH-CENTER</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

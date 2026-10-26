@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Du login à l'émission du jeton — le parcours complet d'une authentification — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; PROTOCOLES D'AUTHENTIFICATION</span>
+                <span class="meta-date">Publié le 4 Août 2026</span>
+            </div>
+            <h1>Du login à l'émission du jeton — le parcours complet d'une authentification</h1>
+            <p class="pitch">
+                Comprendre la chaîne d'exécution de bout en bout entre l'utilisateur, l'annuaire LDAP, l'Identity Provider et l'application cliente.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">LDAP</span>
+                <span class="tag">JWT</span>
+                <span class="tag">OIDC</span>
+                <span class="tag">Architecture</span>
+            </div>
+        </header>
+
+        <article>
+            <section>
+                <h2>Assembler ce que les articles précédents ont posé séparément</h2>
+                <p>
+                    Cette série a traité, chacun de son côté, l'annuaire comme source d'identité, LDAP comme protocole d'interrogation, l'Identity Provider comme émetteur de jetons signés, et les principes de défense en profondeur qui encadrent l'ensemble. Ce qui manque encore, c'est la vue d'assemblage : que se passe-t-il, concrètement, entre le moment où un utilisateur saisit son mot de passe et celui où une application décide de lui accorder l'accès ?
+                </p>
+            </section>
+
+            <section>
+                <h2>Le parcours, étape par étape</h2>
+                
+                <ol class="sequence-list" style="list-style: none; padding-left: 0; margin: 2rem 0; display: flex; flex-direction: column; gap: 1.25rem;">
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Soumission des identifiants</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>L'utilisateur soumet ses identifiants à l'application.</strong> Dans une architecture moderne, l'application elle-même ne reçoit presque jamais directement le mot de passe — elle redirige l'utilisateur vers un Identity Provider, comme décrit dans <a href="../idp-zero-trust/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">le tout premier article de ce site</a>.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Interrogation de l'annuaire</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>L'Identity Provider interroge l'annuaire.</strong> C'est ici que la chaîne se connecte à <a href="../directory-services-ldap/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur LDAP</a> : l'IdP effectue d'abord une recherche (search) pour retrouver le DN correspondant à l'identifiant fourni, puis tente un bind avec ce DN et le mot de passe saisi. Cette étape répond à une seule question, binaire : ces identifiants sont-ils valides.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Décision de session par l'IdP</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>L'IdP transforme ce résultat binaire en une décision de session.</strong> C'est un point de bascule important, et souvent sous-estimé : LDAP ne sait dire que "identifiants valides" ou "invalides" — c'est l'IdP, pas l'annuaire, qui décide ensuite de la durée de la session, des facteurs supplémentaires à exiger (MFA, conforme aux mécanismes de pré-authentification décrits dans <a href="../pre-auth-post-auth-defense-in-depth/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur la défense en profondeur</a>), et du contenu à inclure dans le jeton final.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">4</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Construction et signature du jeton</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>L'IdP construit et signe le jeton.</strong> Selon le protocole utilisé — SAML pour les architectures d'entreprise plus anciennes, OIDC/JWT pour les architectures modernes — l'IdP assemble une assertion ou un token contenant l'identité vérifiée et, potentiellement, des informations de rôle ou de groupe récupérées depuis l'annuaire à l'étape 2. Cette signature s'appuie sur les mécanismes cryptographiques détaillés dans <a href="../jwt-token-lifecycle/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur le cycle de vie des tokens</a> — clé privée de l'IdP, JWKS exposé pour la vérification, <code>kid</code> pour identifier la bonne clé.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">5</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Transmission et vérification locale</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>Le jeton est transmis à l'application, qui le vérifie localement.</strong> L'application ne recontacte ni l'annuaire ni, dans le cas général, l'IdP — elle vérifie la signature et les claims du jeton reçu, exactement comme détaillé précédemment.
+                        </p>
+                    </li>
+
+                    <li class="sequence-item" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; position: relative;">
+                        <div class="sequence-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                            <span class="sequence-number" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; background-color: var(--accent-light); color: var(--accent); width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">6</span>
+                            <span class="sequence-title" style="font-weight: 600; font-size: 1.05rem; color: var(--text);">Décision d'accès applicative</span>
+                        </div>
+                        <p class="sequence-body" style="color: var(--text); font-size: 0.975rem; margin-bottom: 0;">
+                            <strong>L'application prend sa décision d'accès.</strong> À partir des claims du jeton — audience, rôles inclus, scopes — l'application applique ses propres règles d'autorisation, potentiellement du RBAC comme décrit dans le premier article de cette série IAM.
+                        </p>
+                    </li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Trois notions qu'on confond souvent, et qui apparaissent chacune à un endroit précis de ce parcours</h2>
+                <p>
+                    <strong>Authentification</strong> — l'étape 2 et 3 : prouver qui vous êtes.
+                </p>
+                <p>
+                    <strong>Session</strong> — construite à l'étape 3, matérialisée par le jeton émis à l'étape 4 : pendant combien de temps, et dans quelles conditions, cette preuve d'identité reste-t-elle exploitable sans redemander les identifiants.
+                </p>
+                <p>
+                    <strong>Autorisation</strong> — l'étape 6 : ce que l'identité vérifiée a le droit de faire, une fois la session établie.
+                </p>
+                <p>
+                    Ces trois notions sont souvent utilisées de façon interchangeable dans le langage courant ("je me suis connecté" peut vouloir dire les trois à la fois), mais elles correspondent à des décisions prises par des composants différents, à des moments différents de ce parcours — l'annuaire ne décide que la première, l'IdP construit la deuxième, l'application applique la troisième.
+                </p>
+            </section>
+
+            <section>
+                <h2>Où SAML et JWT se distinguent dans ce parcours</h2>
+                <p>
+                    Le déroulé ci-dessus reste valable pour les deux protocoles, mais leur mécanique de transport diffère : SAML transmet une assertion XML signée, généralement via une redirection de navigateur (le fameux "POST binding"), pensée pour des architectures d'entreprise et de SSO web classique. OIDC transmet un JWT, plus compact, plus adapté aux API et aux applications mobiles, et c'est le protocole utilisé tout au long de cette série. Le principe de fond — délégation de confiance via preuve cryptographique signée par un tiers reconnu — reste identique dans les deux cas ; ce qui change, c'est le format et le canal de transport.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> implémente l'intégralité de ce parcours à l'exception de l'étape 2 : Keycloak gère sa propre base d'utilisateurs interne plutôt que d'interroger un annuaire LDAP externe, ce qui correspond à la limite déjà notée dans <a href="../directory-services-ldap/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur LDAP</a>. Les étapes 3 à 6 — construction du jeton, signature, vérification côté API Flask, décision d'accès — sont, elles, directement observables dans le lab.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Observer en direct les étapes du parcours d'authentification et l'échange de jetons.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Où vivent les identités — Active Directory, LDAP et les services d'annuaire — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; SERVICES D'ANNUAIRE</span>
+                <span class="meta-date">Publié le 4 Août 2026</span>
+            </div>
+            <h1>Où vivent les identités — Active Directory, LDAP et les services d'annuaire</h1>
+            <p class="pitch">
+                Déconstruire les confusions courantes entre la source de vérité, le service d'annuaire et le protocole d'interrogation.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">Active Directory</span>
+                <span class="tag">LDAP</span>
+            </div>
+        </header>
+
+        <!-- Figure / Image d'illustration (Profondeur Niveau 2) -->
+        <figure class="article-image-container" style="margin: 2.5rem 0; text-align: center;">
+            <img src="../../images/pont_ad_ldap_keycloak.png" alt="Schéma illustrant le pont AD -> LDAP -> Keycloak -> Applications" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted); font-style: italic;">Flux d'intégration et fédération d'identités : de la source de vérité (AD) aux applications modernes via Keycloak</figcaption>
+        </figure>
+
+        <article>
+            <section>
+                <h2>Où penses-tu que les identités sont stockées ?</h2>
+                <p>
+                    Pose-toi la question avant de lire la suite : dans une entreprise, où vivent réellement les comptes utilisateurs ? Une base de données ? Un annuaire ? Active Directory ? LDAP ? Le cloud ?
+                </p>
+                <p>
+                    La plupart de ces réponses sont correctes selon le contexte — sauf une, qui semble intuitive mais qui ne l'est pas : <strong>LDAP</strong>. Certainement pas LDAP... ou est-ce que ça l'est ? La réponse, contre-intuitive pour beaucoup, est non : LDAP ne stocke rien. C'est un protocole d'interrogation, pas un entrepôt de données. La confusion est si répandue qu'elle mérite d'être déconstruite avant d'aller plus loin — c'est tout l'objet de cet article.
+                </p>
+            </section>
+
+            <section>
+                <h2>Un maillon manquant dans l'article précédent</h2>
+                <p>
+                    <a href="../iam-beyond-authentication/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">Le premier article de cette série</a> a décrit les trois domaines de l'IAM — gouvernance, gestion des accès, comptes privilégiés — sans s'attarder sur une question pourtant préalable à tous les trois : où les identités sont-elles réellement stockées ? Un outil comme SailPoint, Okta ou Keycloak ne fabrique pas les identités qu'il gère — il s'appuie sur une source qui les contient déjà.
+                </p>
+            </section>
+
+            <section>
+                <h2>Qu'est-ce qu'Active Directory ?</h2>
+                <p>
+                    <strong>Active Directory (AD)</strong> est un service d'annuaire développé par Microsoft, introduit à la fin des années 1990 avec Windows NT puis Windows 2000 Server, devenu depuis le standard de fait dans la majorité des entreprises équipées d'un environnement Windows. Concrètement, AD stocke des objets — utilisateurs, machines, imprimantes, groupes, comptes de service — chacun avec un ensemble d'attributs, organisés pour être recherchés, modifiés et supprimés efficacement.
+                </p>
+                <p>
+                    Ce qui rend AD central n'est pas son ancienneté en soi, mais le rôle qu'il occupe structurellement : c'est souvent la toute première brique posée dans une organisation, celle à laquelle tout le reste — authentification, outils IAM, système RH — vient se connecter. C'est en ce sens qu'on le désigne comme <strong>source de vérité</strong> : ce n'est pas qu'AD soit infaillible, c'est que c'est l'endroit où l'identité existe en premier, avant d'être consommée ailleurs.
+                </p>
+                <p>
+                    Cette architecture repose sur quelques composants qu'il vaut la peine de distinguer :
+                </p>
+                <ul>
+                    <li>les <strong>contrôleurs de domaine (Domain Controllers)</strong> : les serveurs qui hébergent réellement les données et répondent aux requêtes,</li>
+                    <li>une <strong>structure arborescente</strong>, avec des <strong>unités organisationnelles (OU)</strong> qui regroupent les objets par département ou par fonction,</li>
+                    <li>des <strong>stratégies de groupe (Group Policy Objects)</strong>, qui appliquent des règles centralisées à ces regroupements.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Le problème concret que LDAP résout</h2>
+                <p>
+                    Imagine un système qui a besoin de faire l'une de ces choses : effectuer une recherche sur un utilisateur, authentifier un utilisateur, ou gérer un utilisateur (le créer, le modifier). Dans les trois cas, la question est la même : où cette information vit-elle réellement ? La réponse, on vient de le voir, est l'annuaire — Active Directory dans le cas le plus courant.
+                </p>
+                <p>
+                    Mais ça soulève une seconde question, plus pratique : <em>comment</em> ce système parle-t-il concrètement à AD ? AD n'expose pas une API REST universelle que n'importe quel outil peut appeler nativement. C'est précisément là que <strong>LDAP (Lightweight Directory Access Protocol)</strong> entre en jeu : c'est le canal de communication standardisé qui permet à un système tiers d'interroger, d'authentifier contre, ou de modifier les données hébergées dans AD — ou dans n'importe quel autre annuaire qui implémente ce même protocole ouvert (OpenLDAP, FreeIPA).
+                </p>
+                <p>
+                    Une confusion fréquente mérite d'être clarifiée à ce stade : LDAP n'est pas une fonctionnalité propre à Active Directory, ni un produit Microsoft. C'est un protocole ouvert, indépendant de tout fournisseur — ce qui explique pourquoi la question posée en ouverture de cet article ("LDAP stocke-t-il des identités ?") a une réponse non intuitive : LDAP est le messager, pas l'entrepôt.
+                </p>
+            </section>
+
+            <section>
+                <h2>Comment LDAP organise les données : le DIT</h2>
+                <p>
+                    LDAP structure les données qu'il interroge selon une hiérarchie appelée <strong>DIT (Directory Information Tree)</strong> — un arbre, pas une table. Chaque nœud, appelé <strong>entrée</strong>, représente un objet : un utilisateur, un groupe, une machine.
+                </p>
+
+<pre><code>dc=exemple,dc=com
+├── ou=utilisateurs
+│    ├── uid=alice
+│    └── uid=bob
+└── ou=groupes
+    ├── cn=admins
+    └── cn=devs</code></pre>
+
+                <p>Trois notions structurent cet arbre :</p>
+                <ul>
+                    <li>Le <strong>DN (Distinguished Name)</strong> identifie de façon unique une entrée par son chemin complet dans l'arbre — par exemple <code>uid=alice,ou=utilisateurs,dc=exemple,dc=com</code>. C'est l'équivalent, pour LDAP, d'un chemin de fichier complet plutôt qu'un simple nom.</li>
+                    <li>Les <strong>attributs</strong> sont des paires clé-valeur portées par chaque entrée (<code>mail: alice@exemple.com</code>, <code>cn: Alice Doe</code>).</li>
+                    <li>L'<strong>objectClass</strong> définit quelle structure d'attributs une entrée doit respecter — un utilisateur et une imprimante n'ont pas le même schéma d'attributs obligatoires.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Bind et Search : les deux opérations qui comptent vraiment</h2>
+                <p>
+                    LDAP expose plusieurs opérations, mais deux dominent l'usage réel dans une architecture d'identité :
+                </p>
+                <p>
+                    <strong>Bind</strong>, l'opération d'authentification : elle consiste à tenter une connexion avec un DN et un mot de passe donnés. Si l'annuaire accepte, les identifiants sont valides ; sinon, non. C'est délibérément binaire — LDAP répond uniquement à la question "ces identifiants sont-ils corrects", il ne crée ni session ni jeton derrière cette réponse.
+                </p>
+                <p>
+                    <strong>Search</strong>, l'opération de loin la plus fréquente en pratique : interroger l'annuaire à partir d'une base (à quel endroit de l'arbre chercher) et d'un filtre (quel critère), pour récupérer les attributs d'une ou plusieurs entrées.
+                </p>
+                <p>
+                    Le déroulé typique d'une authentification applicative combine les deux : l'application effectue d'abord une recherche pour retrouver le DN correspondant à un identifiant fourni par l'utilisateur, puis tente un bind avec ce DN et le mot de passe saisi. LDAP ne maintient aucun état de session après ce bind — à l'application de gérer ce qui se passe ensuite, ce qui explique pourquoi LDAP se retrouve presque toujours derrière une couche supplémentaire, pas exposed directement.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le pont concret entre AD et Keycloak</h2>
+                <p>
+                    Reprenons l'exemple du départ, appliqué à Keycloak. Une organisation a déjà tous ses utilisateurs dans Active Directory, mais veut ajouter par-dessus les protocoles modernes de délégation décrits dans les articles précédents (OAuth2, OIDC). Elle n'a pas besoin de dupliquer sa base d'utilisateurs dans Keycloak — c'est là que sert la <strong>fédération LDAP</strong>, une fonctionnalité native de Keycloak.
+                </p>
+
+                <p>
+                    Concrètement, l'administrateur configure dans Keycloak un fournisseur de type "LDAP" (sous <em>User Federation</em>), avec quelques paramètres clés :
+                </p>
+                <ul>
+                    <li>l'<strong>URL de connexion</strong> vers le contrôleur de domaine AD (<code>ldap://</code> ou <code>ldaps://</code> pour une connexion chiffrée),</li>
+                    <li>le <strong>Bind DN</strong> et son mot de passe : un compte de service dédié, avec juste assez de droits pour interroger l'annuaire — jamais un compte administrateur complet,</li>
+                    <li>les <strong>Users DN</strong> : la portion de l'arbre où chercher les utilisateurs (par exemple <code>ou=utilisateurs,dc=exemple,dc=com</code>),</li>
+                    <li>un <strong>filtre de recherche</strong> qui précise quels objets AD compter comme utilisateurs valides.</li>
+                </ul>
+
+                <p>
+                    Une fois configuré, le flux d'authentification suit exactement le déroulé bind/search décrit plus haut, mais orchestré par Keycloak plutôt que par l'application elle-même : un utilisateur saisit ses identifiants sur l'écran de connexion Keycloak → Keycloak effectue une recherche LDAP pour localiser le DN de cet utilisateur dans AD → Keycloak tente un bind avec ce DN et le mot de passe saisi → si le bind réussit, Keycloak considère l'utilisateur authentifié et prend le relais pour tout ce que les articles précédents ont décrit : émission du jeton, gestion de sa durée de vie, claims.
+                </p>
+                <p>
+                    L'intérêt structurel de ce montage : AD reste l'unique source de vérité pour l'identité et le mot de passe — rien n'est dupliqué ni resynchronisé manuellement — pendant que Keycloak ajoute par-dessus tout ce qu'AD ne sait pas faire nativement : émission de JWT, SSO vers des applications SaaS, MFA adaptatif.
+                </p>
+            </section>
+
+            <section>
+                <h2>Pourquoi LDAP est pensé pour la lecture, pas pour l'écriture</h2>
+                <p>
+                    LDAP est architecturalement optimisé pour des lectures rapides et fréquentes, pas pour des écritures massives ou transactionnelles :
+                </p>
+                <ul>
+                    <li>les attributs les plus consultés (<code>uid</code>, <code>mail</code>) sont indexés, ce qui rend leur recherche très rapide,</li>
+                    <li>les recherches sont scopées à une portion précise de l'arbre plutôt qu'à l'ensemble de l'annuaire, ce qui réduit le coût de chaque requête,</li>
+                    <li>le modèle de réplication privilégie de nombreuses répliques en lecture seule pour quelques nœuds maîtres en écriture — cohérent avec une charge dominée par des milliers de tentatives de connexion, contre relativement peu de créations ou modifications de comptes,</li>
+                    <li>un schéma strict impose une structure prévisible, ce qui évite le coût de jointures complexes qu'une base relationnelle devrait gérer pour un usage équivalent.</li>
+                </ul>
+                <p>
+                    Cette asymétrie a une contrepartie : LDAP gère mal les écritures fréquentes et les transactions complexes. Ce n'est pas une faiblesse de conception, c'est une spécialisation — pensé pour l'identité, consultée en permanence, modifiée rarement.
+                </p>
+            </section>
+
+            <section>
+                <h2>Au-delà de l'authentification applicative : où LDAP intervient ailleurs</h2>
+                <p>
+                    LDAP n'est pas cantonné aux applications web. Il est invoqué en silence dans une bonne partie de l'infrastructure d'entreprise : le WiFi sécurisé (802.1X, via un serveur RADIUS qui interroge l'annuaire en coulisses), les connexions VPN, l'ouverture de session sur des serveurs Linux (via SSSD ou PAM-LDAP), la recherche de contacts dans un client de messagerie, ou même l'authentification à l'impression sur certaines imprimantes réseau. Dans chaque cas, le même schéma se répète : un système qui n'a, autrement, aucune raison de faire confiance à l'utilisateur interroge l'annuaire central via LDAP pour vérifier son identité.
+                </p>
+            </section>
+
+            <section>
+                <h2>Ce que les outils IAM modernes ajoutent, et ce qu'ils ne remplacent pas</h2>
+                <p>
+                    Une question légitime : si Active Directory gère déjà les utilisateurs et l'authentification, pourquoi investir dans des outils IAM supplémentaires ?
+                </p>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Élément</th>
+                                <th>Approche historique (AD/LDAP seuls)</th>
+                                <th>Outils IAM modernes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Gestion des rôles</strong></td>
+                                <td>Groupes gérés manuellement</td>
+                                <td>RBAC automatisé, revues d'accès périodiques</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Périmètre</strong></td>
+                                <td>Réseau interne, on-premise</td>
+                                <td>Cloud, SaaS, multi-environnements</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Authentification</strong></td>
+                                <td>Bind LDAP direct</td>
+                                <td>SSO, MFA, SAML, OpenID Connect</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Session / jeton</strong></td>
+                                <td>Aucun — LDAP répond juste "valide ou non"</td>
+                                <td>Sessions gérées, tokens signés (JWT)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Gouvernance</strong></td>
+                                <td>Journaux à interpréter manuellement</td>
+                                <td>Audits automatisés, certifications d'accès</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    La ligne "session / jeton" est la plus révélatrice : LDAP ne gère ni l'un ni l'autre. C'est exactement le vide que la fédération Keycloak, décrite plus haut, vient combler.
+                </p>
+            </section>
+
+            <section>
+                <h2>Ce que cet article laisse ouvert</h2>
+                <p>
+                    Un annuaire répond à "où l'identité est stockée", LDAP répond à "comment un système l'interroge et l'authentifie localement". Mais aucun des deux ne répond à une question qui devient centrale dès qu'une organisation utilise plusieurs systèmes indépendants : comment un utilisateur authentifié accède-t-il, sans se reconnecter, à une application qui ne partage pas cet annuaire — chez un autre fournisseur, ou dans une autre organisation ? C'est le rôle de la fédération d'identité inter-organisations, distincte de la fédération LDAP décrite ici, et qui fera l'objet d'un prochain article.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Mon lab <a href="../../labs/lab-zt-iam-01/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">LAB-ZT-IAM-01</a> utilise Keycloak avec une base d'utilisateurs interne, sans fédération vers un annuaire LDAP ou Active Directory externe — le montage décrit dans la section précédente reste théorique pour ce lab à ce stade. C'est une extension naturelle et concrète si je voulais illustrer ce mécanisme en pratique plutôt qu'en description.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Découvrir la mise en œuvre pratique du domaine Access Management.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

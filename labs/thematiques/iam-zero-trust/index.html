@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratoires IAM &amp; Zero Trust — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../index.html">← RETOUR AUX LABS</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../articles/index.html">ARTICLES</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la sous-section Labs IAM & Zero Trust -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">EXPÉRIMENTATIONS PRATIQUES</span>
+                <span class="meta-date">Domaine d'expertise</span>
+            </div>
+            <h1>Laboratoires IAM &amp; Architecture Zero Trust</h1>
+            <p class="pitch">
+                Mises en situation pratiques, centralisation de l'identité, fédération OpenID Connect/OAuth2, vérification stricte des tokens et segmentation dynamique des accès.
+            </p>
+        </header>
+
+        <main>
+            <!-- Liste des Labs IAM & Zero Trust -->
+            <section style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem;">
+                
+                <!-- Card Lab IAM ZT 01 -->
+                <a href="../../posts/LAB-ZT-IAM-01/index.html" class="highlight-card" style="display: flex; flex-direction: column; gap: 0.75rem; text-decoration: none; color: inherit;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.25rem; margin: 0; color: var(--text);">LAB-ZT-IAM-01 — Architecture Zero Trust avec Keycloak &amp; API Flask</h2>
+                        <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); font-weight: 500;">Consulter le lab →</span>
+                    </div>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                        Mise en œuvre d'un modèle d'identité déléguée : intégration d'un Identity Provider (Keycloak), émission de jetons JWT cryptographiquement signés (RS256), vérification via endpoint JWKS et validation granulaire du RBAC côté microservice.
+                    </p>
+                    <div class="tags-container" style="margin-top: 0.25rem;">
+                        <span class="tag">Zero Trust</span>
+                        <span class="tag">Keycloak</span>
+                        <span class="tag">JWT / JWKS</span>
+                        <span class="tag">OAuth2 / OIDC</span>
+                        <span class="tag">RBAC</span>
+                    </div>
+                </a>
+
+            </section>
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet INITIUM — Vue Synthétique — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="index.html">← RETOUR AU LAB</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../articles/index.html">ARTICLES</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Vue Synthétique -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">RAPPORT TECHNIQUE &amp; ARCHITECTURE</span>
+                <span class="meta-date">PROJET INITIUM</span>
+            </div>
+            <h1>Modélisation et Sécurisation d'une Infrastructure Critique</h1>
+            <p class="pitch">
+                Rapport de conception d'une infrastructure d'importance vitale (ESIV) hautement résiliente, modélisée sur hyperviseur pour isoler les flux d'informations médicaux face aux risques d'espionnage et de ransomware.
+            </p>
+        </header>
+
+        <article>
+            <!-- Fiche Synthétique du Projet -->
+            <section>
+                <div class="highlight-card" style="margin: 1.5rem 0;">
+                    <h3 style="margin-top: 0; font-size: 1.15rem; color: var(--text);">Fiche Synthétique du Projet</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                        Ce projet simule le durcissement d'un réseau hospitalier plat hébergeant des données de santé critiques afin de bloquer les vecteurs d'attaque classiques par déplacement latéral.
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                        <div style="border-top: 2px solid var(--accent); padding-top: 0.75rem;">
+                            <span style="font-size: 0.85rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase;">Problématique</span>
+                            <p style="font-size: 0.95rem; font-weight: 500; margin-top: 0.25rem; margin-bottom: 0; color: var(--text);">Réseau plat, équipements IoT médicaux non chiffrés et Active Directory non sécurisé.</p>
+                        </div>
+                        <div style="border-top: 2px solid var(--accent); padding-top: 0.75rem;">
+                            <span style="font-size: 0.85rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase;">Solution</span>
+                            <p style="font-size: 0.95rem; font-weight: 500; margin-top: 0.25rem; margin-bottom: 0; color: var(--text);">Segmentation logique stricte (VLANs), filtrage d'état (pfSense) et durcissement de l'identité (GPO Active Directory).</p>
+                        </div>
+                        <div style="border-top: 2px solid var(--accent); padding-top: 0.75rem;">
+                            <span style="font-size: 0.85rem; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase;">Méthodologie</span>
+                            <p style="font-size: 0.95rem; font-weight: 500; margin-top: 0.25rem; margin-bottom: 0; color: var(--text);">Maquettage de précision (EVE-NG) et validation des politiques d'isolation par tests ciblés.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>1. Le Contexte : Analyse de la Surface d'Attaque</h2>
+                <p>
+                    Dans un établissement de santé, l'infrastructure informatique est directement liée à la continuité des soins. Pourtant, l'audit initial a révélé des vulnérabilités critiques : des protocoles médicaux ouverts (<strong>DICOM</strong>, <strong>HL7</strong>) transitant en clair sur un réseau sans aucun cloisonnement.
+                </p>
+                <p>
+                    Une simple compromission par hameçonnage (phishing) sur le poste d'un secrétaire médical offrait à un attaquant un accès direct et immédiat aux serveurs de fichiers d'identité (Active Directory) ou aux consoles de contrôle de dispositifs biomédicaux (scanners, respirateurs).
+                </p>
+            </section>
+
+            <section>
+                <h2>2. L'Architecture Proposée : Le Cloisonnement Défensif</h2>
+                <p>
+                    La philosophie appliquée ici est celle de la <strong>défense en profondeur</strong> et du <strong>Zero-Trust</strong>. Ne pouvant pas totalement garantir l'étanchéité des postes clients face aux erreurs humaines, l'objectif est de limiter drastiquement l'aire de propagation d'un logiciel malveillant (Blast Radius).
+                </p>
+                
+                <pre class="ascii-art" style="margin: 2rem 0; overflow-x: auto; background: var(--card-bg, rgba(255,255,255,0.02)); padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.8rem; line-height: 1.2;">
+                  ┌──────────────────────────────────────────────┐
+                  │                INTERNET (WAN)                │
+                  └───────────────────────┬──────────────────────┘
+                                          │ (Filtrage Périmétrique)
+                                          ▼
+                                   [ pfSense-FW ] (Pare-feu Centralisé &amp; Routage)
+                                          │ (Trunk 802.1Q - VLANs Taggués)
+                                          ▼
+                                  [ Hosp-SW-01 ] (Commutateur de Distribution)
+                                          │
+        ┌────────────────────┬────────────┴────────┬────────────────────┐
+        │ (Flux Interdits)   │ (Flux Interdits)    │ (Accès GPO)        │ (Flux Hyper-Restreints)
+        ▼                    ▼                     ▼                    ▼
+   VLAN 30              VLAN 10               VLAN 50              VLAN 60
+ [ Hosp-CL-01 ]       [ MEDIC Void ]       [ Hosp-BIO-01 ]      [ Hosp-AD-01 ]
+ (Postes Admin)       (Zone de Soins)       (IoT / Imagerie)     (Active Directory)
+                </pre>
+
+                <p>
+                    Grâce à cette conception, toutes les communications inter-VLAN doivent passer par le pare-feu <strong>pfSense</strong>. Par défaut, <strong>tout flux non explicitement autorisé est bloqué</strong>. Un ransomware sur le VLAN 30 ne dispose d'aucune route ni d'aucun droit pour scanner ou rebondir vers le VLAN 50 (médical) ou 60 (système).
+                </p>
+            </section>
+
+            <section>
+                <h2>3. Compétences d'Ingénierie Validées</h2>
+                <p>
+                    Ce lab n'est pas une simple maquette théorique ; il représente la mise en œuvre de standards industriels d'ingénierie système et réseau :
+                </p>
+
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                <th style="padding: 0.75rem;">Domaine</th>
+                                <th style="padding: 0.75rem;">Mise en œuvre technique</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Segmentation L2/L3</strong></td>
+                                <td style="padding: 0.75rem;">Trunks 802.1Q, sous-interfaces pfSense et routage inter-VLAN contrôlé par des règles dynamiques (Stateful).</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Gestion de l'Identité (IAM)</strong></td>
+                                <td style="padding: 0.75rem;">Déploiement d'un annuaire Active Directory avec structuration en Unités d'Organisation (OU) pour le cloisonnement des privilèges.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Durcissement (Hardening)</strong></td>
+                                <td style="padding: 0.75rem;">Création de GPO restrictives : blocage USB, politique de mots de passe renforcée, et limitation des droits d'administration locaux.</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 0.75rem;"><strong>Maquettage &amp; Virtualisation</strong></td>
+                                <td style="padding: 0.75rem;">Déploiement sous EVE-NG avec gestion d'images virt-install, permissions KVM et topologies émulées.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>4. Valeur Métier &amp; Perspectives SecOps</h2>
+                <p>
+                    Ce projet démontre ma capacité à <strong>analyser un besoin métier critique (la santé), en identifier les risques de sécurité majeurs (ransomwares, vols de données), et y apporter des solutions d'architecture concrètes et adaptées</strong>.
+                </p>
+                <p>
+                    L'architecture réseau passive étant validée, la phase suivante (Phase 2) intègre la brique de <strong>Détection Active (SOC)</strong> : supervision via le SIEM open source <strong>Wazuh</strong> et filtrage avancé par pare-feu FortiGate.
+                </p>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Projet INITIUM — Rapport d'Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

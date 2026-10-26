@@ -3,165 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>À Propos — Christian Agbogan</title>
+    <title>À Propos — Christian Agbogan | Architecture & Sécurité des SI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #faf9f6;
-            --text: #1c1c1e;
-            --text-muted: #636366;
-            --accent: #1a56db;
-            --accent-light: #eff6ff;
-            --border: #e5e5ea;
-            --code-bg: #1c1c1e;
-            --code-text: #f4f4f5;
-            --warning: #f59e0b;
-            --warning-light: #fffbeb;
-            --font-sans: 'Inter', sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: var(--font-sans);
-            line-height: 1.625;
-            padding: 3rem 1.5rem;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .back-nav {
-            margin-bottom: 3rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .back-nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            font-family: var(--font-mono);
-        }
-
-        .back-nav a:hover {
-            color: var(--accent);
-        }
-
-        header {
-            margin-bottom: 3rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 2rem;
-        }
-
-        .meta {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        h1 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.25rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
-            letter-spacing: -0.01em;
-        }
-
-        p {
-            margin-bottom: 1.25rem;
-        }
-
-        .highlight-box {
-            background-color: var(--accent-light);
-            border-left: 4px solid var(--accent);
-            padding: 1.25rem;
-            border-radius: 0 8px 8px 0;
-            margin: 1.5rem 0;
-            font-size: 0.95rem;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .skill-card {
-            background: #f1f0ec;
-            padding: 1.5rem;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-
-        .skill-card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-            color: var(--text);
-        }
-
-        .skill-card ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .skill-card li {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.4rem;
-            display: flex;
-            align-items: center;
-        }
-
-        .skill-card li::before {
-            content: "→";
-            color: var(--accent);
-            margin-right: 0.5rem;
-            font-weight: bold;
-        }
-
-        footer {
-            margin-top: 5rem;
-            border-top: 1px solid var(--border);
-            padding-top: 2rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -169,7 +15,12 @@
         <!-- Navigation alignée à gauche et à droite -->
         <nav class="back-nav">
             <a href="index.html">← RETOUR À L'ACCUEIL</a>
-            <a href="mailto:kossi-christian.agbogan@ism.edu.sn">ME CONTACTER →</a>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+                <a href="#" data-email="kossi-christian.agbogan@ism.edu.sn">ME CONTACTER →</a>
+            </div>
         </nav>
 
         <header>
@@ -218,6 +69,17 @@
                     </ul>
                 </div>
 
+                <!-- IAM & Zero Trust -->
+                <div class="skill-card">
+                    <h3>IAM &amp; Zero Trust</h3>
+                    <ul>
+                        <li>Keycloak / FreeIPA</li>
+                        <li>Protocole OpenID Connect (OIDC)</li>
+                        <li>Architecture Tokens JWT</li>
+                        <li>Reverse Proxy (Nginx)</li>
+                    </ul>
+                </div>
+
                 <!-- Supervision / SecOps -->
                 <div class="skill-card">
                     <h3>Supervision &amp; SOC</h3>
@@ -234,13 +96,23 @@
         <section>
             <h2>Mon Parcours Académique</h2>
             <p>
-                Actuellement étudiant à l'<strong>ISM (Institut Supérieur de Management)</strong> à Dakar, Sénégal, j'approfondis mes compétences théoriques et pratiques en sécurité informatique. C'est à travers des projets rigoureux et des maquettages intensifs sur des environnements comme EVE-NG que je valide mes choix d'architecture technique.
+                Actuellement étudiant à l'<strong>ISM (Institut Supérieur de Management)</strong> à Dakar, Sénégal, j'approfondis mes compétences théoriques et pratiques en sécurité informatique. C'est à travers des projets rigoureux et des maquettages intensifs sur des environnements comme EVE-NG et KVM/libvirt que je valide mes choix d'architecture technique.
+            </p>
+        </section>
+
+        <section>
+            <h2>Engagements &amp; Méthodologie</h2>
+            <p>
+                Chaque projet documenté sur ce portfolio est le résultat d'un laboratoire déployé, testé et éprouvé en conditions réelles. Je privilégie la transparence technique : plutôt que d'énoncer des concepts abstraits, je formalise mes architectures à l'aide de schémas explicites, de fichiers de configuration audités et de procédures de validation opérationnelles.
             </p>
         </section>
 
         <footer>
-            © 2026 Kossi Christian Daniel Esuté AGBOGAN. Tous droits réservés.
+            <p>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN. Tous droits réservés.</p>
         </footer>
     </div>
+
+    <!-- Script JS unique -->
+    <script src="script.js" defer></script>
 </body>
 </html>

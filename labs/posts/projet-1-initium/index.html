@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet INITIUM — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../thematiques/active-directory/index.html">← RETOUR AUX LABS INFRASTRUCTURE</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../articles/index.html">ARTICLES</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête du Lab -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">PROJET DE DURCISSEMENT — PHASE 1</span>
+                <span class="meta-date">Mis à jour le 16 Juillet 2026</span>
+            </div>
+            <h1>Projet INITIUM — Durcissement Réseau &amp; Gestion des Identités</h1>
+            <p class="pitch">
+                Refonte globale, segmentation réseau VLAN et sécurisation de l'annuaire centralisé pour le CHR HEALTH-CENTER (Établissement de Santé d'Importance Vitale).
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">pfSense</span>
+                <span class="tag">VLAN / 802.1Q</span>
+                <span class="tag">Active Directory</span>
+                <span class="tag">GPO / IAM</span>
+                <span class="tag">EVE-NG</span>
+            </div>
+        </header>
+
+        <main style="margin-top: 2.5rem;">
+            <!-- Cartes d'orientation du Lab -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem;">
+                
+                <!-- Carte Overview -->
+                <a href="overview.html" class="highlight-card" style="display: flex; flex-direction: column; gap: 0.75rem; text-decoration: none; color: inherit;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.25rem; margin: 0; color: var(--text);">Vue Synthétique &amp; Présentation Métier</h2>
+                        <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); font-weight: 500;">Découvrir l'aperçu →</span>
+                    </div>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                        Analyse du contexte hospitalier, cartographie des risques critiques, définition de l'architecture cible, découpage par VLANs et bénéfices métiers. Destiné aux profils non-techniques, décideurs et recruteurs.
+                    </p>
+                </a>
+
+                <!-- Carte Guide Technique -->
+                <a href="guide.html" class="highlight-card" style="display: flex; flex-direction: column; gap: 0.75rem; text-decoration: none; color: inherit;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+                        <h2 style="font-size: 1.25rem; margin: 0; color: var(--text);">Guide Technique Pas-à-Pas &amp; Rapport d'Ingénierie</h2>
+                        <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent); font-weight: 500;">Consulter le guide →</span>
+                    </div>
+                    <p style="font-size: 0.95rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                        Guide d'implémentation complet pas-à-pas intégrant la configuration des commutateurs vIOS-L2, le déploiement du pare-feu pfSense, la structuration Active Directory, les politiques de groupe (GPO) et le troubleshooting d'incidents.
+                    </p>
+                </a>
+
+            </div>
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Projet INITIUM — Tous droits réservés</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

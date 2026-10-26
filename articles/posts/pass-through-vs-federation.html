@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification Pass-Through, synchronisation de mots de passe ou fédération — quel modèle choisir — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; ARCHITECTURE D'INTÉGRATION</span>
+                <span class="meta-date">Publié le 4 Août 2026</span>
+            </div>
+            <h1>Authentification Pass-Through, synchronisation de mots de passe ou fédération — quel modèle choisir</h1>
+            <p class="pitch">
+                Analyse comparative des trois grands modèles d'intégration d'identité pour connecter un annuaire d'entreprise au cloud ou à des applications externes.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">LDAP</span>
+                <span class="tag">Fédération</span>
+                <span class="tag">Architecture</span>
+            </div>
+        </header>
+
+        <article>
+            <section>
+                <h2>Un choix d'architecture, pas un détail d'implémentation</h2>
+                <p>
+                    Quand une organisation connecte son annuaire interne (Active Directory, LDAP) à des services externes ou cloud, elle doit choisir <em>comment</em> l'identité y transite. Trois modèles existent, avec des compromis de sécurité et de disponibilité suffisamment différents pour justifier de les comparer explicitement plutôt que de choisir par défaut.
+                </p>
+            </section>
+
+            <section>
+                <h2>Pass-Through Authentication (PTA) : le bind direct, exposé</h2>
+                <p>
+                    Dans ce modèle, le service externe — ou un agent placé en périphérie du réseau interne — transmet en temps réel les identifiants saisis par l'utilisateur jusqu'à l'annuaire interne, qui exécute un bind LDAP classique (décrit dans <a href="../directory-services-ldap/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article précédent</a>) pour les valider. Le mot de passe de l'utilisateur ne quitte jamais réellement l'infrastructure interne sous une forme stockée — il transite, vérifié à la volée, à chaque tentative de connexion.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : aucune copie du mot de passe, même hachée, ne réside en dehors de l'annuaire d'origine. Une politique de mot de passe modifiée dans l'annuaire interne s'applique instantanément, sans synchronisation.
+                </p>
+                <p>
+                    <strong>Contrepartie</strong> : ce modèle crée une dépendance de disponibilité forte. Si l'annuaire interne ou l'agent de communication est indisponible, aucune authentification n'est possible via ce canal — un simple problème réseau interne devient une panne d'authentification visible depuis l'extérieur.
+                </p>
+            </section>
+
+            <section>
+                <h2>Password Hash Synchronization : la copie du hash</h2>
+                <p>
+                    Ici, l'organisation copie périodiquement une version hachée des mots de passe depuis l'annuaire interne vers le service externe, qui peut alors valider les authentifications localement, sans solliciter l'annuaire interne à chaque connexion.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : le service externe fonctionne indépendamment de la disponibilité de l'infrastructure interne au moment de l'authentification — une coupure réseau interne n'empêche pas les utilisateurs de se connecter.
+                </p>
+                <p>
+                    <strong>Contrepartie</strong>, et c'est le point qui mérite d'être souligné avec précision : ce n'est pas le mot de passe en clair qui est copié, mais son hash. La robustesse de cette approche dépend donc entièrement de la robustesse de l'algorithme de hachage utilisé côté annuaire source — un hash faible ou mal salé copié vers un second système double, de fait, la surface qu'un attaquant peut cibler pour tenter de le casser hors ligne. Ce n'est pas une faille en soi, mais un compromis à documenter explicitement plutôt qu'à ignorer.
+                </p>
+            </section>
+
+            <section>
+                <h2>Fédération : ni mot de passe, ni hash, seulement un jeton</h2>
+                <p>
+                    Ce modèle est celui déjà détaillé dans les premiers articles de ce site : l'utilisateur s'authentifie exclusivement auprès de son annuaire ou de son Identity Provider interne, qui délivre ensuite un jeton signé (SAML ou JWT selon le protocole) au service externe. Le service externe ne voit jamais le mot de passe, ni même une forme dérivée réutilisable ailleurs — seulement une preuve d'authentification limitée dans le temps et dans sa portée.
+                </p>
+                <p>
+                    <strong>Avantage</strong> : c'est le modèle qui expose le moins de matière sensible au service externe, et qui permet le contrôle le plus fin (durée de validité du jeton, audience, révocation via les mécanismes déjà décrits dans <a href="../jwt-token-lifecycle/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur le cycle de vie des tokens</a>).
+                </p>
+                <p>
+                    <strong>Contrepartie</strong> : la fédération demande une intégration protocolaire plus lourde de part et d'autre (configuration SAML ou OIDC, gestion des certificats de signature, métadonnées d'échange) — un coût d'implémentation initial plus élevé que PTA ou la synchronisation de hash, qui reposent sur des mécanismes plus anciens et souvent déjà en place.
+                </p>
+            </section>
+
+            <section>
+                <h2>Comment ces trois modèles se positionnent entre eux</h2>
+
+                <div class="table-container" style="overflow-x: auto; margin: 1.5rem 0 2rem 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Critère</th>
+                                <th>PTA</th>
+                                <th>Password Hash Sync</th>
+                                <th>Fédération</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Donnée exposée au service externe</strong></td>
+                                <td>Aucune (vérification à distance)</td>
+                                <td>Hash du mot de passe</td>
+                                <td>Jeton limité dans le temps</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dépendance à la disponibilité interne</strong></td>
+                                <td>Forte</td>
+                                <td>Faible</td>
+                                <td>Faible à modérée</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Application immédiate d'un changement de politique</strong></td>
+                                <td>Oui</td>
+                                <td>Différée (délai de sync)</td>
+                                <td>Oui</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coût d'intégration initial</strong></td>
+                                <td>Modéré</td>
+                                <td>Faible</td>
+                                <td>Élevé</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Granularité du contrôle d'accès</strong></td>
+                                <td>Faible (juste bind)</td>
+                                <td>Faible</td>
+                                <td>Élevée (claims, scopes, audience)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>
+                    Aucun de ces trois modèles n'est strictement supérieur aux deux autres — le choix dépend de ce que l'organisation priorise : exposition minimale de données sensibles, tolérance aux pannes réseau internes, ou coût d'intégration initial. Il n'est d'ailleurs pas rare qu'une organisation utilise plusieurs de ces modèles simultanément, selon les services concernés.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> relève exclusivement du modèle fédération — Keycloak, en tant qu'Identity Provider, émet des JWT sans jamais transmettre de mot de passe ni de hash à l'API Flask qui les consomme. Le lab n'implémente ni PTA ni synchronisation de hash, ces deux modèles supposant un second système d'identité externe que l'architecture actuelle du lab ne comporte pas.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Explorer l'architecture basée sur la fédération et l'émission de jetons de sécurité JWT.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

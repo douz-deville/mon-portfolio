@@ -3,414 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articles — Cybersécurité, IAM & Architecture Zero Trust</title>
+    <title>Articles & Analyses — Cybersécurité, IAM & Zero Trust</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #faf9f6;
-            --text: #1c1c1e;
-            --text-muted: #636366;
-            --accent: #1a56db;
-            --accent-light: #eff6ff;
-            --border: #e5e5ea;
-            --card-bg: #ffffff;
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            --font-mono: 'JetBrains Mono', monospace;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            padding: 3rem 1.5rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .back-nav {
-            margin-bottom: 3rem;
-        }
-
-        .back-nav a {
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            font-family: var(--font-mono);
-            transition: color 0.2s ease;
-        }
-
-        .back-nav a:hover {
-            color: var(--accent);
-        }
-
-        header {
-            margin-bottom: 3.5rem;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 2rem;
-        }
-
-        .meta {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1.15;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.75rem;
-        }
-
-        .lead {
-            font-size: 1.15rem;
-            color: var(--text-muted);
-            font-weight: 400;
-        }
-
-        .articles-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.75rem;
-            margin-bottom: 4rem;
-        }
-
-        .article-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            color: inherit;
-            transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .article-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(26, 86, 219, 0.05);
-        }
-
-        .article-header {
-            margin-bottom: 0.75rem;
-        }
-
-        .article-title {
-            font-size: 1.35rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
-            color: var(--text);
-            margin-bottom: 0.75rem;
-            line-height: 1.3;
-        }
-
-        .article-card:hover .article-title {
-            color: var(--accent);
-        }
-
-        .tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .tag {
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            background-color: var(--accent-light);
-            color: var(--accent);
-            padding: 0.2rem 0.55rem;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        .article-description {
-            color: var(--text-muted);
-            font-size: 0.975rem;
-            line-height: 1.6;
-            margin-bottom: 1.25rem;
-        }
-
-        .article-link {
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: var(--accent);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            transition: transform 0.2s ease;
-        }
-
-        .article-card:hover .article-link {
-            transform: translateX(4px);
-        }
-
-        footer {
-            border-top: 1px solid var(--border);
-            padding-top: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        @media (max-width: 640px) {
-            h1 {
-                font-size: 2rem;
-            }
-            footer {
-                flex-direction: column;
-                gap: 0.5rem;
-                align-items: flex-start;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body>
     <div class="container">
+        
+        <!-- Navigation Principale -->
         <nav class="back-nav">
-            <a href="../index.html">← RETOUR À L'ACCUEIL</a>
+            <a href="../index.html">← ACCUEIL</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../articles/index.html" style="color: var(--accent); font-weight: 600;">ARTICLES</a>
+                <a href="../labs/index.html">LABS</a>
+                <a href="../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
         </nav>
 
+        <!-- En-tête -->
         <header>
-            <div class="meta">PUBLICATIONS & ANALYSES</div>
-            <h1>Articles</h1>
-            <p class="lead">Réflexions et vulgarisation autour de la cybersécurité, l'IAM et les architectures modernes de confiance.</p>
+            <div class="meta">PUBLICATIONS &amp; ANALYSES</div>
+            <h1>Articles &amp; Réflexions Techniques</h1>
+            <p class="lead">Explorations approfondies, retours d'expérience et principes d'architecture autour de la cybersécurité, de l'IAM et du Zero Trust.</p>
         </header>
 
-        <main class="articles-list">
-            <a href="./idp-zero-trust/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</h2>
-                        <div class="tags-container">
-                            <span class="tag">IAM</span>
-                            <span class="tag">Zero Trust</span>
-                            <span class="tag">Keycloak</span>
-                        </div>
-                    </div>
-                    <p class="article-description">
+        <!-- Section 1 : Navigation par Thématique (Dossiers) -->
+        <section style="margin-bottom: 3.5rem;">
+            <h2>Explorer par Thématique</h2>
+            <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                
+                <a href="thematiques/active-directory/index.html" class="skill-card" style="text-decoration: none; transition: transform 0.2s ease, border-color 0.2s ease;">
+                    <h3>Active Directory</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Architecture, FSMO, AGDLP, Sites &amp; Services, LAPS, Sécurité Tier 0.</p>
+                </a>
+
+                <a href="thematiques/iam-zero-trust/index.html" class="skill-card" style="text-decoration: none; transition: transform 0.2s ease, border-color 0.2s ease;">
+                    <h3>IAM &amp; Zero Trust</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Identity Providers, Keycloak, JWT, OIDC/OAuth2, Gouvernance IGA/PAM.</p>
+                </a>
+
+                <a href="thematiques/container-security/index.html" class="skill-card" style="text-decoration: none; transition: transform 0.2s ease, border-color 0.2s ease;">
+                    <h3>Container Security</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Namespaces, Cgroups, Isolation Linux, Sécurisation des runtimes.</p>
+                </a>
+
+                <a href="thematiques/fondamentaux/index.html" class="skill-card" style="text-decoration: none; transition: transform 0.2s ease, border-color 0.2s ease;">
+                    <h3>Fondamentaux</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Principes de design, Défense en profondeur, Analyse de risques.</p>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Section 2 : Tous les Articles avec Filtres JS -->
+        <section>
+            <h2>Tous les Articles</h2>
+
+            <!-- Barre de filtres dynamiques JS -->
+            <div class="filter-container" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.25rem 0 2rem 0;">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="active-directory">Active Directory</button>
+                <button class="filter-btn" data-filter="iam-zero-trust">IAM / Zero Trust</button>
+                <button class="filter-btn" data-filter="container-security">Container Security</button>
+                <button class="filter-btn" data-filter="fondamentaux">Fondamentaux</button>
+            </div>
+
+            <!-- Liste des articles -->
+            <div class="case-studies">
+
+                <!-- Article 1 -->
+                <div class="case-card" data-category="iam-zero-trust">
+                    <span class="case-tag">IAM · Zero Trust · Keycloak</span>
+                    <a href="posts/idp-zero-trust.html" class="case-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a>
+                    <p class="case-desc">
                         Comment un Identity Provider comme Keycloak devient le point central de confiance numérique, et pourquoi la vraie question n'est pas « qui es-tu » mais « comment le prouves-tu, et comment je continue à vérifier ».
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./jwt-token-lifecycle/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</h2>
-                        <div class="tags-container">
-                            <span class="tag">JWT</span>
-                            <span class="tag">OAuth2</span>
-                            <span class="tag">Zero Trust</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Keycloak / OIDC / Architecture</span>
+                        <a href="posts/idp-zero-trust.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
-                                            Vérifier la signature d'un token ne suffit pas à le valider entièrement. Entre durée de vie courte, renouvellement et révocation, comment une architecture par jetons gère-t-elle la confiance après l'authentification initiale ?
+                </div>
+
+                <!-- Article 2 -->
+                <div class="case-card" data-category="iam-zero-trust">
+                    <span class="case-tag">JWT · OAuth2 · Zero Trust</span>
+                    <a href="posts/jwt-token-lifecycle.html" class="case-title">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</a>
+                    <p class="case-desc">
+                        Vérifier la signature d'un token ne suffit pas à le valider entièrement. Entre durée de vie courte, renouvellement et révocation, comment une architecture par jetons gère-t-elle la confiance après l'authentification initiale ?
                     </p>
-                </div>
-                <div class="article-link">
-                                        Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./iam-beyond-authentication/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">L'IAM au-delà de l'authentification : identités, cycle de vie et gouvernance</h2>
-                        <div class="tags-container">
-                            <span class="tag">IAM</span>
-                            <span class="tag">IGA</span>
-                            <span class="tag">PAM</span>
-                            <span class="tag">Zero Trust</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">JWT / OAuth2 / Cryptographie</span>
+                        <a href="posts/jwt-token-lifecycle.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 3 -->
+                <div class="case-card" data-category="iam-zero-trust">
+                    <span class="case-tag">IAM · IGA · PAM</span>
+                    <a href="posts/iam-beyond-authentication.html" class="case-title">L'IAM au-delà de l'authentification : identités, cycle de vie et gouvernance</a>
+                    <p class="case-desc">
                         Qu'est-ce qu'une identité, avant même de parler d'accès ? Au-delà de l'authentification, l'IAM répond à cinq questions — qui, quelle ressource, quelle action, quand, pourquoi — et se structure autour de trois domaines distincts : gouvernance, gestion des accès, comptes privilégiés.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./directory-services-ldap/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Où vivent les identités : Active Directory, LDAP et les services d'annuaire</h2>
-                        <div class="tags-container">
-                            <span class="tag">IAM</span>
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">LDAP</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Gouvernance / IGA / PAM / Zero Trust</span>
+                        <a href="posts/iam-beyond-authentication.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 4 -->
+                <div class="case-card" data-category="iam-zero-trust active-directory">
+                    <span class="case-tag">Active Directory · LDAP · Keycloak</span>
+                    <a href="posts/directory-services-ldap.html" class="case-title">Où vivent les identités : Active Directory, LDAP et les services d'annuaire</a>
+                    <p class="case-desc">
                         LDAP stocke-t-il des identités ? La réponse est non — c'est un protocole, pas un entrepôt. Comment Active Directory fait office de source de vérité, comment LDAP sert de canal d'interrogation, et comment Keycloak s'y fédère concrètement.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./agdlp/index.html" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">AGDLP dans Active Directory : organiser les identités et les permissions</h2>
-                        <div class="tags-container">
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">AGDLP</span>
-                            <span class="tag">IAM</span>
-                            <span class="tag">Sécurité</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Active Directory / LDAP / Federation</span>
+                        <a href="posts/directory-services-ldap.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 5 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · Sécurité</span>
+                    <a href="posts/agdlp.html" class="case-title">AGDLP dans Active Directory : organiser les identités et les permissions</a>
+                    <p class="case-desc">
                         Comment structurer les accès sans désordre ? La méthode AGDLP sépare clairement "qui a besoin d'accès" de "quelle ressource et quel niveau", grâce aux groupes globaux, locaux de domaine et ACLs pour une gestion maintenable et évolutive.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./aging_and_scavenging/index.html" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Aging & Scavenging DNS dans Active Directory : comprendre la péremption des enregistrements</h2>
-                        <div class="tags-container">
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">DNS</span>
-                            <span class="tag">Aging & Scavenging</span>
-                            <span class="tag">Sécurité</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Active Directory / AGDLP / ACLs</span>
+                        <a href="posts/agdlp.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 6 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · DNS</span>
+                    <a href="posts/aging_and_scavenging.html" class="case-title">Aging &amp; Scavenging DNS dans Active Directory : comprendre la péremption</a>
+                    <p class="case-desc">
                         Un DNS AD qui ne nettoie pas ses entrées devient une surface d'attaque. Découvrez comment fonctionnent l'Aging (No-Refresh, Refresh) et le Scavenging, pourquoi la suppression n'est pas immédiate et les risques de sécurité majeurs en cas d'inactivité.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./ad-privileged-groups/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation</h2>
-                        <div class="tags-container">
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">Privilege Escalation</span>
-                            <span class="tag">Tier 0</span>
-                            <span class="tag">Sécurité</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">DNS / Active Directory / Maintenance</span>
+                        <a href="posts/aging_and_scavenging.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 7 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · Sécurité Tier 0</span>
+                    <a href="posts/ad-privileged-groups.html" class="case-title">Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges</a>
+                    <p class="case-desc">
                         Sept groupes Active Directory concentrent la quasi-totalité du risque de compromission totale d'un domaine. Du modèle Tier 0 aux pièges d'élévation cachés derrière les "Built-in Operators" (Backup, Server, Account Operators), analyse des risques et règles d'or de la délégation.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./security-architecture-principles/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Les principes fondamentaux de l'architecture cybersécurité : ce qui doit précéder chaque décision technique</h2>
-                        <div class="tags-container">
-                            <span class="tag">Architecture</span>
-                            <span class="tag">Cybersecurity</span>
-                            <span class="tag">Zero Trust</span>
-                            <span class="tag">Design Principles</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Tier 0 / Privilege Escalation / Hardening</span>
+                        <a href="posts/ad-privileged-groups.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 8 -->
+                <div class="case-card" data-category="fondamentaux">
+                    <span class="case-tag">Architecture · Design Principles</span>
+                    <a href="posts/security-architecture-principles.html" class="case-title">Les principes fondamentaux de l'architecture cybersécurité</a>
+                    <p class="case-desc">
                         Ce qui vient avant l'architecture : les réflexes structurels qui dictent chaque choix technique. Pourquoi bannir la sécurité par l'obscurité, et comment appliquer systématiquement les 5 principes fondamentaux — défense en profondeur, moindre privilège, séparation des tâches, secure by design et simplicité (KISS).
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./fsmo-roles/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Les rôles FSMO dans Active Directory : les exceptions nécessaires au modèle multi-maître</h2>
-                        <div class="tags-container">
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">FSMO</span>
-                            <span class="tag">Architecture</span>
-                            <span class="tag">Kerberos</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">Défense en profondeur / Moindre privilège / KISS</span>
+                        <a href="posts/security-architecture-principles.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
-                        Pourquoi le multi-maître ne suffit pas toujours : analyse des 5 rôles FSMO, de leur portée (Forêt vs Domaine) et de leurs impacts en cas d'indisponibilité. Focus sur l'incompatibilité subtile entre Infrastructure Master et Global Catalog, ainsi que la gestion des transferts et seizures.
+                </div>
+
+                <!-- Article 9 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · Architecture</span>
+                    <a href="posts/fsmo-roles.html" class="case-title">Les rôles FSMO dans Active Directory : les exceptions au modèle multi-maître</a>
+                    <p class="case-desc">
+                        Pourquoi le multi-maître ne suffit pas toujours : analyse des 5 rôles FSMO, de leur portée (Forêt vs Domaine) et de leurs impacts en cas d'indisponibilité. Focus sur l'incompatibilité subtile entre Infrastructure Master et Global Catalog.
                     </p>
-                </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
-                </div>
-            </a>
-
-            <a href="./ad-sites-and-services/" class="article-card">
-                <div>
-                    <div class="article-header">
-                        <h2 class="article-title">Active Directory Sites and Services : construire la topologie physique de la réplication</h2>
-                        <div class="tags-container">
-                            <span class="tag">Active Directory</span>
-                            <span class="tag">Sites & Services</span>
-                            <span class="tag">Réplication</span>
-                            <span class="tag">Réseau</span>
-                        </div>
+                    <div class="case-meta">
+                        <span class="tech-stack">FSMO / Multi-maître / Active Directory</span>
+                        <a href="posts/fsmo-roles.html" class="btn-link">Lire l'article →</a>
                     </div>
-                    <p class="article-description">
+                </div>
+
+                <!-- Article 10 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · Réseau</span>
+                    <a href="posts/ad-sites-and-services.html" class="case-title">Active Directory Sites and Services : construire la topologie physique</a>
+                    <p class="case-desc">
                         Comment adapter Active Directory à la réalité physique de votre réseau. Découvrez le rôle des sites, sous-réseaux, KCC et Site Links pour maîtriser la bande passante WAN, optimiser la réplication et garantir l'authentification locale des utilisateurs.
                     </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">Sites &amp; Services / Réplication / KCC</span>
+                        <a href="posts/ad-sites-and-services.html" class="btn-link">Lire l'article →</a>
+                    </div>
                 </div>
-                <div class="article-link">
-                    Lire l'article <span>→</span>
+
+                <!-- Article 11 -->
+                <div class="case-card" data-category="container-security">
+                    <span class="case-tag">Container Security · Linux</span>
+                    <a href="posts/containers-are-just-processes.html" class="case-title">Les conteneurs ne sont que des processus</a>
+                    <p class="case-desc">
+                        Comprendre la réalité technique d'un conteneur Linux : un processus ordinaire de l'hôte isolé par des namespaces, cgroups et capabilities.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">Linux / Namespaces / Cgroups / Docker</span>
+                        <a href="posts/containers-are-just-processes.html" class="btn-link">Lire l'article →</a>
+                    </div>
                 </div>
-            </a>
 
-        </main>
+                <!-- Article 12 -->
+                <div class="case-card" data-category="active-directory">
+                    <span class="case-tag">Active Directory · GPO</span>
+                    <a href="posts/windows-laps.html" class="case-title">Windows LAPS : un mot de passe différent pour chaque ordinateur</a>
+                    <p class="case-desc">
+                        Mise en place et architecture de Windows LAPS pour éliminer la réutilisation des mots de passe administrateur local et contrecarrer les attaques Pass-the-Hash.
+                    </p>
+                    <div class="case-meta">
+                        <span class="tech-stack">LAPS / Active Directory / Pass-the-Hash</span>
+                        <a href="posts/windows-laps.html" class="btn-link">Lire l'article →</a>
+                    </div>
+                </div>
 
+            </div>
+        </section>
+
+        <!-- Pied de page -->
         <footer>
-            <div>Mise à jour : 2026</div>
-            <div>Portfolio Sécurité & Architecture</div>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
         </footer>
     </div>
+
+    <!-- Script JS centralisé -->
+    <script src="../script.js" defer></script>
 </body>
 </html>

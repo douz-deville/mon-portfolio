@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thématique : Container Security — Articles & Analyses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../index.html">← TOUS LES ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../labs/index.html">LABS</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Thématique -->
+        <header>
+            <div class="meta">THÉMATIQUE TECHNIQUE</div>
+            <h1>Container Security &amp; Isolation Linux</h1>
+            <p class="pitch">
+                Comprendre la sécurité des conteneurs nécessite de déconstruire le mythe de la "boîte magique". Retrouvez ici notre série d'analyses sur la réalité système des conteneurs : fonctionnement sous le noyau Linux, mécanismes d'isolation (namespaces, cgroups), gestion des privilèges (capabilities, seccomp) et surface d'attaque du noyau partagé.
+            </p>
+            <div class="tags-container" style="margin-top: 1rem;">
+                <span class="tag">Container Security</span>
+                <span class="tag">Linux Kernel</span>
+                <span class="tag">Namespaces</span>
+                <span class="tag">Cgroups</span>
+                <span class="tag">Capabilities</span>
+                <span class="tag">Docker / OCI</span>
+                <span class="tag">Hardening</span>
+            </div>
+        </header>
+
+        <!-- Liste des Articles de la Thématique -->
+        <main class="case-studies">
+
+            <!-- Article 1 : Les conteneurs ne sont que des processus -->
+            <div class="case-card">
+                <span class="case-tag">Série Container Security — Partie 1</span>
+                <a href="../../posts/containers-are-just-processes.html" class="case-title">Les conteneurs ne sont que des processus</a>
+                <p class="case-desc">
+                    Un conteneur n'est pas une mini-machine virtuelle, mais un processus Linux ordinaire avec des limites posées par le noyau. Démonstration pratique via /proc, analyse du noyau partagé et implications majeures pour la modélisation des menaces.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Linux / Processus / /proc / Noyau partagé / Docker</span>
+                    <a href="../../posts/containers-are-just-processes.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Emplacement pour la suite de la série (Avis de parution) -->
+            <div class="view-all-card" style="border-style: dashed; padding: 1.5rem; text-align: center;">
+                <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem; font-family: var(--font-mono);">
+                    ⏳ Suite de la série en cours de rédaction : <em>Partie 2 — Isolement de la vue avec les Namespaces Linux</em>.
+                </p>
+            </div>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

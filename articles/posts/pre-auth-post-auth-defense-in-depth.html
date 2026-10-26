@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avant et après l'authentification — la défense en profondeur dans une architecture d'identité — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; SÉCURITÉ ARCHITECTURALE</span>
+                <span class="meta-date">Publié le 4 Août 2026</span>
+            </div>
+            <h1>Avant et après l'authentification — la défense en profondeur dans une architecture d'identité</h1>
+            <p class="pitch">
+                Comprendre pourquoi la sécurité ne doit jamais reposer sur l'instant unique de la connexion, mais s'étendre des filtres pré-authentification aux contrôles continus.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">Zero Trust</span>
+                <span class="tag">Sécurité</span>
+            </div>
+        </header>
+
+        <article>
+            <section>
+                <h2>Un seul instant ne suffit pas à sécuriser tout le reste</h2>
+                <p>
+                    Les articles précédents de cette série ont beaucoup insisté sur l'instant de l'authentification : bind LDAP, émission de jetons, fédération. Mais réduire la sécurité d'une architecture d'identité à cet instant unique serait une erreur — une bonne partie des contrôles qui protègent réellement un système se situent avant que l'authentification ne commence, et une bonne partie continues de s'appliquer bien après qu'elle a réussi. C'est le principe de <strong>défense en profondeur</strong> appliqué spécifiquement à l'identité : aucune couche seule ne doit porter toute la responsabilité de la sécurité.
+                </p>
+            </section>
+
+            <section>
+                <h2>Avant l'authentification : filtrer avant même de vérifier</h2>
+                <p>
+                    Plusieurs mécanismes interviennent avant même qu'une tentative de connexion soit évaluée sur le fond :
+                </p>
+                <p>
+                    <strong>La limitation de débit (rate limiting)</strong> empêche un attaquant de tester des milliers de mots de passe en un temps court sur un même compte — une contre-mesure directe aux attaques par force brute et par bourrage d'identifiants (credential stuffing), où des identifiants volés ailleurs sont testés en masse sur un service différent.
+                </p>
+                <p>
+                    <strong>L'authentification par ticket, à la Kerberos</strong>, change la nature même de ce qui est vérifié en amont : plutôt que de transmettre un mot de passe à chaque service, un utilisateur obtient un ticket auprès d'une autorité centrale (le Key Distribution Center) une fois par session, puis présente ce ticket à chaque service ultérieur. C'est un modèle de pré-authentification au sens propre — une preuve d'identité déjà validée est présentée, plutôt qu'une preuve brute réévaluée à chaque fois.
+                </p>
+                <p>
+                    <strong>La confiance conditionnée à l'appareil (device trust)</strong> vérifie, avant même de proposer un écran de connexion, si l'appareil utilisé est reconnu, à jour, et conforme à une politique de sécurité — un appareil non conforme peut se voir refuser la tentative de connexion avant même que des identifiants ne soient saisis.
+                </p>
+                <p>
+                    Ce que ces mécanismes ont en commun : ils réduisent la surface exposée à l'étape d'authentification proprement dite, en filtrant en amont ce qui a le droit d'atteindre cette étape.
+                </p>
+            </section>
+
+            <section>
+                <h2>Après l'authentification : la vérification ne s'arrête pas là</h2>
+                <p>
+                    Une fois l'identité confirmée, une seconde couche de contrôles prend le relais — c'est le terrain déjà couvert par les principes Zero Trust décrits dans les tout premiers articles de ce site, mais qu'il vaut la peine de reformuler ici sous l'angle spécifique du "après" :
+                </p>
+                <p>
+                    <strong>Le MFA</strong> (authentification multi-facteurs) peut intervenir non seulement à la connexion initiale, mais aussi de façon adaptative, en cours de session, si une action jugée sensible est déclenchée — un changement de mot de passe, un virement bancaire, un accès à une ressource classée critique.
+                </p>
+                <p>
+                    <strong>Le RBAC</strong>, déjà détaillé dans le premier article de cette série IAM, s'applique en continu après l'authentification : chaque action, pas seulement la connexion, est confrontée au rôle de l'utilisateur.
+                </p>
+                <p>
+                    <strong>Les claims portés par un jeton</strong> (audience, scope, expiration — voir <a href="../jwt-token-lifecycle/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">l'article sur le cycle de vie des tokens</a>) constituent une forme de contrôle post-authentification distribué : chaque application qui reçoit le jeton réévalue elle-même, localement, si la preuve d'identité présentée reste valable et suffisante pour l'action demandée.
+                </p>
+            </section>
+
+            <section>
+                <h2>Pourquoi séparer les deux couches, plutôt que de tout miser sur l'authentification</h2>
+                <p>
+                    L'intérêt de cette distinction pré/post n'est pas seulement organisationnel. Elle correspond à une hypothèse de sécurité réaliste : aucun mécanisme d'authentification, aussi robuste soit-il, n'est infaillible à 100 % — un mot de passe peut fuiter, un appareil peut être compromis, un jeton peut être intercepté. La défense en profondeur part du principe qu'un contrôle isolé finira, statistiquement, par échouer un jour, et que la sécurité globale du système ne doit donc jamais reposer sur une seule couche.
+                </p>
+                <p>
+                    C'est directement le principe <strong>assume breach</strong> déjà présenté dans les premiers articles de cette série, mais rendu ici concret : ce n'est pas seulement le réseau interne qu'on suppose potentiellement compromis, c'est chaque couche individuelle de l'architecture d'identité, y compris l'authentification elle-même.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    Le lab <code>LAB-ZT-IAM-01</code> implémente une couche de contrôle post-authentification — la validation systématique de signature et de claims à chaque requête côté API Flask — mais aucun contrôle pré-authentification de ce que décrit cet article (pas de rate limiting configuré, pas de vérification de conformité d'appareil). C'est une limite assumée du lab actuel, et une extension naturelle si je voulais illustrer concrètement la défense en profondeur plutôt que seulement en décrire les principes.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Examiner les mécanismes de vérification des jetons et de contrôle d'accès post-authentification.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

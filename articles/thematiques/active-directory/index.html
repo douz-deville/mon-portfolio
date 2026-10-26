@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thématique : Active Directory — Articles & Analyses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../index.html">← TOUS LES ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../labs/index.html">LABS</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Thématique -->
+        <header>
+            <div class="meta">THÉMATIQUE TECHNIQUE</div>
+            <h1>Active Directory &amp; Services d'Annuaire</h1>
+            <p class="pitch">
+                L'annuaire Active Directory constitue le cœur de la confiance et de l'identité des infrastructures Windows Enterprise. Retrouvez ici l'ensemble des analyses, méthodes d'organisation (AGDLP, Tier 0), architectures de réplication et mécanismes de durcissement (LAPS, DNS Scavenging).
+            </p>
+            <div class="tags-container" style="margin-top: 1rem;">
+                <span class="tag">Active Directory</span>
+                <span class="tag">Tier 0</span>
+                <span class="tag">AGDLP</span>
+                <span class="tag">FSMO</span>
+                <span class="tag">LAPS</span>
+                <span class="tag">Kerberos</span>
+                <span class="tag">DNS AD</span>
+            </div>
+        </header>
+
+        <!-- Liste des Articles de la Thématique -->
+        <main class="case-studies">
+
+            <!-- Article 1 : Privileged Groups -->
+            <div class="case-card">
+                <span class="case-tag">Sécurité Tier 0 &amp; Élévation de privilèges</span>
+                <a href="../../posts/ad-privileged-groups.html" class="case-title">Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation</a>
+                <p class="case-desc">
+                    Sept groupes Active Directory concentrent la quasi-totalité du risque de compromission totale d'un domaine. Du modèle Tier 0 aux pièges d'élévation cachés derrière les "Built-in Operators" (Backup, Server, Account Operators), analyse des risques et règles d'or de la délégation.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Tier 0 / Privilege Escalation / Delegation</span>
+                    <a href="../../posts/ad-privileged-groups.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 2 : Windows LAPS -->
+            <div class="case-card">
+                <span class="case-tag">Hardening &amp; Authentification Locale</span>
+                <a href="../../posts/windows-laps.html" class="case-title">Windows LAPS : un mot de passe différent pour chaque ordinateur</a>
+                <p class="case-desc">
+                    Mise en place et architecture de Windows LAPS pour éliminer la réutilisation des mots de passe administrateur local et contrecarrer efficacement les attaques par rebond de type Pass-the-Hash.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Windows LAPS / GPO / Pass-the-Hash</span>
+                    <a href="../../posts/windows-laps.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 3 : AGDLP -->
+            <div class="case-card">
+                <span class="case-tag">Gouvernance des Accès &amp; Permissions</span>
+                <a href="../../posts/agdlp.html" class="case-title">AGDLP dans Active Directory : organiser les identités et les permissions</a>
+                <p class="case-desc">
+                    Comment structurer les accès sans désordre ? La méthode AGDLP sépare clairement "qui a besoin d'accès" de "quelle ressource et quel niveau", grâce aux groupes globaux, locaux de domaine et ACLs pour une gestion maintenable et évolutive.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">AGDLP / Groupes AD / ACLs / IAM</span>
+                    <a href="../../posts/agdlp.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 4 : Directory Services & LDAP -->
+            <div class="case-card">
+                <span class="case-tag">Identité, Annuaire &amp; Fédération</span>
+                <a href="../../posts/directory-services-ldap.html" class="case-title">Où vivent les identités : Active Directory, LDAP et les services d'annuaire</a>
+                <p class="case-desc">
+                    LDAP stocke-t-il des identités ? La réponse est non — c'est un protocole, pas un entrepôt. Comment Active Directory fait office de source de vérité, comment LDAP sert de canal d'interrogation, et comment Keycloak s'y fédère concrètement.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Active Directory / LDAP / Federation / Keycloak</span>
+                    <a href="../../posts/directory-services-ldap.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 5 : FSMO Roles -->
+            <div class="case-card">
+                <span class="case-tag">Architecture &amp; Continuité d'Activité</span>
+                <a href="../../posts/fsmo-roles.html" class="case-title">Les rôles FSMO dans Active Directory : les exceptions nécessaires au modèle multi-maître</a>
+                <p class="case-desc">
+                    Pourquoi le multi-maître ne suffit pas toujours : analyse des 5 rôles FSMO, de leur portée (Forêt vs Domaine) et de leurs impacts en cas d'indisponibilité. Focus sur l'incompatibilité subtile entre Infrastructure Master et Global Catalog.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">FSMO / Multi-maître / Active Directory / Disaster Recovery</span>
+                    <a href="../../posts/fsmo-roles.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 6 : Sites and Services -->
+            <div class="case-card">
+                <span class="case-tag">Réseau &amp; Topologie de Réplication</span>
+                <a href="../../posts/ad-sites-and-services.html" class="case-title">Active Directory Sites and Services : construire la topologie physique de la réplication</a>
+                <p class="case-desc">
+                    Comment adapter Active Directory à la réalité physique de votre réseau. Découvrez le rôle des sites, sous-réseaux, KCC et Site Links pour maîtriser la bande passante WAN, optimiser la réplication et garantir l'authentification locale des utilisateurs.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Sites &amp; Services / KCC / Réplication WAN</span>
+                    <a href="../../posts/ad-sites-and-services.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 7 : Aging & Scavenging -->
+            <div class="case-card">
+                <span class="case-tag">DNS AD &amp; Nettoyage Automatisé</span>
+                <a href="../../posts/aging_and_scavenging.html" class="case-title">Aging &amp; Scavenging DNS dans Active Directory : comprendre la péremption des enregistrements</a>
+                <p class="case-desc">
+                    Un DNS AD qui ne nettoie pas ses entrées devient une surface d'attaque. Découvrez comment fonctionnent l'Aging (No-Refresh, Refresh) et le Scavenging, pourquoi la suppression n'est pas immédiate et les risques de sécurité majeurs en cas d'inactivité.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">DNS AD / Aging &amp; Scavenging / Hygiene Réseau</span>
+                    <a href="../../posts/aging_and_scavenging.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 8 : Partitions AD -->
+            <div class="case-card">
+                <span class="case-tag">Base de données AD &amp; Structure</span>
+                <a href="../../posts/ad-directory-partitions.html" class="case-title">Les partitions de la base de données Active Directory : Schema, Configuration et Domain</a>
+                <p class="case-desc">
+                    Comprendre l'organisation interne de la base `ntds.dit`. Analyse des différentes partitions de l'annuaire (Schema, Configuration, Domain et NDNC), de leur portée de réplication et de leur rôle critique dans la sécurité globale.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">ntds.dit / Partitions / Schema / DomainDNSZones</span>
+                    <a href="../../posts/ad-directory-partitions.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

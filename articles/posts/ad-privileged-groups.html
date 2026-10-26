@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">ACTIVE DIRECTORY &amp; SÉCURITÉ TIER 0</span>
+                <span class="meta-date">Publié le 21 Août 2026</span>
+            </div>
+            <h1>Les groupes privilégiés d'Active Directory : Tier 0, Built-in Operators et pièges de délégation</h1>
+            <p class="pitch">
+                Dans Active Directory, sept groupes concentrent la quasi-totalité du risque de compromission totale d'un domaine. Du modèle Tier 0 aux pièges d'élévation cachés derrière les "Built-in Operators", analyse des risques et règles d'or de la délégation.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">Active Directory</span>
+                <span class="tag">Privilege Escalation</span>
+                <span class="tag">Tier 0</span>
+                <span class="tag">Sécurité</span>
+                <span class="tag">Hardening</span>
+            </div>
+        </header>
+
+        <!-- Corps de l'Article -->
+        <article>
+            <section>
+                <p>
+                    Dans Active Directory, tous les groupes ne se valent pas. Sept d'entre eux concentrent à eux seuls la quasi-totalité du risque de compromission totale d'un domaine — et le plus dangereux n'est pas toujours celui qu'on croit. Certains sont évidents (<code>Domain Admins</code>), d'autres se présentent comme de simples rôles opérationnels (<code>Backup Operators</code>, <code>Server Operators</code>) alors qu'ils offrent, dans les faits, un chemin direct vers le contrôle total du domaine.
+                </p>
+
+                <!-- Zone d'image d'en-tête / Schéma -->
+                <figure class="article-image-container" style="margin: 2.5rem 0; text-align: center;">
+                    <img src="../../images/ad_privileged_groups_hierarchy.png" alt="Schéma illustrant l'architecture des groupes privilégiés Active Directory et des Built-in Operators" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                    <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted); font-style: italic;">Cartographie des privilèges AD : de la portée forêt (Enterprise/Schema Admins) aux droits locaux d'OS et Built-in Operators</figcaption>
+                </figure>
+
+                <!-- Tableau Récapitulatif Global -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Groupe</th>
+                                <th>Portée (Scope)</th>
+                                <th>Niveau (Tier)</th>
+                                <th>Vecteur de risque / usage principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Enterprise Admins</strong></td>
+                                <td>Forêt (Root)</td>
+                                <td>Tier 0</td>
+                                <td>Contrôle absolu sur la totalité de la forêt Active Directory.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Schema Admins</strong></td>
+                                <td>Forêt (Root)</td>
+                                <td>Tier 0</td>
+                                <td>Modification de la structure de la base de données AD.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Domain Admins</strong></td>
+                                <td>Domaine</td>
+                                <td>Tier 0</td>
+                                <td>Contrôle total sur un domaine spécifique et ses machines jointes.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Administrators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Tier 0</td>
+                                <td>Gestionnaires directs des contrôleurs de domaine (DC).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Account Operators</strong></td>
+                                <td>Domaine</td>
+                                <td>Élevé</td>
+                                <td>Création/gestion de comptes non protégés <em>(PrivEsc potentiel)</em>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Backup Operators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Critique</td>
+                                <td>Contourne le NTFS pour lire la base AD (<code>ntds.dit</code>) <em>(PrivEsc direct)</em>.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Server Operators</strong></td>
+                                <td>Domaine / DC</td>
+                                <td>Critique</td>
+                                <td>Gestion des services et sessions sur les DC <em>(PrivEsc direct)</em>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>1. Deux vocabulaires qu'il ne faut pas confondre</h2>
+                <p>
+                    Avant d'aller plus loin, il faut désamorcer une confusion très fréquente : <strong>« Built-in » et « Tier 0 » ne mesurent pas la même chose.</strong>
+                </p>
+                <ul>
+                    <li><strong>« Built-in »</strong> désigne une <strong>origine technique dans l'annuaire</strong> : c'est simplement le nom du conteneur (<code>CN=Builtin</code>) où Windows range les groupes système précréés historiquement par l'OS, avec des identifiants (SID) fixes comme <code>S-1-5-32-544</code> pour <code>Administrators</code>. À l'inverse, <code>CN=Users</code> est le conteneur par défaut où Active Directory génère les groupes globaux de domaine comme <code>Domain Admins</code> (RID 512).</li>
+                    <li><strong>« Tier 0 »</strong> désigne un <strong>niveau de privilège</strong>, dans le modèle de sécurité par paliers (<em>tiering</em>) recommandé par l'ANSSI et Microsoft : tout groupe capable de contrôler un contrôleur de domaine ou la base Active Directory elle-même est classé Tier 0, quel que soit son conteneur d'origine.</li>
+                </ul>
+                <p>
+                    Autrement dit : <code>Administrators</code> est Built-in <strong>et</strong> Tier 0. <code>Domain Admins</code> n'est pas Built-in (il vit dans <code>CN=Users</code>) mais il est <strong>tout autant</strong> Tier 0. Le terme "Built-in" ne dit rien sur le niveau de dangerosité d'un groupe — c'est uniquement une étiquette d'emplacement.
+                </p>
+            </section>
+
+            <section>
+                <h2>2. Le compte <code>Administrator</code> et le groupe <code>Administrators</code> : deux choses différentes</h2>
+                <p>
+                    Un compte est une identité ; un groupe est un conteneur de droits. La confusion entre les deux est fréquente, en particulier parce que le nom se ressemble.
+                </p>
+                <ul>
+                    <li><strong>Le compte <code>Administrator</code> :</strong> une identité individuelle, présente par défaut sur chaque installation Windows — y compris un simple PC qui n'a jamais rejoint de domaine AD. Son identifiant (SID) se termine par <code>-500</code>.</li>
+                    <li><strong>Le groupe <code>Administrators</code> :</strong> le conteneur qui détient les droits techniques absolus sur le système local (SID <code>S-1-5-32-544</code>). C'est ce groupe — pas le compte — qui porte réellement les privilèges Windows bas niveau : installer des pilotes, lire la mémoire système, modifier le registre.</li>
+                </ul>
+                <p>
+                    Par défaut, le compte <code>Administrator</code> est simplement le <strong>premier membre inscrit</strong> dans le groupe <code>Administrators</code>. Ce mécanisme existe sur toute machine Windows, domaine ou pas — un poste isolé, jamais joint à un AD, a lui aussi son compte <code>Administrator</code> et son groupe <code>Administrators</code> locaux.
+                </p>
+            </section>
+
+            <section>
+                <h2>3. Pourquoi <code>Domain Admins</code> est imbriqué dans <code>Administrators</code></h2>
+                <p>
+                    C'est ici que la hiérarchie technique devient intéressante — et légèrement contre-intuitive.
+                </p>
+                <p><strong>Techniquement, le groupe <code>Administrators</code> est au-dessus de <code>Domain Admins</code>.</strong></p>
+                <ul>
+                    <li><strong>L'origine des privilèges :</strong> c'est <code>Administrators</code> qui détient nativement les privilèges système bas niveau sur les contrôleurs de domaine (charger des pilotes, lire la mémoire kernel, gérer les services). <code>Domain Admins</code> ne possède pas ces droits par lui-même — il les <strong>hérite</strong> uniquement parce qu'il est membre d'<code>Administrators</code>.</li>
+                    <li><strong>Le test de séparation :</strong> si on retire <code>Domain Admins</code> du groupe <code>Administrators</code>, ses membres perdent immédiatement la capacité d'administrer les contrôleurs de domaine — impossible de s'y connecter en RDP, de gérer les services système ou d'agir sur la mémoire du DC.</li>
+                    <li><strong>Le pouvoir final :</strong> un utilisateur placé uniquement dans <code>Administrators</code> a le pouvoir absolu sur l'OS du DC. Il peut donc manipuler directement le processus <code>LSASS</code> ou la base Active Directory au niveau fichier — et s'ajouter lui-même dans <code>Domain Admins</code> s'il le souhaite.</li>
+                </ul>
+                <p>
+                    <code>Administrators</code> est donc le conteneur final des droits système. <code>Domain Admins</code> n'est qu'un groupe global imbriqué dedans par défaut, pour faciliter la gestion à grande échelle.
+                </p>
+            </section>
+
+            <section>
+                <h2>4. Une portée plus large, pas un privilège supérieur</h2>
+                <p>
+                    Il y a bien une asymétrie entre les deux groupes — mais elle porte sur la <strong>portée réseau</strong>, pas sur le <strong>niveau de sécurité</strong>. Les deux sont strictly Tier 0.
+                </p>
+                <ul>
+                    <li><strong><code>Domain Admins</code> (groupe global) :</strong> quand une machine rejoint le domaine, Active Directory injecte automatiquement <code>Domain Admins</code> dans le groupe <code>Administrateurs</code> local de cette machine. Cela lui donne un pouvoir d'administration transverse sur tout le parc — postes, serveurs, DC compris.</li>
+                    <li><strong><code>Administrators</code> (groupe Builtin / Domain Local) :</strong> ce groupe contrôle uniquement l'OS des contrôleurs de domaine et la base AD. Il n'est pas injecté automatiquement sur les postes clients ou les serveurs membres.</li>
+                </ul>
+
+                <div class="highlight-card">
+                    <p><strong>L'analogie qui fixe l'idée :</strong> imagine un grand hôtel (le réseau d'entreprise) avec des centaines de chambres (les serveurs et les postes).</p>
+                    <p><code>Administrators</code> = <strong>la serrure de la chambre.</strong> Chaque machine possède son propre groupe <code>Administrators</code> : c'est la serrure locale qui dit « toute personne dans ce groupe a le contrôle total de <em>cette</em> machine ».</p>
+                    <p><code>Domain Admins</code> = <strong>le pass-partout des employés.</strong> C'est le groupe global du réseau dans lequel on place les comptes de l'équipe IT.</p>
+                </div>
+                <p>
+                    Quand une nouvelle machine rejoint le domaine, Windows dit automatiquement à sa serrure locale (<code>Administrators</code>) : « accepte le pass-partout (<code>Domain Admins</code>) ». Résultat : l'équipe IT peut dépanner n'importe quelle machine du réseau instantanément, sans configurer chaque poste un par un.
+                </p>
+            </section>
+
+            <section>
+                <h2>5. Pourquoi deux groupes distincts, alors ?</h2>
+                <p>
+                    Trois raisons structurelles justifient cette séparation entre <code>Domain Admins</code> (porteur d'identités) et <code>Administrators</code> (porteur de droits effectifs) :
+                </p>
+
+                <h3>a) La flexibilité multi-domaines (logique AGDLP)</h3>
+                <p>
+                    <code>Domain Admins</code> est un groupe Global (il rassemble des identités d'un domaine précis) ; <code>Administrators</code> est un groupe Domain Local (il détient les privilèges système effectifs). Dans une entreprise avec deux domaines (<code>france.techcorp.local</code> et <code>usa.techcorp.local</code>), on peut ajouter le <code>Domain Admins</code> de France dans le groupe <code>Administrators</code> des DC américains — accordant un accès croisé propre sans jamais mélanger la gestion des comptes des deux pays. C'est exactement le même principe que l'architecture AGDLP appliquée aux permissions de fichiers, mais transposé au contrôle des serveurs eux-mêmes.
+                </p>
+
+                <h3>b) L'automatisation du parc informatique</h3>
+                <p>
+                    Windows a besoin d'un conteneur mobile, distribuable sur tout le réseau. Sans <code>Domain Admins</code>, il faudrait configurer manuellement les droits d'administration sur chaque nouveau serveur ou poste client — un travail insoutenable à l'échelle d'un parc de plusieurs centaines de machines.
+                </p>
+
+                <h3>c) La cohérence avec le noyau Windows</h3>
+                <p>
+                    Toute machine Windows, du PC individuel au serveur, possède le groupe <code>Administrators</code> pour gérer ses droits internes (services, pilotes, registre). Le conserver sur le contrôleur de domaine permet au noyau Windows d'appliquer exactement les mêmes mécanismes de sécurité système (UAC, politiques de privilèges) que sur n'importe quel autre serveur — pendant que <code>Domain Admins</code> sert de couche d'abstraction propre à Active Directory.
+                </p>
+
+                <div class="highlight-card">
+                    <p><strong>En résumé, la logique est la suivante :</strong></p>
+                    <p><code>Domain Admins</code> sert à regrouper les utilisateurs (les identités de l'équipe IT). <code>Administrators</code> sert à porter les droits et accès effectifs sur le système d'exploitation.</p>
+                    <p><code>Compte Admin → Domain Admins (porteur d'utilisateurs) → Administrators (porteur de droits) → Accès système</code></p>
+                </div>
+
+                <p>
+                    C'est cette séparation stricte entre <em>rassemblement des comptes</em> et <em>attribution des droits</em> qui rend Active Directory aussi souple à gérer à grande échelle — la même logique, littéralement, que celle qui structure AGDLP pour les permissions sur fichiers.
+                </p>
+            </section>
+
+            <section>
+                <h2>6. Enterprise Admins et Schema Admins : changer d'échelle, passer à la forêt</h2>
+                <p>
+                    <code>Enterprise Admins</code> (EA) et <code>Schema Admins</code> (SA) ne sont ni des groupes Globaux ni des groupes Domain Local : ce sont des <strong>groupes Universels</strong> (<em>Universal Groups</em>), et ils n'existent qu'à un seul endroit — le <strong>domaine racine de la forêt</strong> AD. On quitte ici le niveau Domaine pour passer au niveau Forêt.
+                </p>
+
+                <h3>a) Enterprise Admins : la surcouche d'identités de la forêt</h3>
+                <p>C'est un conteneur d'utilisateurs, comme <code>Domain Admins</code>, mais conçu pour gérer plusieurs domaines à la fois.</p>
+                <ul>
+                    <li><strong>Comment il obtient ses droits :</strong> par défaut, Active Directory imbrique automatiquement <code>Enterprise Admins</code> dans le groupe <code>Administrators</code> de <strong>chaque domaine</strong> de la forêt.</li>
+                    <li><strong>Résultat :</strong> un membre d'<code>Enterprise Admins</code> possède automatiquement les droits d'administration locale sur tous les contrôleurs de domaine de toutes les filiales de l'entreprise. Il doit rester <strong>vide au quotidien</strong>, et n'être peuplé que pour des opérations d'infrastructure majeures (création d'un nouveau domaine, approbation de forêt).</li>
+                </ul>
+
+                <h3>b) Schema Admins : le privilège direct sur la base de données</h3>
+                <p>Ici, la mécanique diverge complètement : <code>Schema Admins</code> ne s'imbrique pas dans <code>Administrators</code> et ne sert pas à gérer des serveurs Windows.</p>
+                <ul>
+                    <li><strong>Comment il obtient ses droits :</strong> il possède des permissions d'écriture directes (ACL) sur la <strong>partition Schéma</strong> de la base Active Directory.</li>
+                    <li><strong>Son rôle :</strong> le schéma est le "plan de construction" d'AD — il définit ce qu'est un utilisateur, un ordinateur, quels attributs ils peuvent porter. <code>Schema Admins</code> est le seul groupe autorisé à modifier ce plan (par exemple lors de l'installation d'un serveur Exchange ou d'une mise à niveau majeure d'AD). Il doit rester <strong>vide en permanence</strong>, et n'être peuplé que temporairement, le temps d'une extension de schéma.</li>
+                </ul>
+
+                <p><strong>Résumé de la mécanique à trois échelles :</strong></p>
+                <ul>
+                    <li><code>Domain Admins</code> = conteneur d'identités pour <strong>1 domaine</strong>.</li>
+                    <li><code>Enterprise Admins</code> = conteneur d'identités injecté dans la serrure <code>Administrators</code> de <strong>tous les domaines</strong> de la forêt.</li>
+                    <li><code>Schema Admins</code> = porteur de droits <strong>direct</strong> sur la base de données (le plan d'AD lui-même).</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>7. Les "Built-in Operators" : le piège de la fausse délégation</h2>
+                <p>
+                    Conçus à l'origine par Microsoft pour déléguer des tâches quotidiennes sans attribuer le rôle <code>Domain Admin</code>, ces trois groupes Domain Local (Builtin) offrent en réalité des chemins d'élévation de privilèges (<em>Privilege Escalation</em>) quasi-immédiats vers le contrôle total du domaine. C'est le piège le plus sous-estimé d'Active Directory : on pense attribuer un rôle technique restreint, alors qu'on offre en réalité un bouton "passer Administrateur du Domaine".
+                </p>
+
+                <h3>Account Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> créer, modifier et supprimer des comptes utilisateurs, ordinateurs et groupes du domaine.</li>
+                    <li><strong>Ce qu'il ne peut pas toucher directement :</strong> les comptes protégés par le mécanisme <em>AdminSDHolder</em> (<code>Domain Admins</code>, <code>Administrators</code>, etc.).</li>
+                    <li><strong>Le danger caché :</strong> même sans pouvoir toucher directement aux comptes protégés, un attaquant membre de ce groupe peut créer des objets ordinateurs malveillants, réinitialiser le mot de passe de comptes de service stratégiques, ou configurer une délégation Kerberos (<em>Resource-Based Constrained Delegation</em>) pour pivoter jusqu'au statut <code>Domain Admin</code>.</li>
+                </ul>
+
+                <h3>Backup Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> effectuer les sauvegardes et restaurations sur les contrôleurs de domaine.</li>
+                    <li><strong>Privilèges système clés :</strong> <code>SeBackupPrivilege</code> et <code>SeRestorePrivilege</code> — deux privilèges qui ordonnent au noyau Windows d'<strong>ignorer totalement les permissions NTFS</strong>.</li>
+                    <li><strong>Le danger caché :</strong> un membre peut copier directement le fichier <code>ntds.dit</code> (la base de données AD) et la ruche <code>SYSTEM</code> depuis le contrôleur de domaine, puis extraire hors ligne les hachages NTLM de tous les comptes de l'entreprise — y compris <code>krbtgt</code> et <code>Administrator</code>. C'est un vol direct de la base de mots de passe complète du domaine, en quelques secondes.</li>
+                </ul>
+
+                <h3>Server Operators</h3>
+                <ul>
+                    <li><strong>Rôle officiel :</strong> gérer la configuration des contrôleurs de domaine — redémarrer le serveur, gérer les services, fermer des sessions.</li>
+                    <li><strong>Le danger caché :</strong> gérer les services sur un contrôleur de domaine équivaut à contrôler le domaine. Un attaquant peut reconfigurer le chemin d'exécutable d'un service système pour y injecter un script malveillant. Au redémarrage du service, le script s'exécute avec les droits suprêmes du DC (<code>NT AUTHORITY\SYSTEM</code>).</li>
+                </ul>
+
+                <!-- Tableau de synthèse des Operators -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Groupe</th>
+                                <th>Type de groupe</th>
+                                <th>Droits système cibles</th>
+                                <th>Risque d'élévation de privilèges</th>
+                                <th>Recommandation ANSSI / Microsoft</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Account Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td>Gestion d'objets AD (hors admins)</td>
+                                <td>Élevé (attaques Kerberos)</td>
+                                <td>Laisser vide — préférer la délégation par OU</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Backup Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td><code>SeBackupPrivilege</code> sur DC</td>
+                                <td>Critique (vol de la base <code>ntds.dit</code>)</td>
+                                <td>Laisser vide — utiliser des comptes gMSA</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Server Operators</strong></td>
+                                <td>Domaine Local</td>
+                                <td>Gestion de services &amp; logon sur DC</td>
+                                <td>Critique (exécution de code en <code>SYSTEM</code>)</td>
+                                <td>Laisser vide — restreindre l'accès aux DC</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section>
+                <h2>8. Le point commun de tous les scénarios d'attaque : le vol de jeton en mémoire</h2>
+                <p>
+                    Au-delà des trois "Operators", le risque le plus systémique touche <code>Domain Admins</code> et <code>Enterprise Admins</code> eux-mêmes : le <strong>vol de jeton / Pass-the-Hash</strong>.
+                </p>
+                <p>
+                    Ces comptes possèdent les clés du royaume. Si un membre de ce groupe se connecte sur un poste de travail compromis — même un simple poste utilisateur, pas un serveur — son hachage de mot de passe reste en mémoire RAM, dans le processus <code>LSASS</code>. Un attaquant qui extrait ce hachage (avec un outil comme Mimikatz) devient administrateur sur tout le réseau, sans même connaître le mot de passe en clair. C'est pour cette raison précise que la bonne pratique interdit d'utiliser un compte <code>Domain Admin</code> pour se connecter sur une machine utilisateur — c'est le principe du <em>Tiering</em>.
+                </p>
+            </section>
+
+            <section>
+                <h2>9. La règle d'or de la délégation</h2>
+                <p>
+                    En environnement de production, selon les recommandations conjointes de l'ANSSI et de Microsoft :
+                </p>
+                <ul>
+                    <li><strong>Tier 0 (<code>Enterprise Admins</code>, <code>Schema Admins</code>) :</strong> laissés vides à 100 % au quotidien, peuplés temporairement uniquement pour des opérations d'infrastructure majeures, puis vidés immédiatement après.</li>
+                    <li><strong><code>Domain Admins</code> / <code>Administrators</code> :</strong> effectif réduit au strict minimum (2 à 3 comptes nommés maximum), jamais utilisés pour se connecter sur une machine utilisateur.</li>
+                    <li><strong>Les trois "Built-in Operators" (Account, Backup, Server) :</strong> laissés <strong>entièrement vides</strong>. La délégation des tâches administratives doit se faire exclusivement par <strong>délégation d'unités d'organisation (OU)</strong> ou par des comptes de service gérés de manière sécurisée (gMSA), afin d'appliquer le principe du moindre privilège sans créer de chemins d'élévation cachés.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>10. Synthèse : les bonnes pratiques d'architecture des groupes privilégiés</h2>
+                <div class="highlight-card">
+                    <p><strong>Les 5 règles incontournables pour sécuriser vos groupes privilégiés :</strong></p>
+                    <ol>
+                        <li><strong>Appliquer le modèle de Tiering (ANSSI / Microsoft) :</strong> Isoler hermétiquement le Tier 0 (DC, identités privilégiées, PKI) des serveurs membres (Tier 1) et des postes de travail (Tier 2). Un compte Tier 0 ne doit jamais ouvrir de session sur un Tier 1 ou Tier 2.</li>
+                        <li><strong>Vider les Built-in Operators :</strong> Ne jamais utiliser <code>Account Operators</code>, <code>Server Operators</code> ni <code>Backup Operators</code>. Déléguer les droits d'administration de manière granulaire sur des OU ciblées.</li>
+                        <li><strong>Utiliser des comptes nommés et distincts :</strong> Interdire l'usage partagé du compte <code>Administrator</code> générique. Chaque administrateur doit disposer d'un compte dédié pour l'administration (ex: <code>adm-prenom.nom</code>) distinct de son compte utilisateur au quotidien.</li>
+                        <li><strong>Garder Enterprise et Schema Admins vides :</strong> Ces groupes de niveau forêt ne doivent contenir aucun membre permanent. Activer la gestion des accès temporaires (JIT - Just-In-Time / PAM).</li>
+                        <li><strong>Surveiller les modifications de membres :</strong> Mettre en place un audit systématique (événements Windows 4728, 4729, 4732, 4756) et des alertes SIEM sur tout ajout de membre dans un groupe Tier 0 ou Built-in.</li>
+                    </ol>
+                </div>
+            </section>
+
+            <section>
+                <h2>Conclusion</h2>
+                <p>
+                    Comprendre la structure des groupes privilégiés Active Directory dépasse la simple administration système : c'est le pilier fondamental de la défense d'un annuaire. L'illusion de la délégation par les groupes « Operators » historiques est l'une des failles d'architecture les plus exploitées lors des attaques informatiques réelles.
+                </p>
+                <p>
+                    En appliquant une séparation stricte entre identités et privilèges, en vidant les groupes d'opérateurs hérités et en étanchéifiant le Tier 0, vous fermez la majorité des vecteurs de compromission totale de votre domaine Active Directory.
+                </p>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

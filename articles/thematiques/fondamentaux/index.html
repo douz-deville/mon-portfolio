@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thématique : Fondamentaux — Articles & Analyses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../index.html">← TOUS LES ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../labs/index.html">LABS</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Thématique -->
+        <header>
+            <div class="meta">THÉMATIQUE TECHNIQUE</div>
+            <h1>Fondamentaux &amp; Principes d'Architecture</h1>
+            <p class="pitch">
+                Avant de déployer le moindre outil ou de configurer un équipement, la sécurité d'une infrastructure se joue au niveau de ses principes directeurs. Retrouvez ici nos articles sur les règles de design structurel, la modélisation de la menace, la défense en profondeur et la traduction des analyses de risques en décisions techniques.
+            </p>
+            <div class="tags-container" style="margin-top: 1rem;">
+                <span class="tag">Architecture</span>
+                <span class="tag">Défense en Profondeur</span>
+                <span class="tag">Moindre Privilège</span>
+                <span class="tag">Secure by Design</span>
+                <span class="tag">KISS</span>
+                <span class="tag">Analyse de Risque</span>
+            </div>
+        </header>
+
+        <!-- Liste des Articles de la Thématique -->
+        <main class="case-studies">
+
+            <!-- Article 1 : Principes Fondamentaux -->
+            <div class="case-card">
+                <span class="case-tag">Architecture &amp; Design Principles</span>
+                <a href="../../posts/security-architecture-principles.html" class="case-title">Les principes fondamentaux de l'architecture cybersécurité : ce qui doit précéder chaque décision technique</a>
+                <p class="case-desc">
+                    Ce qui vient avant l'architecture : les réflexes structurels qui dictent chaque choix technique. Pourquoi bannir la sécurité par l'obscurité, et comment appliquer systématiquement les 5 principes fondamentaux — défense en profondeur, moindre privilège, séparation des tâches, secure by design et simplicité (KISS).
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Défense en profondeur / Moindre privilège / KISS / Governance</span>
+                    <a href="../../posts/security-architecture-principles.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 2 : Pre-Auth / Post-Auth Defense in Depth -->
+            <div class="case-card">
+                <span class="case-tag">Défense en Profondeur &amp; Flux</span>
+                <a href="../../posts/pre-auth-post-auth-defense-in-depth.html" class="case-title">Défense en profondeur : sécurisation pré-authentification et post-authentification</a>
+                <p class="case-desc">
+                    De la protection du point d'entrée réseau (Reverse Proxy, WAF, Rate Limiting) à l'inspection continue des privilèges applicatifs au niveau des API : appliquer la défense en profondeur sur toute la chaîne d'authentification.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Défense en profondeur / WAF / Reverse Proxy / Zero Trust</span>
+                    <a href="../../posts/pre-auth-post-auth-defense-in-depth.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 3 : Flow & Authentication Architecture -->
+            <div class="case-card">
+                <span class="case-tag">Flux &amp; Modélisation</span>
+                <a href="../../posts/authentication-flow-end-to-end.html" class="case-title">Analyse de flux d'authentification de bout en bout : du navigateur au service interne</a>
+                <p class="case-desc">
+                    Décomposition pas-à-pas des échanges réseau et cryptographiques lors d'une requête utilisateur protégée. Comprendre les points d'exposition, la rupture de protocole et le maintien de la confiance de bout en bout.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Flux Réseau / Cryptographie / Confiance Distribuée</span>
+                    <a href="../../posts/authentication-flow-end-to-end.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>

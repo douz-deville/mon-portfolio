@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identité et Zero Trust — pourquoi centraliser ne suffit pas — Portfolio de Christian AGBOGAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../style.css">
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 2) -->
+        <nav class="back-nav">
+            <a href="../index.html">← RETOUR AUX ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../index.html">ACCUEIL</a>
+                <a href="../../labs/index.html">LABS</a>
+                <a href="../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de l'Article -->
+        <header>
+            <div class="meta-container">
+                <span class="meta">IAM &amp; ZERO TRUST</span>
+                <span class="meta-date">Publié le 26 Juillet 2026</span>
+            </div>
+            <h1>Identité et Zero Trust — pourquoi centraliser ne suffit pas</h1>
+            <p class="pitch">
+                Comprendre la différence entre centralisation des comptes et délégation de confiance cryptographique au sein d'une architecture moderne.
+            </p>
+            <div class="tags-container" style="margin-top: 1.5rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">Zero Trust</span>
+                <span class="tag">Keycloak</span>
+                <span class="tag">OAuth2</span>
+                <span class="tag">OIDC</span>
+            </div>
+        </header>
+
+        <!-- Figure / Image d'illustration (Profondeur Niveau 2) -->
+        <figure class="article-image-container" style="margin: 2.5rem 0; text-align: center;">
+            <img src="../../images/flux_utilisateur_keycloak_applications.png" alt="Architecture Keycloak OAuth2 et flux de validation JWT entre Gateway et Microservices" style="max-width: 100%; height: auto; border-radius: var(--radius-md); border: 1px solid var(--border);">
+            <figcaption style="margin-top: 0.75rem; font-size: 0.875rem; color: var(--text-muted); font-style: italic;">Architecture du flux de délégation d'identité OAuth 2.0 / Keycloak</figcaption>
+        </figure>
+
+        <article>
+            <section>
+                <h2>Le modèle qui ne suffit plus</h2>
+                <p>
+                    Pendant longtemps, la gestion des identités numériques tenait en une équation simple : un utilisateur, un compte, une application. Chaque application possédait sa propre base d'utilisateurs, son propre mécanisme de connexion, sa propre logique de droits.
+                </p>
+                <p>
+                    Ce modèle fonctionnait tant que le nombre d'applications restait limité. Il s'effondre dès qu'une organisation grandit un peu : un même utilisateur doit aujourd'hui accéder à une application interne, à un environnement cloud public, à des outils collaboratifs, à des API exposées à des partenaires, à des applications métier spécifiques. Multiplier les bases d'utilisateurs indépendantes, c'est multiplier les points de défaillance :
+                </p>
+                <ul>
+                    <li><strong>Mots de passe réutilisés :</strong> des mots de passe différents pour chaque service, donc une tentation constante de les réutiliser ou de les simplifier.</li>
+                    <li><strong>Comptes orphelins :</strong> des accès qu'on oublie de désactiver quand un utilisateur change de rôle ou quitte l'organisation.</li>
+                    <li><strong>Angle mort de sécurité :</strong> aucune vision transversale de qui a accès à quoi.</li>
+                    <li><strong>Audit complexe :</strong> un suivi de sécurité qui devient un exercice de reconstitution, application par application, plutôt qu'une vue d'ensemble.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Centraliser l'identité : un premier pas, pas une solution</h2>
+                <p>
+                    La réponse standard consiste à faire converger l'authentification vers un point unique : un Identity Provider (IdP). Keycloak, dans le cas qui m'intéresse ici, joue ce rôle.
+                </p>
+                <p>
+                    Mais il faut être précis sur ce qu'un IdP centralise réellement, parce qu'il opère en réalité sur deux plans qu'on a tendance à confondre :
+                </p>
+                <ul>
+                    <li><strong>L'authentification :</strong> vérifier qui tu es — mot de passe, MFA, biométrie éventuellement.</li>
+                    <li><strong>L'autorisation :</strong> décider ce que tu as le droit de faire une fois identifié — rôles, permissions, scopes.</li>
+                </ul>
+                <p>
+                    Un IdP mature gère les deux, mais ce sont deux décisions distinctes, prises à des moments différents, et qui répondent à des questions différentes. Confondre les deux, c'est le premier piège conceptuel de l'IAM.
+                </p>
+                <p>
+                    Le second piège, plus profond, est de croire que la centralisation elle-même résout le problème de confiance entre applications. Ce n'est pas le cas. Avoir un référentiel d'identité unique ne dit rien sur la manière dont une application tierce va vérifier, de façon fiable et sans intermédiaire à chaque requête, qu'un utilisateur est bien celui qu'il prétend être.
+                </p>
+            </section>
+
+            <section>
+                <h2>Le vrai verrou technique</h2>
+                <p>
+                    La question qui compte vraiment est celle-ci : <strong>comment une application peut-elle faire confiance à une identité vérifiée par un autre système, sans jamais voir le mot de passe de l'utilisateur, et sans avoir à interroger l'IdP à chaque requête ?</strong>
+                </p>
+                <p>
+                    La réponse repose sur un mécanisme cryptographique précis : le jeton signé (JWT — JSON Web Token), délivré selon des standards ouverts, OAuth 2.0 pour la délégation d'autorisation et OpenID Connect pour l'authentification qui s'appuie dessus.
+                </p>
+                <p>
+                    Concrètement, un JWT se compose de trois parties : un en-tête, une charge utile (les informations sur l'identité et ses droits), et une signature. Cette signature est produite par l'IdP à l'aide d'une clé privée qu'il est seul à détenir. N'importe quelle application peut ensuite vérifier cette signature à l'aide de la clé publique correspondante — sans jamais avoir besoin de contacter l'IdP en temps réel, et sans jamais avoir accès au secret de l'utilisateur.
+                </p>
+                <p>
+                    C'est ce point précis qui change tout : la confiance ne repose plus sur un canal de communication permanent avec une autorité centrale, mais sur une preuve cryptographique vérifiable localement, à chaque requête, par chaque application de façon indépendante. C'est une délégation de confiance, pas une simple centralisation de base de données.
+                </p>
+                <p>
+                    Reste une question que cette vérification locale ne résout pas à elle seule : une fois le token émis, comment s'assurer que la confiance qu'on lui accorde reste valable dans le temps ? C'est le sujet détaillé dans <a href="../jwt-token-lifecycle/index.html" class="inline-link" style="color: var(--accent); text-decoration: underline;">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</a>.
+                </p>
+            </section>
+
+            <section>
+                <h2>De la confiance ponctuelle à la confiance continue</h2>
+                <p>
+                    Une fois ce mécanisme en place, une dernière question reste ouverte : la confiance accordée à la connexion doit-elle rester valable pendant toute la durée d'une session ? L'approche Zero Trust répond non, et structure la réponse autour de trois principes qui se combinent :
+                </p>
+                <p>
+                    <strong>Never trust, always verify.</strong> La vérification ne s'arrête pas à l'authentification initiale. Un jeton a une durée de vie courte, un renouvellement (refresh) est requis régulièrement, et chaque requête est revalidée — jamais présumée légitime parce qu'elle vient d'un utilisateur déjà connecté un peu plus tôt.
+                </p>
+                <p>
+                    <strong>Least privilege.</strong> Un jeton ne transporte que les droits strictly nécessaires à l'action en cours, pas l'ensemble des permissions dont dispose l'utilisateur dans l'absolu. Réduire la portée de chaque accès réduit mécaniquement l'impact d'un jeton compromis.
+                </p>
+                <p>
+                    <strong>Assume breach.</strong> L'architecture se conçoit en partant du principe que le réseau interne est déjà compromis, ou le sera un jour. Cela signifie qu'aucune requête, même émise depuis l'intérieur du périmètre réseau, n'est validée sans vérification cryptographique explicite — l'appartenance au réseau interne n'est plus, en soi, une preuve de confiance.
+                </p>
+            </section>
+
+            <section>
+                <h2>Mise en pratique</h2>
+                <p>
+                    J'ai reproduit concrètement cette architecture dans mon lab personnel : un reverse-proxy Nginx en point d'entrée unique, Keycloak comme Identity Provider, et une API Flask qui valide la signature d'un JWT à chaque requête entrante — sans jamais accorder de confiance implicite au fait que la requête provienne du réseau interne.
+                </p>
+
+                <a href="../../labs/lab-zt-iam-01/index.html" class="highlight-card" style="display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: inherit; margin-top: 1.5rem;">
+                    <div>
+                        <p style="font-weight: 600; color: var(--text); margin-bottom: 0.25rem;">LAB-ZT-IAM-01 — Zero Trust / IAM avec Keycloak</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;">Voir l'implémentation pratique pas à pas de cette architecture.</p>
+                    </div>
+                    <span style="font-family: var(--font-mono); color: var(--accent); font-weight: 500;">Voir le lab →</span>
+                </a>
+            </section>
+        </article>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 2) -->
+    <script src="../../script.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thématique : IAM & Zero Trust — Articles & Analyses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Navigation Principale (Profondeur Niveau 3) -->
+        <nav class="back-nav">
+            <a href="../../index.html">← TOUS LES ARTICLES</a>
+            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                <a href="../../../index.html">ACCUEIL</a>
+                <a href="../../../labs/index.html">LABS</a>
+                <a href="../../../about.html">À PROPOS</a>
+                <button class="theme-toggle" aria-label="Changer de thème" style="background: transparent; border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: var(--radius-md); cursor: pointer; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-mono);">
+                    🌙 / ☀️
+                </button>
+            </div>
+        </nav>
+
+        <!-- En-tête de la Thématique -->
+        <header>
+            <div class="meta">THÉMATIQUE TECHNIQUE</div>
+            <h1>IAM &amp; Architecture Zero Trust</h1>
+            <p class="pitch">
+                Dans un monde sans périmètre réseau étanche, l'identité devient la première frontière de sécurité. Retrouvez ici nos analyses sur la fédération d'identités, le fonctionnement des Fournisseurs d'Identité (IdP/Keycloak), le cycle de vie des jetons d'accès (JWT/OIDC) et la gouvernance globale des accès (IGA/PAM).
+            </p>
+            <div class="tags-container" style="margin-top: 1rem;">
+                <span class="tag">IAM</span>
+                <span class="tag">Zero Trust</span>
+                <span class="tag">Keycloak</span>
+                <span class="tag">JWT</span>
+                <span class="tag">OAuth2 / OIDC</span>
+                <span class="tag">IGA &amp; PAM</span>
+                <span class="tag">Fédération</span>
+            </div>
+        </header>
+
+        <!-- Liste des Articles de la Thématique -->
+        <main class="case-studies">
+
+            <!-- Article 1 : IdP & Zero Trust -->
+            <div class="case-card">
+                <span class="case-tag">Identity Provider &amp; Architecture</span>
+                <a href="../../posts/idp-zero-trust.html" class="case-title">Identité et Zero Trust : pourquoi centraliser ne suffit pas</a>
+                <p class="case-desc">
+                    Comment un Identity Provider comme Keycloak devient le point central de confiance numérique, et pourquoi la vraie question n'est pas « qui es-tu » mais « comment le prouves-tu, et comment je continue à vérifier ».
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Keycloak / Zero Trust / IdP</span>
+                    <a href="../../posts/idp-zero-trust.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 2 : JWT Token Lifecycle -->
+            <div class="case-card">
+                <span class="case-tag">Sécurité des Jetons &amp; Cryptographie</span>
+                <a href="../../posts/jwt-token-lifecycle.html" class="case-title">Cycle de vie d'un token JWT : signature, validation et confiance dans le temps</a>
+                <p class="case-desc">
+                    Vérifier la signature d'un token ne suffit pas à le valider entièrement. Entre durée de vie courte, renouvellement et révocation, comment une architecture par jetons gère-t-elle la confiance après l'authentification initiale ?
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">JWT / OAuth2 / Cryptographie / OIDC</span>
+                    <a href="../../posts/jwt-token-lifecycle.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 3 : IAM Beyond Auth -->
+            <div class="case-tag-container" style="display:none;"></div>
+            <div class="case-card">
+                <span class="case-tag">Gouvernance &amp; Cycle de Vie</span>
+                <a href="../../posts/iam-beyond-authentication.html" class="case-title">L'IAM au-delà de l'authentification : identités, cycle de vie et gouvernance</a>
+                <p class="case-desc">
+                    Qu'est-ce qu'une identité, avant même de parler d'accès ? Au-delà de l'authentification, l'IAM répond à cinq questions — qui, quelle ressource, quelle action, quand, pourquoi — et se structure autour de trois domaines distincts : gouvernance, gestion des accès, comptes privilégiés.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Gouvernance / IGA / PAM / Zero Trust</span>
+                    <a href="../../posts/iam-beyond-authentication.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 4 : Directory Services & LDAP -->
+            <div class="case-card">
+                <span class="case-tag">Annuaire &amp; Fédération</span>
+                <a href="../../posts/directory-services-ldap.html" class="case-title">Où vivent les identités : Active Directory, LDAP et les services d'annuaire</a>
+                <p class="case-desc">
+                    LDAP stocke-t-il des identités ? La réponse est non — c'est un protocole, pas un entrepôt. Comment Active Directory fait office de source de vérité, comment LDAP sert de canal d'interrogation, et comment Keycloak s'y fédère concrètement.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Active Directory / LDAP / Federation / Keycloak</span>
+                    <a href="../../posts/directory-services-ldap.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 5 : Pass-Through vs Federation -->
+            <div class="case-card">
+                <span class="case-tag">Modèles d'Authentification</span>
+                <a href="../../posts/pass-through-vs-federation.html" class="case-title">Pass-Through Authentication vs Fédération d'identité : compromis architecturaux</a>
+                <p class="case-desc">
+                    Analyse comparative des architectures d'authentification : valider les identifiants directement contre l'annuaire source ou émettre des assertions de confiance unifiées via des jetons (SAML/OIDC).
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Fédération / Pass-Through / SSO / SAML / OIDC</span>
+                    <a href="../../posts/pass-through-vs-federation.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+            <!-- Article 6 : Pre-Auth & Post-Auth Defense in Depth -->
+            <div class="case-card">
+                <span class="case-tag">Défense en Profondeur &amp; Contrôle d'Accès</span>
+                <a href="../../posts/pre-auth-post-auth-defense-in-depth.html" class="case-title">Défense en profondeur : sécurisation pré-authentification et post-authentification</a>
+                <p class="case-desc">
+                    De la protection du point d'entrée réseau (Reverse Proxy, WAF, Rate Limiting) à l'inspection continue des privilèges applicatifs au niveau des API : appliquer la défense en profondeur sur toute la chaîne d'authentification.
+                </p>
+                <div class="case-meta">
+                    <span class="tech-stack">Défense en profondeur / Reverse Proxy / Zero Trust / API Security</span>
+                    <a href="../../posts/pre-auth-post-auth-defense-in-depth.html" class="btn-link">Lire l'article →</a>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>&copy; 2026 Kossi Christian Daniel Esuté AGBOGAN</div>
+            <div>Portfolio Sécurité &amp; Architecture</div>
+        </footer>
+    </div>
+
+    <!-- Script JS centralisé (Profondeur Niveau 3) -->
+    <script src="../../../script.js" defer></script>
+</body>
+</html>
